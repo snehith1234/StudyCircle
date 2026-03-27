@@ -44,6 +44,38 @@ def load_notebook(path):
         return json.load(f)
 
 
+def render_outputs(outputs):
+    """Render cell outputs: text, images, HTML tables, errors."""
+    import base64
+    for out in outputs:
+        otype = out.get("output_type", "")
+
+        if otype in ("stream", "execute_result", "display_data"):
+            # Text output (print statements, repr)
+            text = ""
+            if "text" in out:
+                text = "".join(out["text"])
+            elif "data" in out and "text/plain" in out["data"]:
+                text = "".join(out["data"]["text/plain"])
+
+            # HTML output (pandas DataFrames)
+            if "data" in out and "text/html" in out["data"]:
+                html = "".join(out["data"]["text/html"])
+                st.markdown(html, unsafe_allow_html=True)
+            elif text.strip():
+                st.code(text, language="text")
+
+            # Image output (matplotlib charts)
+            if "data" in out and "image/png" in out["data"]:
+                img_data = out["data"]["image/png"]
+                img_bytes = base64.b64decode(img_data)
+                st.image(img_bytes)
+
+        elif otype == "error":
+            tb = "\n".join(out.get("traceback", []))
+            st.error(f"```\n{tb}\n```")
+
+
 def render_notebook(nb_data):
     cells = nb_data.get("cells", [])
     code_count = 0
@@ -59,8 +91,12 @@ def render_notebook(nb_data):
 
         elif cell_type == "code":
             code_count += 1
-            st.markdown(f'<span class="cell-num">In [{code_count}]</span>', unsafe_allow_html=True)
-            st.code(source, language="python")
+            with st.expander(f"📝 Code Cell [{code_count}]", expanded=False):
+                st.code(source, language="python")
+            # Always show outputs
+            outputs = cell.get("outputs", [])
+            if outputs:
+                render_outputs(outputs)
 
 
 # ── Sidebar ──
@@ -114,7 +150,7 @@ with col2:
         use_container_width=True,
     )
 with col1:
-    st.info("💡 This is a read-only view. Download the notebook and open it in Jupyter/Colab to run the code and see outputs.")
+    st.info("💡 Outputs are shown below each code cell. Expand '📝 Code Cell' to see the source code. Download the .ipynb to run it yourself in Jupyter/Colab.")
 
 st.divider()
 
