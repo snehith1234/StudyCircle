@@ -814,102 +814,224 @@ elif module == "📈 M3: Distributions":
 # ═══════════════════════════════════════
 elif module == "🧪 M4: Inferential Statistics":
     st.markdown("# 🧪 Module 4: Inferential Statistics")
-    st.caption("Week 3 · Is this result real, or just a coincidence?")
+    st.caption("Week 3 · Z-Scores → T-Tests → P-Values — one story, three tools.")
 
     st.markdown("""<div class="story-box">
-    <b>🎬 The Story:</b> Your company redesigns the checkout page. Conversion goes from 10% to 11%.
-    Your boss asks: <b>"Is this real, or did we just get lucky this week?"</b>
+    <b>🎬 The Story:</b> You manage PizzaChain — 50 stores across East and West regions.
+    Three questions keep coming up:
     <br><br>
-    This is THE question of inferential statistics. You have data from a <b>sample</b> (this week's users),
-    and you want to make a conclusion about the <b>whole population</b> (all future users).
+    🔹 <b>"Is Store #1 abnormally good?"</b> → You need a <b>Z-Score</b><br>
+    🔹 <b>"Are East stores really better than West?"</b> → You need a <b>T-Test</b><br>
+    🔹 <b>"Can I trust this result?"</b> → You need a <b>P-Value</b>
     <br><br>
-    The tools: <b>Z-scores</b> (how unusual is a value?), <b>hypothesis tests</b> (is the difference real?),
-    and <b>p-values</b> (how likely is this result if nothing changed?).
+    Let's use the <b>same data</b> to walk through all three — step by step, with the actual math.
     </div>""", unsafe_allow_html=True)
 
-    # ── Z-Scores ──
-    st.markdown("### 📖 Z-Scores: How Unusual Is This?")
+    # ── Generate the shared dataset ──
+    np.random.seed(42)
+    n_stores = 50
+    store_sales = np.round(np.random.normal(500, 100, n_stores)).astype(int)
+    store_sales[0] = 850  # flagship store
+    mu_all = store_sales.mean()
+    sigma_all = store_sales.std()
+
+    # East vs West split
+    east_sales = store_sales[:22] + 45  # East is slightly better
+    west_sales = store_sales[22:]
+
+    st.markdown("""<div class="key-box">
+    <b>📋 Our Data:</b> 50 pizza stores. Average daily sales = ${:.0f}, Std Dev = ${:.0f}.
+    Store #1 (flagship) sells $850/day. East region has 22 stores, West has 28.
+    </div>""".format(mu_all, sigma_all), unsafe_allow_html=True)
+
+    # ═══════════════════════════════════
+    # PART 1: Z-SCORE
+    # ═══════════════════════════════════
+    st.markdown("---")
+    st.markdown("## 📏 Part 1: Z-Score — 'Is This Store Abnormal?'")
+
+    st.markdown("""<div class="story-box">
+    <b>🎬 Scene 1:</b> Your boss points at Store #1: "They made $850 yesterday. Is that genuinely exceptional,
+    or could any store have a day like that?"
+    <br><br>
+    The Z-score answers this by measuring <b>how many standard deviations</b> a value is from the average.
+    Think of it as a <b>ruler for weirdness</b>.
+    </div>""", unsafe_allow_html=True)
 
     st.markdown("""<div class="analogy-box">
-    📏 <b>Think of it like a ruler for weirdness:</b>
+    🧮 <b>The Math — Step by Step:</b>
     <br><br>
-    A Z-score tells you how many "standard deviations" a value is from the average.
+    <b>Formula:</b> z = (value − mean) / std dev
     <br><br>
-    • z = 0 → exactly average (nothing special)<br>
-    • z = 1 → one step above average (top ~16%)<br>
-    • z = 2 → two steps above (top ~2.5%) — getting unusual<br>
-    • z = 3 → three steps above (top ~0.1%) — extremely rare!
+    <b>Our numbers:</b><br>
+    • Store #1 sales = $850<br>
+    • Chain average (μ) = ${:.0f}<br>
+    • Chain spread (σ) = ${:.0f}
     <br><br>
-    <b>Formula:</b> z = (your value − average) ÷ spread
-    <br><br>
-    <b>Example:</b> Average exam score = 75, spread = 10. You scored 95.
-    z = (95−75)/10 = <b>2.0</b> → You're 2 standard deviations above average. Only ~2.5% scored higher!
-    </div>""", unsafe_allow_html=True)
+    <b>Calculation:</b><br>
+    z = (850 − {:.0f}) / {:.0f}<br>
+    z = {:.0f} / {:.0f}<br>
+    z = <b>{:.2f}</b>
+    </div>""".format(mu_all, sigma_all, mu_all, sigma_all, 850 - mu_all, sigma_all, (850 - mu_all) / sigma_all), unsafe_allow_html=True)
 
-    st.markdown("#### 🎮 Try It: Z-Score Calculator")
-    zc1, zc2, zc3 = st.columns(3)
-    z_mean = zc1.number_input("Average (μ):", value=75.0, key="m4_zmean")
-    z_std = zc2.number_input("Spread (σ):", value=10.0, min_value=0.1, key="m4_zstd")
-    z_val = zc3.number_input("Your value:", value=95.0, key="m4_zval")
-
-    z_score = (z_val - z_mean) / z_std
+    z_flagship = (850 - mu_all) / sigma_all
     from scipy.stats import norm
-    percentile = norm.cdf(z_score) * 100
+    pct_flagship = norm.cdf(z_flagship) * 100
 
-    mc = st.columns(3)
-    mc[0].metric("Z-Score", f"{z_score:.2f}", help="How many std devs from average")
-    mc[1].metric("Percentile", f"{percentile:.1f}%", help="% of values below yours")
-    mc[2].metric("How unusual?",
-                 "😐 Normal" if abs(z_score) < 1.5 else "🤔 Unusual" if abs(z_score) < 2.5 else "😱 Very rare!")
+    mc = st.columns(4)
+    mc[0].metric("Store #1 Sales", "$850")
+    mc[1].metric("Z-Score", f"{z_flagship:.2f}")
+    mc[2].metric("Percentile", f"{pct_flagship:.1f}%")
+    mc[3].metric("Verdict", "😱 Very rare!" if abs(z_flagship) > 2.5 else "🤔 Unusual" if abs(z_flagship) > 2 else "😐 Normal")
 
-    x_bell = np.linspace(z_mean - 4*z_std, z_mean + 4*z_std, 500)
-    y_bell = norm.pdf(x_bell, z_mean, z_std)
+    # Bell curve visualization
+    x_bell = np.linspace(mu_all - 4*sigma_all, mu_all + 4*sigma_all, 500)
+    y_bell = norm.pdf(x_bell, mu_all, sigma_all)
     fig_z = go.Figure()
-    fig_z.add_trace(go.Scatter(x=x_bell, y=y_bell, fill='tozeroy', fillcolor='rgba(124,106,255,0.15)', line=dict(color='#7c6aff', width=2)))
-    x_shade = x_bell[x_bell <= z_val]
-    y_shade = norm.pdf(x_shade, z_mean, z_std)
-    fig_z.add_trace(go.Scatter(x=np.append(x_shade, [z_val, x_shade[0]]), y=np.append(y_shade, [0, 0]),
-                                fill='toself', fillcolor='rgba(34,211,167,0.25)', line=dict(color='rgba(0,0,0,0)'), name=f'{percentile:.1f}% below'))
-    fig_z.add_vline(x=z_val, line_dash="dash", line_color="#f45d6d", annotation_text=f"Your value (z={z_score:.1f})")
-    fig_z.update_layout(height=300, title=f"Where does {z_val} fall? Top {100-percentile:.1f}%", xaxis_title="Value", yaxis_title="How common?", **DL)
+    fig_z.add_trace(go.Scatter(x=x_bell, y=y_bell, fill='tozeroy', fillcolor='rgba(124,106,255,0.15)', line=dict(color='#7c6aff', width=2), name='All stores'))
+    x_beyond = x_bell[x_bell >= 850]
+    y_beyond = norm.pdf(x_beyond, mu_all, sigma_all)
+    fig_z.add_trace(go.Scatter(x=np.append(x_beyond, [x_beyond[-1], x_beyond[0]]), y=np.append(y_beyond, [0, 0]),
+                                fill='toself', fillcolor='rgba(244,93,109,0.35)', line=dict(color='rgba(0,0,0,0)'), name=f'Top {100-pct_flagship:.1f}%'))
+    fig_z.add_vline(x=850, line_dash="dash", line_color="#f45d6d", annotation_text=f"Store #1: $850 (z={z_flagship:.2f})")
+    fig_z.add_vline(x=mu_all, line_dash="dot", line_color="#22d3a7", annotation_text=f"Average: ${mu_all:.0f}")
+    for mult in [1, 2, 3]:
+        fig_z.add_vline(x=mu_all + mult*sigma_all, line_dash="dot", line_color="#2d3148")
+        fig_z.add_vline(x=mu_all - mult*sigma_all, line_dash="dot", line_color="#2d3148")
+    fig_z.update_layout(height=350, title="Where does Store #1 fall on the bell curve?", xaxis_title="Daily Sales ($)", yaxis_title="How common?", **DL)
     st.plotly_chart(fig_z, use_container_width=True, config={"displayModeBar": False})
 
-    # ── Hypothesis Testing ──
+    st.markdown(f"""<div class="green-box">
+    💡 <b>Inference:</b> z = {z_flagship:.2f} means Store #1 is {z_flagship:.1f} standard deviations above average.
+    Only <b>{100-pct_flagship:.1f}%</b> of stores perform this well. This is NOT normal variation — something special
+    is happening at this store. Investigate what they're doing differently!
+    <br><br>
+    <b>Z-Score Cheat Sheet:</b><br>
+    • |z| < 1.5 → Normal (nothing to see here)<br>
+    • |z| 1.5–2.5 → Unusual (worth a look)<br>
+    • |z| > 2.5 → Very rare (investigate immediately!)
+    </div>""", unsafe_allow_html=True)
+
+    st.markdown("#### 🎮 Try It: Check Any Store")
+    zc1, zc2, zc3 = st.columns(3)
+    z_mean = zc1.number_input("Chain average (μ):", value=float(round(mu_all)), key="m4_zmean")
+    z_std = zc2.number_input("Chain spread (σ):", value=float(round(sigma_all)), min_value=1.0, key="m4_zstd")
+    z_val = zc3.number_input("Store's sales:", value=850.0, key="m4_zval")
+    z_score = (z_val - z_mean) / z_std
+    percentile = norm.cdf(z_score) * 100
+    mc = st.columns(3)
+    mc[0].metric("Z-Score", f"{z_score:.2f}")
+    mc[1].metric("Percentile", f"{percentile:.1f}%")
+    mc[2].metric("How unusual?", "😐 Normal" if abs(z_score) < 1.5 else "🤔 Unusual" if abs(z_score) < 2.5 else "😱 Very rare!")
+
+    # ═══════════════════════════════════
+    # PART 2: T-TEST
+    # ═══════════════════════════════════
     st.markdown("---")
-    st.markdown("### 📖 Hypothesis Testing: The Courtroom Analogy")
+    st.markdown("## 🔬 Part 2: T-Test — 'Are East Stores Really Better?'")
 
     st.markdown("""<div class="story-box">
-    <b>🎬 Think of it like a trial:</b>
+    <b>🎬 Scene 2:</b> Your boss looks at the regional report: East stores average ${:.0f}/day,
+    West stores average ${:.0f}/day. "East is clearly better! Let's copy whatever they're doing."
     <br><br>
-    🔹 <b>The defendant</b> = "Nothing changed" (null hypothesis, H₀)<br>
-    🔹 <b>The prosecution</b> = "Something DID change" (alternative hypothesis, H₁)<br>
-    🔹 <b>The evidence</b> = your data<br>
-    🔹 <b>The verdict</b> = based on how strong the evidence is
-    <br><br>
-    Just like in court, the defendant is <b>innocent until proven guilty</b>.
-    We assume nothing changed (H₀) unless the data is strong enough to convince us otherwise.
-    <br><br>
-    <b>The p-value</b> is like asking: "If the defendant IS innocent, how likely would we see this evidence?"
-    If the answer is "very unlikely" (p < 0.05), we reject innocence → "guilty" → something real happened.
-    </div>""", unsafe_allow_html=True)
-
-    # ── P-Value Deep Dive ──
-    st.markdown("---")
-    st.markdown("### 📖 P-Values: The Most Misunderstood Number in Science")
+    But wait — is that ${:.0f} difference <b>real</b>, or could it just be random luck?
+    Maybe East just happened to have a few good days. The <b>T-test</b> answers this.
+    </div>""".format(east_sales.mean(), west_sales.mean(), east_sales.mean() - west_sales.mean()), unsafe_allow_html=True)
 
     st.markdown("""<div class="analogy-box">
-    🪙 <b>The coin flip story:</b>
+    ⚖️ <b>When to use which test:</b>
     <br><br>
-    Your friend claims their coin is fair. You flip it 100 times and get <b>60 heads</b>. Suspicious?
-    <br><br>
-    The p-value answers: <b>"If the coin IS fair, what's the chance of getting 60+ heads just by luck?"</b>
-    <br><br>
-    If that chance is tiny (say 2%), you conclude: "A fair coin almost never gives 60 heads. This coin is probably rigged."
-    That 2% IS the p-value.
+    <b>Z-Score:</b> "Is this ONE value weird?" (one store vs the chain)<br>
+    <b>T-Test:</b> "Are these TWO GROUPS different?" (East vs West)<br>
+    <br>
+    <b>Z-Test vs T-Test:</b> Z-test requires knowing the population σ (rare). T-test estimates σ from your sample (what you'll use 99% of the time).
     </div>""", unsafe_allow_html=True)
 
+    from scipy.stats import ttest_ind
+    mean_diff = east_sales.mean() - west_sales.mean()
+    se = np.sqrt(east_sales.var()/len(east_sales) + west_sales.var()/len(west_sales))
+    t_stat_manual = mean_diff / se
+    t_stat, p_val_tt = ttest_ind(east_sales, west_sales)
+
+    st.markdown("""<div class="analogy-box">
+    🧮 <b>The Math — Step by Step:</b>
+    <br><br>
+    <b>Formula:</b> t = (mean₁ − mean₂) / SE, where SE = √(s₁²/n₁ + s₂²/n₂)
+    <br><br>
+    <b>Step 1: Group stats</b><br>
+    • East: n={}, mean=${:.1f}, std=${:.1f}<br>
+    • West: n={}, mean=${:.1f}, std=${:.1f}
+    <br><br>
+    <b>Step 2: Difference</b><br>
+    mean_east − mean_west = {:.1f} − {:.1f} = <b>${:.1f}</b>
+    <br><br>
+    <b>Step 3: Standard Error</b> (how much could this differ by chance?)<br>
+    SE = √({:.1f}²/{} + {:.1f}²/{}) = √({:.1f} + {:.1f}) = <b>{:.2f}</b>
+    <br><br>
+    <b>Step 4: T-statistic</b> (signal ÷ noise)<br>
+    t = {:.1f} / {:.2f} = <b>{:.2f}</b>
+    <br><br>
+    <b>Step 5: P-value</b> = <b>{:.4f}</b>
+    </div>""".format(
+        len(east_sales), east_sales.mean(), east_sales.std(),
+        len(west_sales), west_sales.mean(), west_sales.std(),
+        east_sales.mean(), west_sales.mean(), mean_diff,
+        east_sales.std(), len(east_sales), west_sales.std(), len(west_sales),
+        east_sales.var()/len(east_sales), west_sales.var()/len(west_sales), se,
+        mean_diff, se, t_stat,
+        p_val_tt
+    ), unsafe_allow_html=True)
+
+    mc = st.columns(4)
+    mc[0].metric("East Mean", f"${east_sales.mean():.0f}")
+    mc[1].metric("West Mean", f"${west_sales.mean():.0f}")
+    mc[2].metric("T-Statistic", f"{t_stat:.2f}")
+    mc[3].metric("P-Value", f"{p_val_tt:.4f}")
+
+    # Visualization
+    fig_tt = go.Figure()
+    fig_tt.add_trace(go.Histogram(x=east_sales, name=f"East (${east_sales.mean():.0f})", marker_color="#7c6aff", opacity=0.5, nbinsx=12))
+    fig_tt.add_trace(go.Histogram(x=west_sales, name=f"West (${west_sales.mean():.0f})", marker_color="#22d3a7", opacity=0.5, nbinsx=12))
+    fig_tt.add_vline(x=east_sales.mean(), line_dash="dash", line_color="#7c6aff")
+    fig_tt.add_vline(x=west_sales.mean(), line_dash="dash", line_color="#22d3a7")
+    fig_tt.update_layout(barmode="overlay", height=300, title="East vs West: Do the distributions actually differ?", xaxis_title="Daily Sales ($)", **DL)
+    st.plotly_chart(fig_tt, use_container_width=True, config={"displayModeBar": False})
+
+    if p_val_tt < 0.05:
+        st.markdown(f"""<div class="green-box">✅ <b>p = {p_val_tt:.4f} < 0.05 → Significant!</b>
+        The ${mean_diff:.0f} difference is real, not random noise. East stores genuinely outperform West.
+        <br>ACTION: Investigate what East is doing differently (location? staff? marketing?).</div>""", unsafe_allow_html=True)
+    else:
+        st.markdown(f"""<div class="red-box">❌ <b>p = {p_val_tt:.4f} ≥ 0.05 → Not significant.</b>
+        The difference could be random variation. We can't conclude East is truly better.</div>""", unsafe_allow_html=True)
+
+    st.markdown("""<div class="key-box">
+    <b>📋 Three Types of T-Tests:</b><br>
+    • <b>One-sample:</b> "Is our average delivery time ≠ 30 min SLA?" (one group vs a target)<br>
+    • <b>Two-sample:</b> "East vs West sales" (two separate groups) ← what we just did<br>
+    • <b>Paired:</b> "Same stores before vs after renovation" (same group, two measurements)
+    </div>""", unsafe_allow_html=True)
+
+    # ═══════════════════════════════════
+    # PART 3: P-VALUE
+    # ═══════════════════════════════════
+    st.markdown("---")
+    st.markdown("## 🎯 Part 3: P-Value — 'Can I Trust This?'")
+
+    st.markdown("""<div class="story-box">
+    <b>🎬 Scene 3:</b> You present the t-test results to your boss. They ask: "What does p = {:.4f} actually mean?"
+    <br><br>
+    The p-value is the <b>probability of seeing a result this extreme IF there were truly no difference</b>.
+    <br><br>
+    Think of it like a courtroom:<br>
+    🔹 <b>H₀ (null):</b> "East and West are the same" (innocent until proven guilty)<br>
+    🔹 <b>H₁ (alternative):</b> "East and West are different"<br>
+    🔹 <b>p-value:</b> "If they ARE the same, what's the chance we'd see a ${:.0f} gap just by luck?"<br>
+    🔹 <b>p < 0.05:</b> "Less than 5% chance → reject H₀ → the difference is real"
+    </div>""".format(p_val_tt, mean_diff), unsafe_allow_html=True)
+
     st.markdown("#### 🎮 Try It: The Suspicious Coin")
-    st.caption("How many heads would make you suspicious?")
+    st.caption("A simpler example to build intuition. Your friend's coin lands heads 60 out of 100 times. Fair or rigged?")
 
     n_heads = st.slider("Heads out of 100 flips:", 40, 75, 60, 1, key="m4_pval_heads")
     from scipy.stats import binom
@@ -918,13 +1040,13 @@ elif module == "🧪 M4: Inferential Statistics":
     mc = st.columns(3)
     mc[0].metric("Heads", f"{n_heads} / 100")
     mc[1].metric("P-Value", f"{p_value_coin:.4f}")
-    mc[2].metric("Verdict", "🟢 Looks fair" if p_value_coin > 0.05 else "🔴 Suspicious!" if p_value_coin > 0.01 else "🔴 Almost certainly rigged")
+    mc[2].metric("Verdict", "🟢 Looks fair" if p_value_coin > 0.05 else "🔴 Suspicious!" if p_value_coin > 0.01 else "🔴 Rigged!")
 
     x_vals = np.arange(30, 71)
     y_vals = binom.pmf(x_vals, 100, 0.5)
-    colors = ['#f45d6d' if x >= n_heads else '#7c6aff' for x in x_vals]
+    colors_pv = ['#f45d6d' if x >= n_heads else '#7c6aff' for x in x_vals]
     fig_pv = go.Figure()
-    fig_pv.add_trace(go.Bar(x=x_vals, y=y_vals, marker_color=colors, opacity=0.7))
+    fig_pv.add_trace(go.Bar(x=x_vals, y=y_vals, marker_color=colors_pv, opacity=0.7))
     fig_pv.add_vline(x=n_heads, line_dash="dash", line_color="#f5b731", annotation_text=f"Your result: {n_heads}")
     fig_pv.add_vline(x=50, line_dash="dot", line_color="#22d3a7", annotation_text="Expected: 50")
     fig_pv.update_layout(height=320, title=f"Red area = p-value = {p_value_coin:.4f}", xaxis_title="Number of Heads", yaxis_title="Probability", **DL)
@@ -933,84 +1055,82 @@ elif module == "🧪 M4: Inferential Statistics":
     st.markdown(f"""<div class="{'green-box' if p_value_coin > 0.05 else 'red-box'}">
     📖 <b>Reading this chart:</b> Blue bars = all possible outcomes with a fair coin.
     <b style="color:#f45d6d">Red bars</b> = outcomes as extreme as yours ({n_heads}+ heads).
-    The total red area = p-value = {p_value_coin:.4f}.
-    {'Getting ' + str(n_heads) + ' heads is not that unusual for a fair coin. No reason to suspect it.' if p_value_coin > 0.05 else 'Getting ' + str(n_heads) + ' heads with a fair coin would be very unlikely. The coin is probably not fair!'}
+    Red area = p-value = {p_value_coin:.4f}.
+    {'Not unusual for a fair coin.' if p_value_coin > 0.05 else 'Very unlikely with a fair coin — probably rigged!'}
     </div>""", unsafe_allow_html=True)
 
     # ── Common Mistakes ──
-    st.markdown("### ⚠️ What P-Value Does NOT Mean")
+    st.markdown("### ⚠️ Three Things P-Value Does NOT Mean")
     st.markdown("""<div class="red-box">
-    <b>❌ WRONG:</b> "There's a 3% chance the coin is fair."<br>
-    <b>✅ RIGHT:</b> "IF the coin is fair, there's a 3% chance of seeing this result."
+    <b>❌</b> "There's a 3% chance the null is true." → <b>✅</b> "IF the null is true, there's a 3% chance of this result."
     <br><br>
-    <b>❌ WRONG:</b> "The effect is big and important."<br>
-    <b>✅ RIGHT:</b> P-value says nothing about SIZE. A tiny, meaningless difference can have p=0.001 with enough data.
+    <b>❌</b> "The effect is big and important." → <b>✅</b> P-value says nothing about SIZE. A tiny difference can have p=0.001 with enough data.
     <br><br>
-    <b>❌ WRONG:</b> "p < 0.05 means it's definitely real."<br>
-    <b>✅ RIGHT:</b> 0.05 is just a convention. 1 in 20 "significant" results is a false alarm by definition.
-    </div>""", unsafe_allow_html=True)
-
-    st.markdown("""<div class="analogy-box">
-    🔥 <b>Smoke detector analogy:</b> A smoke detector goes off. The p-value is like asking:
-    "If there's NO fire, how likely would the alarm go off?" If very unlikely (low p-value), you investigate.
-    But the alarm doesn't tell you <b>how big</b> the fire is, or whether it's real fire vs. burnt toast.
-    <br><br>
-    <b>Statistical significance ≠ practical significance.</b> Always ask: "Is the effect big enough to matter?"
+    <b>❌</b> "p < 0.05 means it's definitely real." → <b>✅</b> 1 in 20 "significant" results is a false alarm by definition.
     </div>""", unsafe_allow_html=True)
 
     # ── A/B Test Simulator ──
     st.markdown("---")
     st.markdown("### 🎮 A/B Test Simulator")
-    st.caption("You're testing a new website design. Does it actually improve conversion?")
+    st.caption("Test a new pizza menu. Does it actually improve sales?")
 
     c1, c2 = st.columns(2)
-    conv_a = c1.slider("🔵 Old design conversion %:", 1.0, 20.0, 10.0, 0.5, key="m4_ca")
-    conv_b = c2.slider("🟢 New design conversion %:", 1.0, 20.0, 11.0, 0.5, key="m4_cb")
-    n_users = st.slider("👥 Users per group:", 100, 50000, 5000, 500, key="m4_users")
+    conv_a = c1.slider("🔵 Old menu conversion %:", 1.0, 20.0, 10.0, 0.5, key="m4_ca")
+    conv_b = c2.slider("🟢 New menu conversion %:", 1.0, 20.0, 11.0, 0.5, key="m4_cb")
+    n_users = st.slider("👥 Customers per group:", 100, 50000, 5000, 500, key="m4_users")
 
     np.random.seed(42)
     group_a = np.random.binomial(1, conv_a/100, n_users)
     group_b = np.random.binomial(1, conv_b/100, n_users)
-    from scipy.stats import ttest_ind
-    t_stat, p_val = ttest_ind(group_a, group_b)
+    t_ab, p_ab = ttest_ind(group_a, group_b)
     lift = (group_b.mean() - group_a.mean()) / group_a.mean() * 100 if group_a.mean() > 0 else 0
 
     mc = st.columns(4)
-    mc[0].metric("Old Design", f"{group_a.mean()*100:.2f}%")
-    mc[1].metric("New Design", f"{group_b.mean()*100:.2f}%", f"{lift:+.1f}% lift")
-    mc[2].metric("P-Value", f"{p_val:.4f}")
-    mc[3].metric("Significant?", "✅ Yes!" if p_val < 0.05 else "❌ Not yet")
+    mc[0].metric("Old Menu", f"{group_a.mean()*100:.2f}%")
+    mc[1].metric("New Menu", f"{group_b.mean()*100:.2f}%", f"{lift:+.1f}% lift")
+    mc[2].metric("P-Value", f"{p_ab:.4f}")
+    mc[3].metric("Significant?", "✅ Yes!" if p_ab < 0.05 else "❌ Not yet")
 
-    if p_val < 0.05:
-        st.markdown(f"""<div class="green-box">✅ <b>p = {p_val:.4f}</b> — The improvement is statistically significant! Less than 5% chance this is just luck. Ship it! 🚀</div>""", unsafe_allow_html=True)
+    if p_ab < 0.05:
+        st.markdown(f"""<div class="green-box">✅ <b>p = {p_ab:.4f}</b> — Ship it! 🚀</div>""", unsafe_allow_html=True)
     else:
-        st.markdown(f"""<div class="red-box">❌ <b>p = {p_val:.4f}</b> — Not significant yet. The difference could be random noise. Try increasing the number of users or wait for a bigger effect.</div>""", unsafe_allow_html=True)
+        st.markdown(f"""<div class="red-box">❌ <b>p = {p_ab:.4f}</b> — Need more data or a bigger effect.</div>""", unsafe_allow_html=True)
 
-    st.markdown("""<div class="green-box">
-    💡 <b>Play with the sliders to build intuition:</b>
-    <br>• Make the difference bigger → p-value drops (easier to detect)
-    <br>• Add more users → p-value drops (more data = more certainty)
-    <br>• Make the difference tiny → need LOTS of users to detect it
+    # ── Decision Flow ──
+    st.markdown("---")
+    st.markdown("### 🗺️ The Decision Flow: When to Use What")
+    st.markdown("""<div class="key-box">
+    <b>1. Is ONE value weird?</b> → Z-Score<br>
+    <b>2. Is a GROUP different from a target?</b> → One-sample T-Test<br>
+    <b>3. Are TWO GROUPS different?</b> → Two-sample T-Test<br>
+    <b>4. Did the SAME group change?</b> → Paired T-Test<br>
+    <b>5. Check p < 0.05?</b> → Statistically significant<br>
+    <b>6. Check effect size?</b> → Practically meaningful
     </div>""", unsafe_allow_html=True)
 
     check_quiz("m4_q1",
-        "Your A/B test shows p=0.04. Should you immediately launch the new design?",
-        ["Yes — p < 0.05 means it works!", "No — check effect size, run longer, look at other metrics too", "No — p=0.04 means there's a 4% chance it works"],
+        "Store #1 has z=3.2. East vs West t-test gives p=0.03. What should you do?",
+        ["Ignore both — statistics is unreliable", "Investigate Store #1 AND roll out East's strategy to West", "Only look at Store #1, ignore the regional difference"],
         1,
-        "p < 0.05 is necessary but not sufficient. Smart teams also check: Is the improvement big enough to matter? Did any other metrics get worse? Is it a novelty effect? Always look at the full picture."
+        "z=3.2 means Store #1 is genuinely exceptional — learn from them. p=0.03 means East is significantly better — find out why and replicate it."
     )
 
     iq([
         {"q": "Explain p-value to a non-technical stakeholder.", "d": "Medium", "c": ["Meta", "Google"],
-         "a": "A p-value answers: 'If there's truly no effect, how likely would we see results this extreme by pure chance?' Example: coin flip, 60 heads out of 100. P-value = probability of 60+ heads with a fair coin. p < 0.05 = 'less than 5% chance this is luck.' <b>Critical:</b> p-value does NOT tell you how big the effect is.",
+         "a": "A p-value answers: 'If there's truly no effect, how likely would we see results this extreme by pure chance?' p < 0.05 = 'less than 5% chance this is luck.' <b>Critical:</b> p-value does NOT tell you how big the effect is.",
          "t": "Always mention what p-value does NOT mean."},
+        {"q": "When do you use Z-score vs T-test?", "d": "Medium", "c": ["Google", "Amazon"],
+         "a": "<b>Z-score:</b> Compare ONE value to a population (is this store unusual?). <b>T-test:</b> Compare TWO GROUPS to each other (is East ≠ West?). Z-test needs known σ (rare). T-test estimates σ from the sample (use this 99% of the time).",
+         "t": "Say 'I use t-test 99% of the time' — shows practical experience."},
         {"q": "What's the difference between Type I and Type II errors?", "d": "Medium", "c": ["Amazon", "Apple"],
-         "a": "<b>Type I (False Positive):</b> You say there's an effect when there isn't. Launching a feature that doesn't work. <b>Type II (False Negative):</b> You miss a real effect. Not launching a feature that would have worked. <b>Tradeoff:</b> Reducing one increases the other.",
+         "a": "<b>Type I (False Positive):</b> You say there's an effect when there isn't. <b>Type II (False Negative):</b> You miss a real effect. <b>Tradeoff:</b> Reducing one increases the other. In A/B testing, Type I is usually worse (launching bad features).",
          "t": "Give a real-world example and say which error is worse in that context."},
-        {"q": "What is the Central Limit Theorem and why does it matter?", "d": "Medium", "c": ["Google", "Meta"],
-         "a": "CLT says: sample averages from ANY population form a bell curve as sample size increases. <b>Why it matters:</b> Foundation of A/B testing — we compare sample means assuming normality. Works with n ≥ 30 for most distributions.",
-         "t": "This is the bridge between 'any data' and 'we can use normal-based tests.'"},
+        {"q": "Your A/B test shows p=0.04. Should you launch?", "d": "Hard", "c": ["Meta", "Google", "Netflix"],
+         "a": "Not automatically. Check: (1) Effect size — is the improvement meaningful? (2) Multiple comparisons — did we test many metrics? (3) Guardrail metrics — did anything get worse? (4) Novelty effect — is it just because it's new? Recommend: 'Promising, but validate with a longer test.'",
+         "t": "Show you don't blindly trust p-values. This is a CLASSIC Meta/Google question."},
     ])
+
+
 
 
 # ═══════════════════════════════════════
