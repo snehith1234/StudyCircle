@@ -1,6 +1,9 @@
 import streamlit as st
 import json
 import os
+import sys
+from io import StringIO
+import traceback
 
 st.set_page_config(page_title="📓 Notebooks", page_icon="📓", layout="wide")
 
@@ -8,34 +11,61 @@ st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 .stApp { font-family: 'Inter', sans-serif; }
-.nb-code {
-    background: #1a1d2e; border: 1px solid #2d3148; border-radius: 10px;
-    padding: 1rem; margin: 0.5rem 0; font-family: 'Fira Code', monospace;
-    font-size: 0.85rem; overflow-x: auto;
+.nb-output {
+    background: #0d1117; border: 1px solid #2d3148; border-radius: 8px;
+    padding: 0.8rem; margin: 0.3rem 0; font-family: 'Fira Code', monospace;
+    font-size: 0.82rem; color: #c8cfe0; overflow-x: auto;
 }
-.nb-md {
-    background: linear-gradient(135deg, #1a1d2e, #1f2235);
-    border: 1px solid #2d3148; border-radius: 12px; padding: 1.2rem 1.4rem;
-    margin: 0.6rem 0; line-height: 1.8; font-size: 0.93rem; color: #c8cfe0;
+.nb-error {
+    background: #2d1b1b; border: 1px solid #5a2a3a; border-radius: 8px;
+    padding: 0.8rem; margin: 0.3rem 0; font-family: 'Fira Code', monospace;
+    font-size: 0.82rem; color: #f45d6d; overflow-x: auto;
 }
-.nb-md b, .nb-md strong { color: #e2e8f0; }
-.nb-md code { background: #252840; padding: 2px 6px; border-radius: 4px; font-size: 0.85rem; }
+.cell-header {
+    display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.3rem;
+}
 .cell-num {
     display: inline-block; background: #252840; color: #7c6aff; font-size: 0.7rem;
-    padding: 2px 8px; border-radius: 6px; margin-bottom: 4px; font-weight: 600;
+    padding: 2px 8px; border-radius: 6px; font-weight: 600;
 }
+.run-status {
+    display: inline-block; font-size: 0.7rem; padding: 2px 8px; border-radius: 6px; font-weight: 600;
+}
+.status-success { background: #22d3a722; color: #22d3a7; }
+.status-error { background: #f45d6d22; color: #f45d6d; }
+.status-pending { background: #f5b73122; color: #f5b731; }
 </style>
 """, unsafe_allow_html=True)
 
 NOTEBOOKS_DIR = "notebooks"
 
-NOTEBOOK_INFO = {
-    "pizza_store_descriptive_stats": ("🍕 M1: Descriptive Stats — Pizza Store", "Summarize 50 pizza stores with mean, median, std dev, outliers, quartiles"),
-    "M2_probability": ("🎲 M2: Probability — Real-Life Cases", "Late deliveries, churn prediction, fraud detection with Bayes' theorem"),
-    "M3_distributions": ("📈 M3: Distributions — Real-Life Cases", "Normal, skewed, Poisson, binomial — which shape fits which data?"),
-    "M4_inferential_statistics": ("🧪 M4: Z-Scores, T-Tests & P-Values", "One story through all three tools with step-by-step math"),
-    "M5_correlation": ("🔗 M5: Correlation — Real-Life Cases", "Ad spend vs sales, employees vs delivery time, the causation trap"),
-    "M6_regression": ("📉 M6: Regression — Real-Life Cases", "Predicting sales from ad spend, residuals, overfitting"),
+# Phase notebooks
+PHASE_NOTEBOOKS = {
+    "Phase1_Statistics_Pizza": {
+        "title": "📊 Phase 1: Statistics Fundamentals",
+        "desc": "Complete statistics journey — descriptive stats, probability, distributions, hypothesis testing, correlation, and regression.",
+        "topics": ["Descriptive Statistics", "Probability & Bayes", "Distributions", "Z-scores & T-tests", "Correlation", "Linear Regression"],
+    },
+    "Phase2_DS_Core_Pizza": {
+        "title": "🔧 Phase 2: Data Science Core",
+        "desc": "Data lifecycle, cleaning, feature engineering, and visualization.",
+        "topics": ["Data Lifecycle", "Data Cleaning", "Feature Engineering", "Data Visualization"],
+    },
+    "Phase3_ML_Pizza": {
+        "title": "🤖 Phase 3: Machine Learning",
+        "desc": "Supervised learning, decision trees, random forests, XGBoost, and clustering.",
+        "topics": ["Supervised Learning", "Decision Trees", "Random Forest", "XGBoost", "K-Means"],
+    },
+}
+
+# Module notebooks
+MODULE_NOTEBOOKS = {
+    "pizza_store_descriptive_stats": ("🍕 M1: Descriptive Stats", "Mean, median, std dev, outliers"),
+    "M2_probability": ("🎲 M2: Probability", "Bayes' theorem, conditional probability"),
+    "M3_distributions": ("📈 M3: Distributions", "Normal, Poisson, binomial"),
+    "M4_inferential_statistics": ("🧪 M4: Inferential Stats", "Z-scores, T-tests, P-values"),
+    "M5_correlation": ("🔗 M5: Correlation", "Pearson, Spearman correlation"),
+    "M6_regression": ("📉 M6: Regression", "Linear regression, R²"),
 }
 
 
@@ -44,28 +74,98 @@ def load_notebook(path):
         return json.load(f)
 
 
-def render_outputs(outputs):
-    """Render cell outputs: text, images, HTML tables, errors."""
+def execute_code(code, namespace):
+    """Execute code and capture output."""
+    import matplotlib.pyplot as plt
+    import matplotlib
+    matplotlib.use('Agg')
+    
+    old_stdout = sys.stdout
+    sys.stdout = StringIO()
+    
+    output = {"text": "", "figures": [], "error": None, "dataframes": []}
+    
+    try:
+        # Execute the code
+        exec(code, namespace)
+        output["text"] = sys.stdout.getvalue()
+        
+        # Capture any matplotlib figures
+        figs = [plt.figure(i) for i in plt.get_fignums()]
+        for fig in figs:
+            output["figures"].append(fig)
+        
+        # Check for DataFrame in last expression
+        lines = code.strip().split('\n')
+        if lines:
+            last_line = lines[-1].strip()
+            # If last line is a variable name or expression, try to get its value
+            if last_line and not last_line.startswith(('#', 'import', 'from', 'def ', 'class ', 'if ', 'for ', 'while ', 'with ', 'try:', 'except', 'finally', 'return', 'yield', 'raise', 'assert', 'pass', 'break', 'continue')):
+                if '=' not in last_line or last_line.count('=') == last_line.count('=='):
+                    try:
+                        result = eval(last_line, namespace)
+                        if result is not None:
+                            import pandas as pd
+                            if isinstance(result, pd.DataFrame):
+                                output["dataframes"].append(result)
+                            elif isinstance(result, pd.Series):
+                                output["dataframes"].append(result.to_frame())
+                            elif not output["text"]:
+                                output["text"] = repr(result)
+                    except:
+                        pass
+                        
+    except Exception as e:
+        output["error"] = traceback.format_exc()
+    finally:
+        sys.stdout = old_stdout
+    
+    return output
+
+
+def render_output(output):
+    """Render execution output."""
+    import matplotlib.pyplot as plt
+    
+    if output["error"]:
+        st.markdown(f'<div class="nb-error">{output["error"]}</div>', unsafe_allow_html=True)
+        return False
+    
+    # Show text output
+    if output["text"].strip():
+        st.code(output["text"], language="text")
+    
+    # Show DataFrames
+    for df in output["dataframes"]:
+        st.dataframe(df, use_container_width=True)
+    
+    # Show figures
+    for fig in output["figures"]:
+        st.pyplot(fig)
+        plt.close(fig)
+    
+    return True
+
+
+def render_saved_outputs(outputs):
+    """Render pre-saved cell outputs from notebook file."""
     import base64
     for out in outputs:
         otype = out.get("output_type", "")
 
         if otype in ("stream", "execute_result", "display_data"):
-            # Text output (print statements, repr)
             text = ""
             if "text" in out:
                 text = "".join(out["text"])
             elif "data" in out and "text/plain" in out["data"]:
                 text = "".join(out["data"]["text/plain"])
 
-            # HTML output (pandas DataFrames)
             if "data" in out and "text/html" in out["data"]:
                 html = "".join(out["data"]["text/html"])
                 st.markdown(html, unsafe_allow_html=True)
             elif text.strip():
                 st.code(text, language="text")
 
-            # Image output (matplotlib charts)
             if "data" in out and "image/png" in out["data"]:
                 img_data = out["data"]["image/png"]
                 img_bytes = base64.b64decode(img_data)
@@ -76,84 +176,151 @@ def render_outputs(outputs):
             st.error(f"```\n{tb}\n```")
 
 
-def render_notebook(nb_data):
-    cells = nb_data.get("cells", [])
-    code_count = 0
-    for cell in cells:
-        cell_type = cell.get("cell_type", "")
-        source = "".join(cell.get("source", []))
-
-        if not source.strip():
-            continue
-
-        if cell_type == "markdown":
-            st.markdown(source, unsafe_allow_html=True)
-
-        elif cell_type == "code":
-            code_count += 1
-            with st.expander(f"📝 Code Cell [{code_count}]", expanded=False):
-                st.code(source, language="python")
-            # Always show outputs
-            outputs = cell.get("outputs", [])
-            if outputs:
-                render_outputs(outputs)
+# Initialize session state for execution
+if 'nb_namespace' not in st.session_state:
+    st.session_state.nb_namespace = {}
+if 'nb_executed' not in st.session_state:
+    st.session_state.nb_executed = {}
+if 'nb_outputs' not in st.session_state:
+    st.session_state.nb_outputs = {}
+if 'current_notebook' not in st.session_state:
+    st.session_state.current_notebook = None
 
 
 # ── Sidebar ──
 with st.sidebar:
     st.markdown("## 📓 Notebooks")
-    st.caption("Interactive notebooks for each module — view here or download to run locally.")
+    st.caption("Run Jupyter notebooks directly in the browser")
     st.divider()
+    
+    category = st.radio("Category:", ["🎯 Phase Notebooks", "📚 Module Notebooks"], label_visibility="collapsed")
+    
+    st.divider()
+    
+    if category == "🎯 Phase Notebooks":
+        st.markdown("### 🎯 Phase Notebooks")
+        phase_keys = list(PHASE_NOTEBOOKS.keys())
+        phase_names = [PHASE_NOTEBOOKS[k]["title"] for k in phase_keys]
+        selected_idx = st.radio("Select:", range(len(phase_keys)),
+                                format_func=lambda i: phase_names[i],
+                                label_visibility="collapsed")
+        selected_key = phase_keys[selected_idx]
+        selected_file = f"{selected_key}.ipynb"
+    else:
+        st.markdown("### 📚 Module Notebooks")
+        module_keys = list(MODULE_NOTEBOOKS.keys())
+        module_names = [MODULE_NOTEBOOKS[k][0] for k in module_keys]
+        selected_idx = st.radio("Select:", range(len(module_keys)),
+                                format_func=lambda i: module_names[i],
+                                label_visibility="collapsed")
+        selected_key = module_keys[selected_idx]
+        selected_file = f"{selected_key}.ipynb"
+    
+    st.divider()
+    
+    # Reset button
+    if st.button("🔄 Reset Notebook", use_container_width=True):
+        st.session_state.nb_namespace = {}
+        st.session_state.nb_executed = {}
+        st.session_state.nb_outputs = {}
+        st.rerun()
 
-    nb_files = []
-    if os.path.exists(NOTEBOOKS_DIR):
-        for fname in sorted(os.listdir(NOTEBOOKS_DIR)):
-            if fname.endswith(".ipynb"):
-                nb_files.append(fname)
 
-    if not nb_files:
-        st.warning("No notebooks found in /notebooks folder.")
-        st.stop()
+# Check if notebook changed
+if st.session_state.current_notebook != selected_key:
+    st.session_state.current_notebook = selected_key
+    st.session_state.nb_namespace = {}
+    st.session_state.nb_executed = {}
+    st.session_state.nb_outputs = {}
 
-    display_names = []
-    for f in nb_files:
-        key = f.replace(".ipynb", "")
-        if key in NOTEBOOK_INFO:
-            display_names.append(NOTEBOOK_INFO[key][0])
-        else:
-            display_names.append(f.replace(".ipynb", "").replace("_", " "))
-
-    selected_idx = st.radio("Pick a notebook:", range(len(nb_files)),
-                            format_func=lambda i: display_names[i],
-                            label_visibility="collapsed")
 
 # ── Main content ──
-selected_file = nb_files[selected_idx]
-selected_key = selected_file.replace(".ipynb", "")
 nb_path = os.path.join(NOTEBOOKS_DIR, selected_file)
 
-title, desc = NOTEBOOK_INFO.get(selected_key, (selected_key, ""))
-st.markdown(f"# {title}")
-st.caption(desc)
+if not os.path.exists(nb_path):
+    st.error(f"Notebook not found: {selected_file}")
+    st.stop()
 
-# Download button
-with open(nb_path, 'r') as f:
-    nb_content = f.read()
+nb_data = load_notebook(nb_path)
+cells = nb_data.get("cells", [])
 
-col1, col2 = st.columns([3, 1])
-with col2:
-    st.download_button(
-        "⬇️ Download .ipynb",
-        data=nb_content,
-        file_name=selected_file,
-        mime="application/json",
-        use_container_width=True,
-    )
+# Header
+if selected_key in PHASE_NOTEBOOKS:
+    info = PHASE_NOTEBOOKS[selected_key]
+    st.markdown(f"# {info['title']}")
+    st.caption(info['desc'])
+    topics_str = " • ".join(info['topics'])
+    st.markdown(f"**Topics:** {topics_str}")
+else:
+    title, desc = MODULE_NOTEBOOKS.get(selected_key, (selected_key, ""))
+    st.markdown(f"# {title}")
+    st.caption(desc)
+
+# Controls
+col1, col2, col3 = st.columns([2, 1, 1])
 with col1:
-    st.info("💡 Outputs are shown below each code cell. Expand '📝 Code Cell' to see the source code. Download the .ipynb to run it yourself in Jupyter/Colab.")
+    st.info("💡 Click **▶ Run** on each cell to execute, or **Run All** to execute the entire notebook.")
+with col2:
+    run_all = st.button("▶️ Run All Cells", use_container_width=True, type="primary")
+with col3:
+    with open(nb_path, 'r') as f:
+        nb_content = f.read()
+    st.download_button("⬇️ Download", data=nb_content, file_name=selected_file, 
+                       mime="application/json", use_container_width=True)
 
 st.divider()
 
-# Render
-nb_data = load_notebook(nb_path)
-render_notebook(nb_data)
+# Render cells
+code_count = 0
+for cell_idx, cell in enumerate(cells):
+    cell_type = cell.get("cell_type", "")
+    source = "".join(cell.get("source", []))
+    
+    if not source.strip():
+        continue
+    
+    if cell_type == "markdown":
+        st.markdown(source, unsafe_allow_html=True)
+    
+    elif cell_type == "code":
+        code_count += 1
+        cell_key = f"{selected_key}_{cell_idx}"
+        
+        # Check execution status
+        is_executed = st.session_state.nb_executed.get(cell_key, False)
+        
+        # Cell header with run button
+        col_code, col_btn = st.columns([6, 1])
+        
+        with col_code:
+            status = ""
+            if is_executed:
+                if st.session_state.nb_outputs.get(cell_key, {}).get("error"):
+                    status = '<span class="run-status status-error">Error</span>'
+                else:
+                    status = '<span class="run-status status-success">✓ Done</span>'
+            st.markdown(f'<span class="cell-num">In [{code_count}]</span> {status}', unsafe_allow_html=True)
+        
+        with col_btn:
+            run_cell = st.button("▶ Run", key=f"run_{cell_key}", use_container_width=True)
+        
+        # Show code
+        st.code(source, language="python")
+        
+        # Execute if button clicked or run_all
+        if run_cell or (run_all and not is_executed):
+            with st.spinner("Running..."):
+                output = execute_code(source, st.session_state.nb_namespace)
+                st.session_state.nb_outputs[cell_key] = output
+                st.session_state.nb_executed[cell_key] = True
+                st.rerun()
+        
+        # Show output
+        if is_executed and cell_key in st.session_state.nb_outputs:
+            output = st.session_state.nb_outputs[cell_key]
+            render_output(output)
+        elif cell.get("outputs"):
+            # Show pre-saved outputs if available
+            render_saved_outputs(cell.get("outputs", []))
+        
+        st.markdown("---")

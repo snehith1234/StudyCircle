@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import streamlit as st
 import plotly.graph_objects as go
 import plotly.express as px
@@ -10,47 +11,40 @@ st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 .stApp { font-family: 'Inter', sans-serif; }
-.story-box {
+.concept-card {
     background: linear-gradient(135deg, #1a1d2e, #1f2235);
-    border: 1px solid #2d3148; border-radius: 16px; padding: 1.4rem 1.6rem;
-    margin: 0.8rem 0; line-height: 1.9; font-size: 0.95rem; color: #c8cfe0;
+    border: 1px solid #2d3148; border-radius: 14px; padding: 1.1rem 1.3rem;
+    margin: 0.4rem 0; line-height: 1.85; font-size: 0.91rem; color: #c8cfe0;
 }
-.story-box b, .story-box strong { color: #e2e8f0; }
-.green-box {
+.concept-card b { color: #e2e8f0; }
+.output-label {
+    display: inline-block; background: #22d3a722; color: #22d3a7;
+    font-size: 0.72rem; padding: 3px 10px; border-radius: 8px;
+    font-weight: 700; margin-bottom: 6px; letter-spacing: 0.5px;
+}
+.concept-label {
+    display: inline-block; background: #7c6aff22; color: #7c6aff;
+    font-size: 0.72rem; padding: 3px 10px; border-radius: 8px;
+    font-weight: 700; margin-bottom: 6px; letter-spacing: 0.5px;
+}
+.insight-box {
     background: linear-gradient(135deg, #1a2a1f, #1f3528);
-    border: 1px solid #2a5a3a; border-radius: 14px; padding: 1.1rem 1.4rem;
-    margin: 0.6rem 0; font-size: 0.92rem; color: #c8d8c0; line-height: 1.8;
+    border: 1px solid #2a5a3a; border-radius: 12px; padding: 0.9rem 1.1rem;
+    margin: 0.4rem 0; font-size: 0.87rem; color: #c8d8c0; line-height: 1.7;
 }
-.green-box b { color: #d0f0e0; }
-.red-box {
+.insight-box b { color: #d0f0e0; }
+.warn-box {
     background: linear-gradient(135deg, #2a1a1e, #351f25);
-    border: 1px solid #5a2a3a; border-radius: 14px; padding: 1.1rem 1.4rem;
-    margin: 0.6rem 0; font-size: 0.92rem; color: #d8a8b8; line-height: 1.8;
+    border: 1px solid #5a2a3a; border-radius: 12px; padding: 0.9rem 1.1rem;
+    margin: 0.4rem 0; font-size: 0.87rem; color: #d8a8b8; line-height: 1.7;
 }
-.red-box b { color: #f0c8d8; }
-.key-box {
-    background: #252840; border-left: 4px solid #7c6aff;
-    border-radius: 0 10px 10px 0; padding: 0.8rem 1.2rem;
-    margin: 0.6rem 0; font-size: 0.9rem; color: #c8cfe0; line-height: 1.8;
+.warn-box b { color: #f0c8d8; }
+.math-box {
+    background: #252840; border-left: 4px solid #f5b731;
+    border-radius: 0 10px 10px 0; padding: 0.9rem 1.1rem;
+    margin: 0.4rem 0; font-size: 0.87rem; color: #c8cfe0; line-height: 1.8;
 }
-.key-box b { color: #e2e8f0; }
-.analogy-box {
-    background: linear-gradient(135deg, #1e1a2e, #251f35);
-    border: 1px solid #3d2d58; border-radius: 14px; padding: 1.1rem 1.4rem;
-    margin: 0.6rem 0; font-size: 0.92rem; color: #d0c8e0; line-height: 1.8;
-    border-left: 4px solid #e879a8;
-}
-.analogy-box b { color: #f0d8e8; }
-.quiz-correct {
-    background: linear-gradient(135deg, #1a2a1f, #1f3528);
-    border: 2px solid #22d3a7; border-radius: 14px; padding: 1rem 1.3rem;
-    margin: 0.5rem 0; font-size: 0.92rem; color: #c8d8c0;
-}
-.quiz-wrong {
-    background: linear-gradient(135deg, #2a1a1e, #351f25);
-    border: 2px solid #f45d6d; border-radius: 14px; padding: 1rem 1.3rem;
-    margin: 0.5rem 0; font-size: 0.92rem; color: #d8a8b8;
-}
+.math-box b { color: #f5b731; }
 .iq-card {
     background: #181a27; border: 1px solid #2d3148; border-radius: 14px;
     padding: 1.1rem 1.4rem; margin-bottom: 0.5rem; border-left: 4px solid;
@@ -58,15 +52,9 @@ st.markdown("""
 .iq-title { font-size: 0.93rem; font-weight: 700; color: #e2e8f0; line-height: 1.5; }
 .iq-meta { font-size: 0.7rem; margin-top: 5px; }
 .iq-tag { display: inline-block; padding: 2px 7px; border-radius: 6px; font-size: 0.67rem; font-weight: 600; }
-.iq-answer {
-    background: #1a2a1f; border: 1px solid #2a5a3a; border-radius: 12px;
-    padding: 1rem 1.3rem; margin-top: 0.3rem; color: #c8d8c0; font-size: 0.88rem; line-height: 1.8;
-}
+.iq-answer { background: #1a2a1f; border: 1px solid #2a5a3a; border-radius: 12px; padding: 1rem 1.3rem; margin-top: 0.3rem; color: #c8d8c0; font-size: 0.88rem; line-height: 1.8; }
 .iq-answer b { color: #d0f0e0; }
-.iq-tip {
-    background: #252840; border-left: 4px solid #f5b731; border-radius: 0 10px 10px 0;
-    padding: 0.6rem 1rem; margin-top: 0.3rem; font-size: 0.84rem; color: #c8cfe0; line-height: 1.6;
-}
+.iq-tip { background: #252840; border-left: 4px solid #f5b731; border-radius: 0 10px 10px 0; padding: 0.6rem 1rem; margin-top: 0.3rem; font-size: 0.84rem; color: #c8cfe0; line-height: 1.6; }
 .iq-tip b { color: #e2e8f0; }
 </style>
 """, unsafe_allow_html=True)
@@ -80,11 +68,26 @@ DL = dict(
 )
 DIFF_C = {"Easy": "#22d3a7", "Medium": "#f5b731", "Hard": "#f45d6d"}
 
+@st.cache_data
+def load_pizza_data():
+    np.random.seed(42)
+    n = 50
+    return pd.DataFrame({
+        "store_id": [f"Store_{i+1}" for i in range(n)],
+        "daily_sales": np.concatenate([[1200, 80], np.random.normal(500, 100, n-2)]).clip(80, 1200).round(2),
+        "avg_order_value": np.random.normal(22, 5, n).clip(10, 40).round(2),
+        "customer_rating": np.random.uniform(3.5, 5.0, n).round(2),
+        "delivery_time_min": np.concatenate([np.random.normal(30, 8, n-5), [55, 60, 65, 70, 75]]).round(1),
+        "employees": np.random.randint(3, 12, n),
+        "ad_spend": np.random.normal(200, 50, n).clip(50, 400).round(2),
+        "region": np.random.choice(["East", "West"], n, p=[0.35, 0.65]),
+    })
+
+df = load_pizza_data()
 
 def iq(questions):
     st.markdown("---")
     st.markdown("### 🎤 Interview Questions")
-    st.caption("Real FAANG-level questions on this topic.")
     for i, q in enumerate(questions, 1):
         d = q.get("d", "Medium"); c = DIFF_C.get(d, "#7c6aff")
         cos = q.get("c", [])
@@ -96,60 +99,27 @@ def iq(questions):
             if q.get("t"):
                 st.markdown(f'<div class="iq-tip">🎯 <b>Tip:</b> {q["t"]}</div>', unsafe_allow_html=True)
 
+def split_row(concept_html, code_str, output_func, concept_title="", output_title=""):
+    """Render split view: Concept on LEFT, Code + Output on RIGHT."""
+    left, right = st.columns([1, 1])
+    with left:
+        st.markdown('<span class="concept-label">📖 CONCEPT</span>', unsafe_allow_html=True)
+        if concept_title:
+            st.markdown(f"#### {concept_title}")
+        st.markdown(concept_html, unsafe_allow_html=True)
+    with right:
+        st.markdown('<span class="output-label">💻 CODE + OUTPUT</span>', unsafe_allow_html=True)
+        if output_title:
+            st.markdown(f"#### {output_title}")
+        with st.expander("📝 Show Code", expanded=False):
+            st.code(code_str, language="python")
+        output_func()
+    st.divider()
 
-def check_quiz(key, question, options, correct_idx, explanation):
-    """Reusable quiz component with drag-and-drop feel."""
-    st.markdown(f"**🧩 Quick Check:** {question}")
-    answer = st.radio("Pick your answer:", options, key=key, index=None)
-    if answer is not None:
-        if options.index(answer) == correct_idx:
-            st.markdown(f'<div class="quiz-correct">✅ <b>Correct!</b> {explanation}</div>', unsafe_allow_html=True)
-        else:
-            st.markdown(f'<div class="quiz-wrong">❌ <b>Not quite.</b> The answer is <b>{options[correct_idx]}</b>. {explanation}</div>', unsafe_allow_html=True)
-
-
-def match_quiz(key, title, items, targets, correct_mapping, explanations):
-    """Matching quiz — user matches items to categories using dropdowns."""
-    st.markdown(f"**🔗 Match It:** {title}")
-    st.caption("Use the dropdowns to match each item to the right category.")
-    all_correct = True
-    for i, item in enumerate(items):
-        col1, col2 = st.columns([2, 2])
-        col1.markdown(f"**{item}**")
-        choice = col2.selectbox(f"Match for {item}", ["— Pick one —"] + targets, key=f"{key}_{i}", label_visibility="collapsed")
-        if choice != "— Pick one —":
-            if choice == correct_mapping[i]:
-                st.markdown(f'<div class="quiz-correct" style="padding:0.5rem 1rem;margin:0.2rem 0">✅ {explanations[i]}</div>', unsafe_allow_html=True)
-            else:
-                st.markdown(f'<div class="quiz-wrong" style="padding:0.5rem 1rem;margin:0.2rem 0">❌ Try again! {explanations[i]}</div>', unsafe_allow_html=True)
-                all_correct = False
-
-
-def order_quiz(key, title, items, correct_order, explanation):
-    """Ordering quiz — user arranges items in the right order using number inputs."""
-    st.markdown(f"**📋 Put It In Order:** {title}")
-    st.caption("Assign a number (1, 2, 3...) to each item to put them in the right order.")
-    user_order = {}
-    for i, item in enumerate(items):
-        col1, col2 = st.columns([3, 1])
-        col1.markdown(f"**{item}**")
-        user_order[item] = col2.number_input(f"Order for {item}", min_value=1, max_value=len(items), value=i+1, key=f"{key}_{i}", label_visibility="collapsed")
-
-    if st.button("Check my order", key=f"{key}_check"):
-        sorted_items = sorted(user_order.keys(), key=lambda x: user_order[x])
-        if sorted_items == correct_order:
-            st.markdown(f'<div class="quiz-correct">✅ <b>Perfect!</b> {explanation}</div>', unsafe_allow_html=True)
-        else:
-            correct_str = " → ".join(f"**{x}**" for x in correct_order)
-            st.markdown(f'<div class="quiz-wrong">❌ <b>Not quite.</b> The correct order is: {correct_str}. {explanation}</div>', unsafe_allow_html=True)
-
-
-# ═══════════════════════════════════════
-# SIDEBAR
-# ═══════════════════════════════════════
+# ── Sidebar ──
 with st.sidebar:
     st.markdown("## 📊 Phase 1: Statistics")
-    st.caption("3–4 Weeks · The foundation for everything")
+    st.caption("Concept | Code + Output")
     st.divider()
     module = st.radio("Module:", [
         "🏠 Overview",
@@ -158,7 +128,7 @@ with st.sidebar:
         "📈 M3: Distributions",
         "🧪 M4: Inferential Statistics",
         "🔗 M5: Correlation",
-        "📉 M6: Regression Intuition",
+        "📉 M6: Regression",
     ], label_visibility="collapsed")
 
 
@@ -167,1208 +137,1163 @@ with st.sidebar:
 # ═══════════════════════════════════════
 if module == "🏠 Overview":
     st.markdown("# 📊 Phase 1: Statistics Foundation")
-    st.caption("3–4 Weeks · Understand data, uncertainty, and decision-making — no math degree needed.")
+    st.caption("Concept on Left · Code + Output on Right")
 
-    st.markdown("""<div class="story-box">
-    <b>🎬 Imagine this:</b> You just got hired at a company. Your boss walks in and says,
-    "We have 10 million users. Are they happy? Is our product getting better or worse? Should we launch this new feature?"
-    <br><br>
-    You can't talk to 10 million people. But you CAN look at the <b>data</b> — and statistics is the language
-    that lets you read it, understand it, and make smart decisions from it.
-    <br><br>
-    <b>Statistics is not about formulas.</b> It's about asking the right questions and knowing when the data
-    is telling you something real vs. when it's just noise.
-    </div>""", unsafe_allow_html=True)
-
-    st.markdown("""<div class="analogy-box">
-    🍕 <b>Think of it like cooking:</b> You don't need to be a chemist to cook great food.
-    But understanding a few basics — heat, timing, seasoning — makes you 10x better.
-    Statistics is the "cooking basics" of data. Once you get it, everything else (ML, AI, data science) becomes way easier.
+    st.markdown("""<div class="concept-card">
+    <b>🎬 Welcome to Statistics!</b> You just got hired at PizzaChain with 50 stores.
+    Your boss asks: "Are we doing well? Which stores need help?"
+    <br><br>You need <b>statistics</b> — the language that lets you summarize data and find patterns.
     </div>""", unsafe_allow_html=True)
 
     modules = [
-        ("🧩", "Descriptive Statistics", "Week 1", "#7c6aff", "How to summarize thousands of numbers into a few meaningful ones. Like reading the highlights instead of the whole book."),
-        ("🎲", "Probability", "Week 1–2", "#22d3a7", "How likely is something to happen? The math behind predictions, risk, and 'what are the odds?'"),
-        ("📈", "Distributions", "Week 2", "#f5b731", "What shape does your data make? Bell curves, lopsided data, and why the shape matters."),
-        ("🧪", "Inferential Statistics", "Week 3", "#f45d6d", "Is this result real or just a coincidence? The science of making conclusions from limited data."),
-        ("🔗", "Correlation", "Week 3", "#e879a8", "Do two things move together? And the biggest trap: just because they do doesn't mean one causes the other."),
-        ("📉", "Regression Intuition", "Week 4", "#5eaeff", "Drawing the best line through data to make predictions. This is where statistics meets machine learning."),
+        ("🧩", "Descriptive Statistics", "Week 1", "#7c6aff", "Summarize data: mean, median, spread, outliers"),
+        ("🎲", "Probability", "Week 1–2", "#22d3a7", "How likely is something? Bayes' theorem"),
+        ("📈", "Distributions", "Week 2", "#f5b731", "What shape is your data? Normal, Poisson, Binomial"),
+        ("🧪", "Inferential Statistics", "Week 3", "#f45d6d", "Is this result real? Z-scores, T-tests, P-values"),
+        ("🔗", "Correlation", "Week 3", "#e879a8", "Do two things move together? Pearson correlation"),
+        ("📉", "Regression", "Week 4", "#5eaeff", "Predict values with a line. The bridge to ML."),
     ]
 
     for icon, title, week, color, desc in modules:
-        st.markdown(f"""<div class="story-box" style="border-left:4px solid {color}">
+        st.markdown(f"""<div class="concept-card" style="border-left:4px solid {color}">
         <span style="font-size:1.3rem">{icon}</span>
         <span class="iq-tag" style="background:{color}22;color:{color}">{week}</span>
         <b style="margin-left:6px">{title}</b>
         <br><span style="color:#8892b0">{desc}</span>
         </div>""", unsafe_allow_html=True)
 
-    st.markdown("""<div class="key-box">
-    <b>✅ After Phase 1 you will:</b><br>
-    • Look at any dataset and immediately understand what's going on<br>
-    • Know when a result is real vs. random luck<br>
-    • Understand ML concepts easily (because they're all built on this)<br>
-    • Be ready for data science interview questions at any company
-    </div>""", unsafe_allow_html=True)
-
 
 # ═══════════════════════════════════════
-# MODULE 1: DESCRIPTIVE STATISTICS
+# M1: DESCRIPTIVE STATISTICS
 # ═══════════════════════════════════════
 elif module == "🧩 M1: Descriptive Statistics":
     st.markdown("# 🧩 Module 1: Descriptive Statistics")
-    st.caption("Week 1 · Summarize data in a few meaningful numbers — like a movie trailer for your dataset.")
-
-    # ── The Story ──
-    st.markdown("""<div class="story-box">
-    <b>🎬 The Story:</b> You're a manager at a pizza chain with 500 stores. Every store reports daily sales.
-    You can't read 500 numbers every morning. You need a <b>summary</b> — a few numbers that tell you:
-    <br><br>
-    🔹 What's a <b>typical</b> store making? (Center)<br>
-    🔹 How <b>different</b> are stores from each other? (Spread)<br>
-    🔹 Are there any stores that are <b>weirdly</b> high or low? (Outliers)
-    <br><br>
-    That's exactly what descriptive statistics does. Let's learn each tool.
+    st.caption("Concept on Left · Code + Output on Right")
+    st.markdown("""<div class="concept-card">
+    <b>What is Descriptive Statistics?</b> It's the art of <b>summarizing data</b> so you can understand it at a glance.
+    Instead of looking at 1000 numbers, you get a few key metrics that tell the story.
+    <br><br>🎯 <b>Three key questions:</b> What's typical (center)? How spread out (variability)? Any weird values (outliers)?
     </div>""", unsafe_allow_html=True)
+    st.divider()
 
-    # ── Mean, Median, Mode ──
-    st.markdown("### 📖 The Three Averages: Mean, Median, Mode")
+    # Row 1: Load Data
+    def show_dataset():
+        st.dataframe(df.head(8), use_container_width=True, height=180)
+        st.caption(f"Shape: {df.shape[0]} rows × {df.shape[1]} columns")
 
-    st.markdown("""<div class="analogy-box">
-    🏠 <b>Real-life analogy:</b> Imagine 5 friends share their monthly rent:<br>
-    $800, $900, $950, $1000, <b>$8000</b> (one friend lives in a penthouse)
-    <br><br>
-    • <b>Mean (average):</b> Add them up, divide by 5 = <b>$2,330</b>. Sounds like everyone pays a lot — but that's misleading! The penthouse pulled the average way up.<br>
-    • <b>Median (middle value):</b> Sort them, pick the middle = <b>$950</b>. This better represents what a "typical" friend pays.<br>
-    • <b>Mode (most common):</b> No repeats here, but if three friends paid $900, the mode would be $900.
-    <br><br>
-    <b>💡 The lesson:</b> When there's an extreme value (outlier), the <b>median</b> is more trustworthy than the mean.
-    That's why news reports say "median household income" not "average household income."
-    </div>""", unsafe_allow_html=True)
+    split_row(
+        concept_html="""<div class="concept-card">
+        <b>🎬 The Story:</b> You manage 50 pizza stores. Your boss asks "How are we doing?"
+        <br><br>Descriptive stats answers three questions:
+        <br>🔹 <b>Center:</b> What's typical? (Mean, Median)
+        <br>🔹 <b>Spread:</b> How different are values? (Std Dev, IQR)
+        <br>🔹 <b>Outliers:</b> Any weird values?
+        </div>
+        <div class="insight-box">💡 <code>df.head()</code> and <code>df.describe()</code> are your first steps with any dataset.</div>""",
+        code_str='''import pandas as pd
 
-    st.markdown("#### 🎮 Try It Yourself: Enter any numbers and see all three")
-    user_data = st.text_input("Enter numbers separated by commas:", "25, 30, 35, 40, 45, 50, 200", key="m1_data")
-    try:
-        vals = np.array([float(x.strip()) for x in user_data.split(",") if x.strip()])
-        from scipy import stats as sp_stats
+# Load data
+df = pd.read_csv("pizza_stores.csv")
 
-        mc = st.columns(4)
-        mc[0].metric("🔵 Mean", f"{vals.mean():.1f}", help="Add all numbers, divide by count")
-        mc[1].metric("🟣 Median", f"{np.median(vals):.1f}", help="The middle number when sorted")
-        mode_result = sp_stats.mode(vals, keepdims=True)
-        mc[2].metric("🟠 Mode", f"{mode_result.mode[0]:.1f}", help="The most frequent number")
-        gap = vals.mean() - np.median(vals)
-        mc[3].metric("Gap (Mean − Median)", f"{gap:.1f}", help="Big gap = data is lopsided")
+# Quick look
+df.head()
+df.shape
+df.describe()''',
+        output_func=show_dataset,
+        concept_title="📋 Load & Explore Data",
+        output_title="Pizza Store Dataset"
+    )
 
+    # Row 2: Mean, Median, Mode
+    def show_center():
+        col = "daily_sales"
+        data = df[col]
+        mean_val, median_val = data.mean(), data.median()
+        
+        mc = st.columns(3)
+        mc[0].metric("Mean", f"${mean_val:.0f}")
+        mc[1].metric("Median", f"${median_val:.0f}")
+        mc[2].metric("Gap", f"${mean_val - median_val:.0f}")
+        
         fig = go.Figure()
-        fig.add_trace(go.Histogram(x=vals, nbinsx=15, marker_color="#7c6aff", opacity=0.7, name="Your data"))
-        fig.add_vline(x=vals.mean(), line_dash="dash", line_color="#f45d6d", annotation_text=f"Mean: {vals.mean():.1f}")
-        fig.add_vline(x=np.median(vals), line_dash="dash", line_color="#22d3a7", annotation_text=f"Median: {np.median(vals):.1f}")
-        fig.update_layout(height=300, title="Your Data — Where do Mean and Median land?", xaxis_title="Value", yaxis_title="Count", **DL)
+        fig.add_trace(go.Histogram(x=data, nbinsx=20, marker_color="#7c6aff", opacity=0.7))
+        fig.add_vline(x=mean_val, line_dash="dash", line_color="#f45d6d", annotation_text=f"Mean: ${mean_val:.0f}")
+        fig.add_vline(x=median_val, line_dash="dash", line_color="#22d3a7", annotation_text=f"Median: ${median_val:.0f}")
+        fig.update_layout(height=220, title="Daily Sales Distribution", **DL)
         st.plotly_chart(fig, use_container_width=True, config={"displayModeBar": False})
 
-        if abs(gap) > vals.std() * 0.3:
-            st.markdown(f"""<div class="red-box">⚠️ <b>Notice:</b> Mean ({vals.mean():.1f}) and Median ({np.median(vals):.1f}) are far apart!
-            This means your data is <b>lopsided</b> (skewed). The median is a better "typical" value here.
-            Try removing the extreme number and watch them come together.</div>""", unsafe_allow_html=True)
-        else:
-            st.markdown(f"""<div class="green-box">✅ Mean and Median are close — your data is fairly <b>balanced</b> (symmetric).</div>""", unsafe_allow_html=True)
-    except:
-        st.error("Please enter valid numbers separated by commas.")
+    split_row(
+        concept_html="""<div class="concept-card">
+        <b>🤔 Why do we need "center" measures?</b>
+        <br><br>Imagine your boss asks: "How much does a typical store make?" You can't list all 50 numbers. You need ONE number that represents the whole group.
+        <br><br><b>Mean (Average):</b> Add everything up, divide by count.
+        <br>• <b>Pros:</b> Uses all data points
+        <br>• <b>Cons:</b> One extreme value can drag it way up or down
+        <br>• <b>Analogy:</b> If Bill Gates walks into a bar, the "average" wealth skyrockets — but nobody actually got richer!
+        <br><br><b>Median (Middle):</b> Sort all values, pick the one in the middle.
+        <br>• <b>Pros:</b> Ignores extremes — robust to outliers
+        <br>• <b>Cons:</b> Doesn't use all data
+        <br>• <b>Analogy:</b> In a race, the median runner is literally in the middle of the pack
+        <br><br><b>Mode:</b> The most common value. Best for categories (e.g., "most popular pizza topping").
+        </div>
+        <div class="math-box">
+        <b>📐 Mean — Step by Step:</b>
+        <br><br><b>Data:</b> Sales = [400, 450, 500, 550, 1200]
+        <br><br><b>Mean:</b> (400+450+500+550+1200) / 5
+        <br>&nbsp;&nbsp;&nbsp;&nbsp;= 3100 / 5 = <b>$620</b>
+        <br><br><b>Median:</b> Sort → [400, 450, <b>500</b>, 550, 1200]
+        <br>&nbsp;&nbsp;&nbsp;&nbsp;Middle value = <b>$500</b>
+        <br><br>🧠 Mean ($620) > Median ($500) → right-skewed!
+        <br>&nbsp;&nbsp;&nbsp;&nbsp;The $1200 outlier pulls mean up by $120!
+        </div>
+        <div class="warn-box">⚠️ <b>Interview tip:</b> "When would you use median over mean?" → When data has outliers or is skewed (income, house prices, response times).</div>""",
+        code_str='''# Calculate center measures
+mean_val = df["daily_sales"].mean()
+median_val = df["daily_sales"].median()
+mode_val = df["daily_sales"].mode()[0]
 
-    # ── Quiz: Mean vs Median ──
-    check_quiz("m1_q1",
-        "A company reports 'average salary is $150,000.' But most employees earn around $60,000. What's likely happening?",
-        ["The company is lying", "A few executives with huge salaries are pulling the mean up", "The median must also be $150,000", "Salaries follow a bell curve"],
-        1,
-        "A few very high salaries (CEO, VPs) drag the mean way up, while the median stays near $60K. This is why median is better for skewed data like income."
+print(f"Mean: ${mean_val:.0f}")
+print(f"Median: ${median_val:.0f}")
+print(f"Gap: ${mean_val - median_val:.0f}")''',
+        output_func=show_center,
+        concept_title="📊 Mean, Median, Mode",
+        output_title="Center Measures"
     )
 
-    # ── Variance & Std Dev ──
-    st.markdown("---")
-    st.markdown("### 📖 Spread: How Different Are the Numbers?")
+    # Row 3: Standard Deviation
+    def show_spread():
+        col = "daily_sales"
+        data = df[col]
+        std_val, var_val = data.std(), data.var()
+        iqr_val = data.quantile(0.75) - data.quantile(0.25)
+        
+        mc = st.columns(3)
+        mc[0].metric("Std Dev", f"${std_val:.0f}")
+        mc[1].metric("Variance", f"${var_val:,.0f}")
+        mc[2].metric("IQR", f"${iqr_val:.0f}")
+        
+        fig = go.Figure()
+        fig.add_trace(go.Box(x=data, marker_color="#22d3a7", boxmean=True, name="Daily Sales"))
+        fig.update_layout(height=120, **DL)
+        st.plotly_chart(fig, use_container_width=True, config={"displayModeBar": False})
 
-    st.markdown("""<div class="story-box">
-    <b>🎬 The Story:</b> Two coffee shops both sell an average of 100 cups/day. But:
-    <br><br>
-    ☕ <b>Shop A:</b> Sells 95–105 cups every day. Very consistent. You can predict tomorrow easily.<br>
-    ☕ <b>Shop B:</b> Some days 20 cups, some days 200. Wild swings. Hard to plan for.
-    <br><br>
-    Both have the <b>same average</b>, but they're completely different businesses!
-    The average alone doesn't tell the full story. You need to know the <b>spread</b>.
-    </div>""", unsafe_allow_html=True)
+    split_row(
+        concept_html="""<div class="concept-card">
+        <b>🤔 Why do we need "spread" measures?</b>
+        <br><br>Two classes can have the same average grade (75%), but one class might have everyone at 70-80%, while another has scores from 30% to 100%. The <b>spread</b> tells you how consistent or variable the data is.
+        <br><br><b>Standard Deviation (σ):</b> "On average, how far is each value from the mean?"
+        <br>• <b>Small σ:</b> Values are tightly clustered (consistent)
+        <br>• <b>Large σ:</b> Values are spread out (variable)
+        <br>• <b>Analogy:</b> A reliable employee (low σ) arrives at 9:00 ± 5 min. An unreliable one (high σ) arrives at 9:00 ± 45 min.
+        <br><br><b>Variance:</b> Just σ² (squared). Mathematically useful but harder to interpret.
+        <br><br><b>IQR (Interquartile Range):</b> The range of the middle 50% of data.
+        <br>• Q1 = 25th percentile, Q3 = 75th percentile
+        <br>• IQR = Q3 - Q1
+        <br>• <b>Why use it?</b> Like median, it ignores outliers!
+        </div>
+        <div class="math-box">
+        <b>📐 Std Dev — Step by Step:</b>
+        <br><br><b>Data:</b> [400, 500, 600], Mean = 500
+        <br><br><b>Step 1:</b> Deviations from mean
+        <br>&nbsp;&nbsp;&nbsp;&nbsp;400-500 = -100, 500-500 = 0, 600-500 = 100
+        <br><br><b>Step 2:</b> Square them (removes negatives)
+        <br>&nbsp;&nbsp;&nbsp;&nbsp;(-100)² + 0² + 100² = 10000 + 0 + 10000 = 20000
+        <br><br><b>Step 3:</b> Average & sqrt
+        <br>&nbsp;&nbsp;&nbsp;&nbsp;Variance = 20000/3 = 6667
+        <br>&nbsp;&nbsp;&nbsp;&nbsp;Std Dev = √6667 = <b>$82</b>
+        <br><br>🧠 "A typical store is about $82 away from the $500 average"
+        </div>""",
+        code_str='''# Calculate spread measures
+std_dev = df["daily_sales"].std()
+variance = df["daily_sales"].var()
 
-    st.markdown("""<div class="analogy-box">
-    🌡️ <b>Weather analogy:</b> San Francisco and Kansas City both have an average temperature of ~60°F.
-    But San Francisco stays 55–65°F year-round (low spread), while Kansas City swings from 20°F to 100°F (high spread).
-    Same average, totally different experience!
-    <br><br>
-    <b>Standard Deviation</b> measures this spread. It answers: <b>"How far does a typical value sit from the average?"</b>
-    <br>• Small std dev → values are clustered close to the average (consistent)<br>
-    • Large std dev → values are spread out (unpredictable)
-    </div>""", unsafe_allow_html=True)
+Q1 = df["daily_sales"].quantile(0.25)
+Q3 = df["daily_sales"].quantile(0.75)
+IQR = Q3 - Q1
 
-    st.markdown("#### 🎮 Try It: Same Average, Different Spread")
-    c1, c2 = st.columns(2)
-    sd_a = c1.slider("☕ Shop A — How consistent? (std dev)", 1, 25, 5, key="m1_sda")
-    sd_b = c2.slider("☕ Shop B — How wild? (std dev)", 1, 25, 18, key="m1_sdb")
-
-    np.random.seed(42)
-    team_a = np.random.normal(100, sd_a, 300).clip(0, 200)
-    team_b = np.random.normal(100, sd_b, 300).clip(0, 200)
-
-    fig2 = go.Figure()
-    fig2.add_trace(go.Histogram(x=team_a, name=f"Shop A (std={team_a.std():.0f})", marker_color="#7c6aff", opacity=0.5, nbinsx=25))
-    fig2.add_trace(go.Histogram(x=team_b, name=f"Shop B (std={team_b.std():.0f})", marker_color="#22d3a7", opacity=0.5, nbinsx=25))
-    fig2.update_layout(barmode="overlay", height=300, title="Same Average (100 cups), Different Spread", xaxis_title="Cups Sold", yaxis_title="Days", **DL)
-    st.plotly_chart(fig2, use_container_width=True, config={"displayModeBar": False})
-
-    st.markdown(f"""<div class="green-box">
-    💡 <b>What you're seeing:</b> Both shops average ~100 cups. But Shop A (purple) is tightly packed — predictable.
-    Shop B (green) is spread out — some great days, some terrible days.
-    <b>Drag the sliders</b> to see how changing the spread changes the shape!
-    </div>""", unsafe_allow_html=True)
-
-    # ── 68-95-99.7 Rule ──
-    st.markdown("---")
-    st.markdown("### 📖 The 68-95-99.7 Rule (The Magic Numbers)")
-    st.caption("If your data makes a bell shape, these three numbers tell you almost everything.")
-
-    st.markdown("""<div class="story-box">
-    <b>🎬 The Story:</b> Your class takes an exam. Average score = 75, std dev = 10. Without looking at every score, you already know:
-    <br><br>
-    🟢 <b>68%</b> of students scored between <b>65 and 85</b> (within 1 std dev)<br>
-    🔵 <b>95%</b> scored between <b>55 and 95</b> (within 2 std devs)<br>
-    🟣 <b>99.7%</b> scored between <b>45 and 105</b> (within 3 std devs)
-    <br><br>
-    Someone scored 110? That's beyond 3 std devs — only 0.3% of people score that high. Either a genius or a grading error! 🤔
-    </div>""", unsafe_allow_html=True)
-
-    st.markdown("#### 🎮 Play With It: Adjust the bell curve")
-    rc1, rc2 = st.columns(2)
-    rule_mean = rc1.slider("Average (μ):", 40, 100, 75, 5, key="m1_rule_mean")
-    rule_std = rc2.slider("Spread (σ):", 2, 20, 10, 1, key="m1_rule_std")
-
-    x_rule = np.linspace(rule_mean - 4*rule_std, rule_mean + 4*rule_std, 500)
-    from scipy.stats import norm
-    y_rule = norm.pdf(x_rule, rule_mean, rule_std)
-
-    fig_rule = go.Figure()
-    fig_rule.add_trace(go.Scatter(x=x_rule, y=y_rule, mode='lines', line=dict(color='#7c6aff', width=2.5), name='Bell Curve'))
-    fig_rule.add_vrect(x0=rule_mean-rule_std, x1=rule_mean+rule_std, fillcolor="rgba(34,211,167,0.18)", line_width=0, annotation_text="68%", annotation_position="top")
-    fig_rule.add_vrect(x0=rule_mean-2*rule_std, x1=rule_mean+2*rule_std, fillcolor="rgba(124,106,255,0.08)", line_width=0)
-    for mult in [1, 2, 3]:
-        fig_rule.add_vline(x=rule_mean+mult*rule_std, line_dash="dot", line_color="#2d3148")
-        fig_rule.add_vline(x=rule_mean-mult*rule_std, line_dash="dot", line_color="#2d3148")
-    fig_rule.add_annotation(x=rule_mean, y=max(y_rule)*0.5, text="<b>68%</b>", showarrow=False, font=dict(color="#22d3a7", size=14))
-    fig_rule.update_layout(height=300, title=f"The 68-95-99.7 Rule: Average={rule_mean}, Spread={rule_std}", **DL)
-    st.plotly_chart(fig_rule, use_container_width=True, config={"displayModeBar": False})
-
-    mc = st.columns(3)
-    mc[0].metric("68% are between", f"{rule_mean-rule_std} – {rule_mean+rule_std}")
-    mc[1].metric("95% are between", f"{rule_mean-2*rule_std} – {rule_mean+2*rule_std}")
-    mc[2].metric("99.7% are between", f"{rule_mean-3*rule_std} – {rule_mean+3*rule_std}")
-
-    check_quiz("m1_q2",
-        f"If the average is {rule_mean} and std dev is {rule_std}, a value of {rule_mean + 3*rule_std + 5} would be...",
-        ["Totally normal", "A little unusual", "Extremely rare (beyond 3 std devs) — investigate!"],
-        2,
-        f"That value is more than 3 standard deviations from the mean. Only 0.3% of data falls this far out. It's either an error, a special case, or something worth investigating."
+print(f"Std Dev: ${std_dev:.0f}")
+print(f"IQR: ${IQR:.0f}")''',
+        output_func=show_spread,
+        concept_title="📏 Spread: Std Dev & IQR",
+        output_title="Variability Measures"
     )
 
-    # ── Outliers ──
-    st.markdown("---")
-    st.markdown("### 📖 Outliers: The Weird Ones")
+    # Row 4: Outliers
+    def show_outliers():
+        col = "daily_sales"
+        data = df[col]
+        Q1, Q3 = data.quantile(0.25), data.quantile(0.75)
+        IQR = Q3 - Q1
+        lower, upper = Q1 - 1.5*IQR, Q3 + 1.5*IQR
+        outliers = df[(data < lower) | (data > upper)]
+        
+        mc = st.columns(4)
+        mc[0].metric("Q1", f"${Q1:.0f}")
+        mc[1].metric("Q3", f"${Q3:.0f}")
+        mc[2].metric("Upper Fence", f"${upper:.0f}")
+        mc[3].metric("Outliers", len(outliers))
+        
+        st.dataframe(outliers[["store_id", col]], use_container_width=True, height=100)
 
-    st.markdown("""<div class="story-box">
-    <b>🎬 The Story:</b> You're analyzing salaries at a startup. Everyone earns $50K–$80K... except the CEO who earns $2 million.
-    <br><br>
-    That CEO salary is an <b>outlier</b> — a data point that's far from the rest. The key question isn't "should I remove it?"
-    The key question is: <b>"WHY is it there?"</b>
-    <br><br>
-    🔹 <b>It's an error</b> (typo, sensor glitch) → Remove it<br>
-    🔹 <b>It's real but rare</b> (CEO salary, fraud transaction) → Keep it, it might be the most important data point!<br>
-    🔹 <b>It's from a different group</b> (mixing student and professional salaries) → Separate the groups
-    </div>""", unsafe_allow_html=True)
+    split_row(
+        concept_html="""<div class="concept-card">
+        <b>🤔 What are outliers and why do they matter?</b>
+        <br><br>An outlier is a data point that's <b>far away from the rest</b>. It could be:
+        <br>• <b>A data entry error:</b> Someone typed $12000 instead of $1200
+        <br>• <b>A measurement error:</b> Faulty sensor reading
+        <br>• <b>A genuine extreme:</b> Your flagship store really does make 3× more
+        <br>• <b>Fraud:</b> Suspicious transaction that's actually the signal you're looking for!
+        <br><br><b>The key question:</b> WHY is this value so different?
+        <br>• If it's an error → fix or remove it
+        <br>• If it's real but rare → study it separately
+        <br>• If it's fraud → that's your finding!
+        <br><br><b>IQR Method:</b> The most common way to detect outliers.
+        <br>• Calculate Q1 (25th percentile) and Q3 (75th percentile)
+        <br>• IQR = Q3 - Q1 (the middle 50% range)
+        <br>• Anything below Q1 - 1.5×IQR or above Q3 + 1.5×IQR is an outlier
+        <br>• <b>Why 1.5?</b> It's a convention that works well for normal-ish data
+        </div>
+        <div class="math-box">
+        <b>📐 IQR Outlier Rule — Step by Step:</b>
+        <br><br><b>Given:</b> Q1 = $440, Q3 = $560
+        <br><br><b>Step 1:</b> Calculate IQR
+        <br>&nbsp;&nbsp;&nbsp;&nbsp;IQR = Q3 - Q1 = 560 - 440 = <b>$120</b>
+        <br><br><b>Step 2:</b> Calculate fences
+        <br>&nbsp;&nbsp;&nbsp;&nbsp;Lower = 440 - 1.5×120 = 440 - 180 = <b>$260</b>
+        <br>&nbsp;&nbsp;&nbsp;&nbsp;Upper = 560 + 1.5×120 = 560 + 180 = <b>$740</b>
+        <br><br><b>Step 3:</b> Flag outliers
+        <br>&nbsp;&nbsp;&nbsp;&nbsp;$1200 > $740 → <b>Outlier!</b>
+        <br>&nbsp;&nbsp;&nbsp;&nbsp;$80 < $260 → <b>Outlier!</b>
+        </div>
+        <div class="warn-box">⚠️ <b>Never auto-delete outliers!</b> Always investigate first. In fraud detection, outliers ARE the signal.</div>""",
+        code_str='''# IQR method for outlier detection
+Q1 = df["daily_sales"].quantile(0.25)
+Q3 = df["daily_sales"].quantile(0.75)
+IQR = Q3 - Q1
 
-    st.markdown("#### 🎮 Try It: Add an outlier and watch the damage")
-    outlier_v = st.slider("💰 Add a salary (drag right to add an outlier):", 50, 500, 75, 25, key="m1_out",
-                          help="Normal salaries are 50-100K. Drag higher to see what happens!")
-    np.random.seed(42)
-    base = np.random.normal(75, 10, 50)
-    data_out = np.append(base, outlier_v) if outlier_v > 100 else base
+lower_fence = Q1 - 1.5 * IQR
+upper_fence = Q3 + 1.5 * IQR
 
-    mc = st.columns(4)
-    mc[0].metric("Mean", f"${data_out.mean():.0f}K", f"{data_out.mean()-base.mean():+.0f}K" if outlier_v > 100 else None)
-    mc[1].metric("Median", f"${np.median(data_out):.0f}K", f"{np.median(data_out)-np.median(base):+.0f}K" if outlier_v > 100 else None)
-    mc[2].metric("Std Dev", f"{data_out.std():.0f}K", f"{data_out.std()-base.std():+.0f}K" if outlier_v > 100 else None)
-    mc[3].metric("Mean Distortion", f"{((data_out.mean()/base.mean())-1)*100:+.0f}%" if outlier_v > 100 else "0%")
-
-    fig3 = go.Figure()
-    colors = ['#f45d6d' if v == outlier_v and outlier_v > 100 else '#22d3a7' for v in data_out]
-    sizes = [14 if c == '#f45d6d' else 6 for c in colors]
-    fig3.add_trace(go.Scatter(x=list(range(len(data_out))), y=data_out, mode='markers', marker=dict(color=colors, size=sizes)))
-    fig3.add_hline(y=data_out.mean(), line_dash="dash", line_color="#f45d6d", annotation_text=f"Mean: ${data_out.mean():.0f}K")
-    fig3.add_hline(y=np.median(data_out), line_dash="dash", line_color="#7c6aff", annotation_text=f"Median: ${np.median(data_out):.0f}K")
-    fig3.update_layout(height=300, title="Outlier Impact: Mean gets dragged, Median stays put", xaxis_title="Employee #", yaxis_title="Salary ($K)", **DL)
-    st.plotly_chart(fig3, use_container_width=True, config={"displayModeBar": False})
-
-    if outlier_v > 100:
-        st.markdown(f"""<div class="red-box">👀 <b>See it?</b> One person earning ${outlier_v}K pulled the mean from ${base.mean():.0f}K to ${data_out.mean():.0f}K.
-        But the median barely moved! That's why the median is <b>robust</b> — it ignores extremes.</div>""", unsafe_allow_html=True)
-
-    # ── Matching Quiz ──
-    st.markdown("---")
-    match_quiz("m1_match",
-        "Match each scenario to the best measure of center:",
-        ["House prices in a city", "Most popular shoe size", "Test scores (no outliers)"],
-        ["Mean", "Median", "Mode"],
-        ["Median", "Mode", "Mean"],
-        [
-            "House prices are skewed (mansions pull the mean up). Median is better.",
-            "Shoe sizes are categories — Mode tells you the most common one.",
-            "With no outliers and symmetric data, Mean works great."
-        ]
+# Find outliers
+outliers = df[
+    (df["daily_sales"] < lower_fence) | 
+    (df["daily_sales"] > upper_fence)
+]
+print(f"Found {len(outliers)} outliers")''',
+        output_func=show_outliers,
+        concept_title="🔔 Outlier Detection",
+        output_title="IQR Method Results"
     )
 
     iq([
         {"q": "Explain mean, median, and mode. When would you use each?", "d": "Easy", "c": ["Google", "Amazon"],
-         "a": "<b>Mean:</b> Use when data is symmetric, no outliers. <b>Median:</b> Use when data is skewed or has outliers (income, house prices). <b>Mode:</b> Use for categorical data (most popular product, most common error type). <b>Key insight:</b> If mean >> median, data is right-skewed.",
-         "t": "Always mention outlier sensitivity of the mean. Give a concrete example."},
-        {"q": "What is standard deviation? Explain it to a 10-year-old.", "d": "Easy", "c": ["Meta", "Apple"],
-         "a": "Imagine your class takes a test. The average score is 75. Std dev tells you <b>how far most students scored from 75</b>. If std dev is 5, almost everyone got 70–80. If std dev is 20, scores ranged from 55 to 95. It measures <b>how spread out</b> the data is.",
-         "t": "Use the exam analogy — it's universally understood."},
-        {"q": "How do you detect outliers? Compare IQR and Z-score methods.", "d": "Medium", "c": ["Google", "Amazon", "Meta"],
-         "a": "<b>IQR:</b> Q1 - 1.5×IQR to Q3 + 1.5×IQR. Doesn't assume normal distribution. <b>Z-score:</b> Flag |z| > 2-3. Assumes roughly normal data. <b>Key difference:</b> IQR is robust (outliers don't affect Q1/Q3 much). Z-score uses mean and std, which ARE affected by outliers.",
-         "t": "Mention that you'd always VISUALIZE first. Box plots catch things formulas miss."},
-        {"q": "You're told the average response time is 200ms. Is the system healthy?", "d": "Medium", "c": ["Amazon", "Google", "Netflix"],
-         "a": "Not enough info! I'd ask: <b>What's the median?</b> <b>What's the std dev?</b> <b>What's the 95th/99th percentile?</b> P99 = 2000ms means 1% of users wait 2 seconds — terrible even if the average looks fine. <b>The average alone is never enough.</b>",
-         "t": "This is a CLASSIC system design question. Always ask for percentiles, not just averages."},
+         "a": "<b>Mean:</b> Use when data is symmetric. <b>Median:</b> Use when data is skewed or has outliers. <b>Mode:</b> Use for categorical data.",
+         "t": "Always mention outlier sensitivity of the mean."},
     ])
 
 
 # ═══════════════════════════════════════
-# MODULE 2: PROBABILITY
+# M2: PROBABILITY
 # ═══════════════════════════════════════
 elif module == "🎲 M2: Probability":
     st.markdown("# 🎲 Module 2: Probability")
-    st.caption("Week 1–2 · The math behind 'what are the odds?'")
-
-    st.markdown("""<div class="story-box">
-    <b>🎬 The Story:</b> You're at a carnival. There's a game where you pick a door — behind one is a prize.
-    Should you play? How do you decide? You think about the <b>chances</b>.
-    <br><br>
-    Probability is just a fancy word for <b>"how likely is something to happen?"</b>
-    It's a number from 0 (impossible — the sun won't rise in the west) to 1 (certain — you'll eventually get hungry).
-    <br><br>
-    Every prediction, every risk assessment, every "should we launch this feature?" decision is built on probability.
+    st.caption("Concept on Left · Code + Output on Right")
+    st.markdown("""<div class="concept-card">
+    <b>What is Probability?</b> It's the math of <b>uncertainty</b> — quantifying how likely something is to happen.
+    From "Will it rain?" to "Will this customer churn?" — probability gives you a number between 0 and 1.
+    <br><br>🎯 <b>Key concepts:</b> Basic probability, conditional probability (given X, what's P(Y)?), and Bayes' theorem (flipping conditionals).
     </div>""", unsafe_allow_html=True)
+    st.divider()
 
-    # ── Basics ──
-    st.markdown("### 📖 The Basics: Counting Chances")
+    # Generate order data
+    np.random.seed(42)
+    n_orders = 2000
+    orders = pd.DataFrame({
+        "order_id": range(1, n_orders+1),
+        "delivery_time": np.random.normal(35, 12, n_orders).clip(15, 80),
+        "complained": np.random.choice([0, 1], n_orders, p=[0.85, 0.15]),
+        "churned": np.random.choice([0, 1], n_orders, p=[0.87, 0.13]),
+    })
+    orders.loc[orders["complained"] == 1, "churned"] = np.random.choice([0, 1], orders["complained"].sum(), p=[0.6, 0.4])
 
-    st.markdown("""<div class="analogy-box">
-    🎯 <b>The simplest formula in all of statistics:</b>
-    <br><br>
-    <b>Probability = (ways it can happen) ÷ (total possible outcomes)</b>
-    <br><br>
-    🪙 Coin flip: 1 way to get heads ÷ 2 total outcomes = <b>0.5 (50%)</b><br>
-    🎲 Rolling a 6: 1 way ÷ 6 total outcomes = <b>0.167 (16.7%)</b><br>
-    🃏 Drawing an Ace: 4 aces ÷ 52 cards = <b>0.077 (7.7%)</b>
-    </div>""", unsafe_allow_html=True)
-
-    # ── Three Rules ──
-    st.markdown("### 📖 The Three Rules You Actually Need")
-
-    st.markdown("""<div class="story-box" style="border-left:4px solid #7c6aff">
-    <b style="color:#7c6aff">Rule 1: "OR" — Add (but don't double-count)</b>
-    <br><br>
-    <b>Question:</b> "What's the chance of A happening OR B happening?"
-    <br><b>Formula:</b> P(A or B) = P(A) + P(B) − P(both)
-    <br><br>
-    <b>🍕 Pizza analogy:</b> In a class of 30 kids, 10 like pepperoni, 8 like mushroom, 3 like both.
-    How many like at least one? Not 10+8=18 (you counted the 3 twice!). It's 10+8−3 = <b>15</b>.
-    </div>""", unsafe_allow_html=True)
-
-    st.markdown("""<div class="story-box" style="border-left:4px solid #22d3a7">
-    <b style="color:#22d3a7">Rule 2: "AND" — Multiply (if independent)</b>
-    <br><br>
-    <b>Question:</b> "What's the chance of A AND B both happening?"
-    <br><b>Formula:</b> P(A and B) = P(A) × P(B) — but ONLY if they don't affect each other!
-    <br><br>
-    <b>🪙 Example:</b> Flip a coin AND roll a die. P(heads AND six) = ½ × ⅙ = <b>1/12</b>.
-    The coin doesn't care what the die does — they're <b>independent</b>.
-    <br><br>
-    <b>☔ Counter-example:</b> P(umbrella AND rain) — you CAN'T just multiply these!
-    If it's raining, you're way more likely to carry an umbrella. They're <b>dependent</b>.
-    </div>""", unsafe_allow_html=True)
-
-    st.markdown("""<div class="story-box" style="border-left:4px solid #f5b731">
-    <b style="color:#f5b731">Rule 3: "NOT" — Subtract from 1</b>
-    <br><br>
-    <b>Question:</b> "What's the chance of something NOT happening?"
-    <br><b>Formula:</b> P(not A) = 1 − P(A)
-    <br><br>
-    <b>🎲 Trick:</b> "What's the probability of getting at least one 6 in four dice rolls?"
-    Hard to calculate directly. But P(zero sixes) = (5/6)⁴ = 0.48. So P(at least one 6) = 1 − 0.48 = <b>0.52</b>. Easy!
-    </div>""", unsafe_allow_html=True)
-
-    # ── Interactive Coin Flip ──
-    st.markdown("#### 🎮 Try It: Coin Flip Simulator")
-    st.caption("Flip a coin many times and watch the probability settle toward 0.5. This is the Law of Large Numbers in action!")
-
-    n_flips = st.slider("Number of flips:", 10, 50000, 1000, 100, key="m2_flips")
-    if st.button("🪙 Flip the coins!", key="m2_flip_btn"):
-        np.random.seed(None)
-        results = np.random.choice([0, 1], n_flips)
-        running = np.cumsum(results) / np.arange(1, n_flips + 1)
-        mc = st.columns(2)
-        mc[0].metric("Heads %", f"{results.mean()*100:.1f}%", f"{(results.mean()-0.5)*100:+.1f}% from 50%")
-        mc[1].metric("Total Flips", f"{n_flips:,}")
+    # Row 1: Basic Probability
+    def show_basic_prob():
+        late_threshold = 45
+        late_count = (orders["delivery_time"] > late_threshold).sum()
+        total = len(orders)
+        prob = late_count / total
+        
+        mc = st.columns(3)
+        mc[0].metric("Total Orders", f"{total:,}")
+        mc[1].metric("Late (>45min)", late_count)
+        mc[2].metric("P(Late)", f"{prob:.1%}")
+        
         fig = go.Figure()
-        fig.add_trace(go.Scatter(y=running, mode='lines', line=dict(color='#7c6aff', width=1.5), name="Running average"))
-        fig.add_hline(y=0.5, line_dash="dash", line_color="#22d3a7", annotation_text="Theory: 50%")
-        fig.update_layout(height=300, title="Watch it converge! More flips → closer to 50%", xaxis_title="Flip #", yaxis_title="% Heads", **DL)
+        fig.add_trace(go.Histogram(x=orders["delivery_time"], nbinsx=30, marker_color="#7c6aff", opacity=0.7))
+        fig.add_vline(x=late_threshold, line_dash="dash", line_color="#f45d6d", annotation_text="Late: 45min")
+        fig.update_layout(height=200, title="Delivery Time Distribution", **DL)
         st.plotly_chart(fig, use_container_width=True, config={"displayModeBar": False})
 
-        st.markdown("""<div class="green-box">💡 <b>The Law of Large Numbers:</b> With few flips, the result is wild (maybe 70% heads!).
-        With thousands of flips, it always settles near 50%. This is why casinos always win in the long run — they play millions of "flips."</div>""", unsafe_allow_html=True)
+    split_row(
+        concept_html="""<div class="concept-card">
+        <b>🤔 What is probability?</b>
+        <br><br>Probability is a number between 0 and 1 that tells you <b>how likely something is to happen</b>.
+        <br>• P = 0 means "impossible" (sun rising in the west)
+        <br>• P = 1 means "certain" (sun rising tomorrow)
+        <br>• P = 0.5 means "50-50 chance" (fair coin flip)
+        <br><br><b>The formula is simple:</b>
+        <br>P(event) = (# of ways event can happen) / (total # of possible outcomes)
+        <br><br><b>Real-world example:</b> You're a delivery manager. Out of 2000 orders, 495 arrived late (>45 min). What's the probability a random order is late?
+        <br><br><b>Why it matters:</b> If P(late) = 25%, and you have 100 orders today, expect ~25 complaints. Now you can staff accordingly!
+        </div>
+        <div class="math-box">
+        <b>📐 Basic Probability — Step by Step:</b>
+        <br><br><b>Given:</b> 2000 total orders, 495 were late
+        <br><br><b>Calculate P(late):</b>
+        <br>&nbsp;&nbsp;&nbsp;&nbsp;P(late) = late orders / total orders
+        <br>&nbsp;&nbsp;&nbsp;&nbsp;P(late) = 495 / 2000 = <b>0.2475 = 24.75%</b>
+        <br><br>🧠 <b>Interpretation:</b> "If you pick a random order, there's about a 1-in-4 chance it was late."
+        </div>""",
+        code_str='''# Basic probability calculation
+late_threshold = 45  # minutes
 
-    # ── Conditional Probability ──
-    st.markdown("---")
-    st.markdown("### 📖 Conditional Probability: 'Given that X happened...'")
+late_orders = orders[orders["delivery_time"] > late_threshold]
+late_count = len(late_orders)
+total = len(orders)
 
-    st.markdown("""<div class="story-box">
-    <b>🎬 The Story:</b> A school has 200 students. You know:
-    <br>• 120 play sports (60%)
-    <br>• 80 get A grades (40%)
-    <br>• 50 do BOTH (25%)
-    <br><br>
-    Now someone says: <i>"I picked a random student who plays sports."</i>
-    What's the chance they ALSO get A grades?
-    <br><br>
-    <b>Key insight:</b> You're no longer looking at all 200 students. You've <b>zoomed in</b> to just the 120 athletes.
-    Of those 120, how many get A's? <b>50.</b>
-    <br><br>
-    <div style="text-align:center;font-size:1.2rem;padding:0.6rem;background:rgba(124,106,255,0.08);border-radius:10px;margin:0.5rem 0">
-    P(A grades | plays sports) = 50 / 120 = <b>41.7%</b>
-    </div>
-    <br>
-    Compare to P(A grades) for ALL students = 40%. Knowing they play sports <b>slightly changed</b> the probability.
-    The "given" information <b>narrows your world</b>.
-    </div>""", unsafe_allow_html=True)
-
-    # ── Bayes' Theorem ──
-    st.markdown("---")
-    st.markdown("### 📖 Bayes' Theorem: The Plot Twist of Probability")
-
-    st.markdown("""<div class="story-box">
-    <b>🎬 The Story:</b> A disease affects 1 in 1,000 people. You take a test that's 99% accurate. It comes back <b>positive</b>.
-    <br><br>
-    <b>Quick — what's the chance you're actually sick?</b>
-    <br><br>
-    Most people say "99%!" But the real answer is shocking...
-    </div>""", unsafe_allow_html=True)
-
-    st.markdown("""<div class="analogy-box">
-    🧮 <b>Let's walk through it with 10,000 people:</b>
-    <br><br>
-    • <b>10 people</b> actually have the disease (1 in 1,000)<br>
-    • Of those 10, the test correctly catches <b>~10</b> (99% sensitivity)<br>
-    • Of the 9,990 healthy people, the test <b>falsely flags ~500</b> (5% false positive rate)<br>
-    <br>
-    So 510 people test positive, but only 10 are actually sick!
-    <br><br>
-    <div style="text-align:center;font-size:1.2rem;padding:0.6rem;background:rgba(244,93,109,0.1);border-radius:10px;margin:0.5rem 0">
-    P(sick | positive test) = 10 / 510 ≈ <b>2%</b> 😱
-    </div>
-    <br>
-    <b>Why so low?</b> The disease is so rare that false positives overwhelm true positives.
-    This is called the <b>base rate fallacy</b> — ignoring how rare something is.
-    </div>""", unsafe_allow_html=True)
-
-    st.markdown("#### 🎮 Try It: Bayes' Calculator")
-    st.caption("Adjust the numbers and see how the answer changes. Try making the disease more common!")
-    c1, c2, c3 = st.columns(3)
-    prevalence = c1.slider("How common is the disease?", 0.001, 0.1, 0.001, 0.001, format="%.3f", key="m2_prev",
-                           help="0.001 = 1 in 1000 people have it")
-    sensitivity = c2.slider("Test accuracy (catches sick people):", 0.5, 1.0, 0.99, 0.01, key="m2_sens")
-    fpr = c3.slider("False alarm rate:", 0.01, 0.2, 0.05, 0.01, key="m2_fpr",
-                    help="How often the test says 'positive' for healthy people")
-
-    p_pos = sensitivity * prevalence + fpr * (1 - prevalence)
-    p_disease_given_pos = (sensitivity * prevalence) / p_pos
-
-    st.markdown(f"""<div class="{'green-box' if p_disease_given_pos > 0.5 else 'red-box'}">
-    <b>P(actually sick | tested positive) = {p_disease_given_pos:.1%}</b>
-    <br><br>{'✅ The test is reliable here — a positive result likely means disease.' if p_disease_given_pos > 0.5 else f'⚠️ Despite a {sensitivity:.0%} accurate test, a positive result only means a <b>{p_disease_given_pos:.1%}</b> chance of disease! The disease is so rare that false positives dominate.'}
-    <br><br>💡 <b>Try it:</b> Increase the disease prevalence and watch the probability jump. The rarer the condition, the less you can trust a single positive test.
-    </div>""", unsafe_allow_html=True)
-
-    # ── Quiz ──
-    check_quiz("m2_q1",
-        "You flip a fair coin 10 times and get 10 heads. What's the probability of heads on the 11th flip?",
-        ["Almost 100% — it's on a streak!", "Less than 50% — tails is 'due'", "Exactly 50% — each flip is independent"],
-        2,
-        "Each flip is independent — the coin has no memory! This mistake is called the Gambler's Fallacy."
+p_late = late_count / total
+print(f"P(late) = {late_count}/{total} = {p_late:.1%}")''',
+        output_func=show_basic_prob,
+        concept_title="📊 Basic Probability",
+        output_title="P(Late Delivery)"
     )
 
-    iq([
-        {"q": "Explain Bayes' Theorem with a real example.", "d": "Hard", "c": ["Google", "Apple", "Amazon"],
-         "a": "Bayes' updates beliefs with new evidence. <b>Example:</b> Disease affects 1/1000. Test is 99% accurate, 5% false positive. You test positive. Out of 10,000 people: 10 true positives + 500 false positives = 510 positives. P(sick|positive) = 10/510 ≈ 2%. The 'base rate' (rarity of disease) dominates.",
-         "t": "Walk through the numbers step by step. Draw a 2×2 table if you can."},
-        {"q": "What's the difference between independent and dependent events?", "d": "Easy", "c": ["Google", "Meta"],
-         "a": "<b>Independent:</b> One event doesn't affect the other. P(A and B) = P(A) × P(B). Example: two coin flips. <b>Dependent:</b> One event changes the probability of the other. P(A and B) = P(A) × P(B|A). Example: drawing cards without replacement.",
-         "t": "Use the card deck example — it's concrete and universally understood."},
-        {"q": "A spam filter has 95% accuracy. 2% of emails are spam. An email is flagged. What's the probability it's actually spam?", "d": "Hard", "c": ["Google", "Netflix"],
-         "a": "Bayes': P(spam|flagged) = P(flagged|spam)×P(spam) / P(flagged). P(flagged) = 0.95×0.02 + 0.05×0.98 = 0.068. P(spam|flagged) = 0.019/0.068 ≈ <b>28%</b>. Despite 95% accuracy, only 28% of flagged emails are actually spam!",
-         "t": "Same structure as the disease testing question. Show you can apply Bayes' to any domain."},
-    ])
+    # Row 2: Conditional Probability
+    def show_conditional():
+        complainers = orders[orders["complained"] == 1]
+        non_complainers = orders[orders["complained"] == 0]
+        
+        p_churn_complained = complainers["churned"].mean()
+        p_churn_no_complaint = non_complainers["churned"].mean()
+        
+        mc = st.columns(2)
+        mc[0].metric("P(Churn | Complained)", f"{p_churn_complained:.1%}")
+        mc[1].metric("P(Churn | No Complaint)", f"{p_churn_no_complaint:.1%}")
+        
+        fig = go.Figure(data=[
+            go.Bar(name='Complained', x=['Churn Rate'], y=[p_churn_complained], marker_color='#f45d6d'),
+            go.Bar(name='No Complaint', x=['Churn Rate'], y=[p_churn_no_complaint], marker_color='#22d3a7')
+        ])
+        fig.update_layout(height=200, barmode='group', **DL)
+        st.plotly_chart(fig, use_container_width=True, config={"displayModeBar": False})
+
+    split_row(
+        concept_html="""<div class="concept-card">
+        <b>🤔 What is conditional probability?</b>
+        <br><br>Sometimes you want to know the probability of something <b>given that something else already happened</b>. The "|" symbol means "given that."
+        <br><br><b>P(A|B)</b> = "Probability of A, given that B happened"
+        <br><br><b>The key insight:</b> You're <b>filtering your universe</b>. Instead of looking at ALL customers, you only look at customers who complained.
+        <br><br><b>Real-world example:</b>
+        <br>• Overall churn rate: 13% of all customers leave
+        <br>• But what about customers who complained? 40% of them leave!
+        <br>• This tells you: complaints are a <b>warning signal</b> for churn
+        <br><br><b>Why it matters:</b> If you can identify high-risk groups (complainers), you can intervene before they leave!
+        </div>
+        <div class="math-box">
+        <b>📐 Conditional Probability — Step by Step:</b>
+        <br><br><b>Question:</b> What's P(churn | complained)?
+        <br><br><b>Step 1:</b> Filter to only complainers
+        <br>&nbsp;&nbsp;&nbsp;&nbsp;300 customers complained
+        <br><br><b>Step 2:</b> Count how many churned
+        <br>&nbsp;&nbsp;&nbsp;&nbsp;120 of those 300 churned
+        <br><br><b>Step 3:</b> Calculate
+        <br>&nbsp;&nbsp;&nbsp;&nbsp;P(churn | complained) = 120/300 = <b>40%</b>
+        <br><br><b>Compare to baseline:</b>
+        <br>&nbsp;&nbsp;&nbsp;&nbsp;P(churn | no complaint) = 136/1700 = <b>8%</b>
+        <br><br>🧠 Complainers churn at <b>5× the rate</b>! This is actionable insight.
+        </div>
+        <div class="warn-box">⚠️ <b>Business insight:</b> Prioritize reaching out to customers who complained — they're 5× more likely to leave!</div>""",
+        code_str='''# Conditional probability: P(A|B)
+complainers = orders[orders["complained"] == 1]
+non_complainers = orders[orders["complained"] == 0]
+
+p_churn_given_complained = complainers["churned"].mean()
+p_churn_given_no_complaint = non_complainers["churned"].mean()
+
+print(f"P(churn | complained) = {p_churn_given_complained:.1%}")
+print(f"P(churn | no complaint) = {p_churn_given_no_complaint:.1%}")''',
+        output_func=show_conditional,
+        concept_title="🔀 Conditional Probability",
+        output_title="P(Churn | Complained)"
+    )
+
+    # Row 3: Bayes' Theorem
+    def show_bayes():
+        p_complained = orders["complained"].mean()
+        p_churned = orders["churned"].mean()
+        p_churn_given_complained = orders[orders["complained"] == 1]["churned"].mean()
+        p_complained_given_churned = (p_churn_given_complained * p_complained) / p_churned
+        
+        mc = st.columns(4)
+        mc[0].metric("P(Complained)", f"{p_complained:.1%}")
+        mc[1].metric("P(Churned)", f"{p_churned:.1%}")
+        mc[2].metric("P(Churn|Complained)", f"{p_churn_given_complained:.1%}")
+        mc[3].metric("P(Complained|Churned)", f"{p_complained_given_churned:.1%}")
+
+    split_row(
+        concept_html="""<div class="concept-card">
+        <b>🤔 What is Bayes' Theorem and why is it powerful?</b>
+        <br><br>Bayes' Theorem lets you <b>flip a conditional probability</b>. You know P(B|A), but you need P(A|B).
+        <br><br><b>Real-world example:</b>
+        <br>• You know: "40% of complainers churn" — P(churn | complained)
+        <br>• You want: "What % of churned customers had complained?" — P(complained | churned)
+        <br><br><b>Why does this matter?</b>
+        <br>• If 46% of churned customers complained first, complaints are a <b>leading indicator</b>
+        <br>• You can build an early warning system!
+        <br><br><b>The formula:</b> P(A|B) = P(B|A) × P(A) / P(B)
+        <br><br><b>Analogy:</b> A medical test is 99% accurate. You test positive. What's the chance you're actually sick? Bayes tells you — and the answer might surprise you (it depends on how rare the disease is)!
+        </div>
+        <div class="math-box">
+        <b>📐 Bayes' Theorem — Step by Step:</b>
+        <br><br><b>Question:</b> What % of churned customers had complained?
+        <br><br><b>Given:</b>
+        <br>&nbsp;&nbsp;&nbsp;&nbsp;P(complained) = 15% (overall complaint rate)
+        <br>&nbsp;&nbsp;&nbsp;&nbsp;P(churned) = 13% (overall churn rate)
+        <br>&nbsp;&nbsp;&nbsp;&nbsp;P(churn | complained) = 40%
+        <br><br><b>Apply Bayes:</b>
+        <br>&nbsp;&nbsp;&nbsp;&nbsp;P(complained | churned) = P(churn|complained) × P(complained) / P(churned)
+        <br>&nbsp;&nbsp;&nbsp;&nbsp;= (0.40 × 0.15) / 0.13
+        <br>&nbsp;&nbsp;&nbsp;&nbsp;= 0.06 / 0.13 = <b>46%</b>
+        <br><br>🧠 <b>Insight:</b> Nearly half of churned customers complained first! Complaints are a strong warning signal.
+        </div>""",
+        code_str='''# Bayes' Theorem: P(A|B) = P(B|A) × P(A) / P(B)
+p_complained = orders["complained"].mean()
+p_churned = orders["churned"].mean()
+p_churn_given_complained = orders[orders["complained"] == 1]["churned"].mean()
+
+# Apply Bayes
+p_complained_given_churned = (
+    p_churn_given_complained * p_complained / p_churned
+)
+print(f"P(complained | churned) = {p_complained_given_churned:.1%}")''',
+        output_func=show_bayes,
+        concept_title="🔄 Bayes' Theorem",
+        output_title="Flipping Conditionals"
+    )
 
 
 # ═══════════════════════════════════════
-# MODULE 3: DISTRIBUTIONS
+# M3: DISTRIBUTIONS
 # ═══════════════════════════════════════
 elif module == "📈 M3: Distributions":
     st.markdown("# 📈 Module 3: Distributions")
-    st.caption("Week 2 · What shape does your data make? And why should you care?")
-
-    st.markdown("""<div class="story-box">
-    <b>🎬 The Story:</b> Imagine you're pouring M&Ms from a bag onto a table and sorting them by color.
-    You'd see a <b>pattern</b> — maybe lots of brown, fewer blue, very few green.
-    <br><br>
-    A <b>distribution</b> is just that pattern — it shows you <b>how your data is spread out</b>.
-    Is it a nice bell shape? Is it lopsided? Does it have two humps? The shape tells you
-    which tools work and what to expect.
+    st.caption("Concept on Left · Code + Output on Right")
+    st.markdown("""<div class="concept-card">
+    <b>What are Distributions?</b> They describe the <b>shape of your data</b> — how values are spread across a range.
+    Is it bell-shaped? Skewed? Understanding distributions helps you pick the right statistical tests and make better predictions.
+    <br><br>🎯 <b>Key distributions:</b> Normal (bell curve), Binomial (success/failure trials), Poisson (event counts).
     </div>""", unsafe_allow_html=True)
+    st.divider()
 
-    # ── Normal Distribution ──
-    st.markdown("### 📖 The Bell Curve (Normal Distribution)")
+    # Row 1: Normal Distribution
+    def show_normal():
+        from scipy.stats import norm
+        data = df["avg_order_value"]
+        mean_val, std_val = data.mean(), data.std()
+        
+        mc = st.columns(3)
+        mc[0].metric("Mean (μ)", f"${mean_val:.2f}")
+        mc[1].metric("Std Dev (σ)", f"${std_val:.2f}")
+        mc[2].metric("68% Range", f"${mean_val-std_val:.0f}-${mean_val+std_val:.0f}")
+        
+        fig = go.Figure()
+        fig.add_trace(go.Histogram(x=data, nbinsx=20, marker_color="#7c6aff", opacity=0.7, name="Data"))
+        x_range = np.linspace(data.min(), data.max(), 100)
+        y_norm = norm.pdf(x_range, mean_val, std_val) * len(data) * (data.max() - data.min()) / 20
+        fig.add_trace(go.Scatter(x=x_range, y=y_norm, mode='lines', line=dict(color='#f5b731', width=2, dash='dash'), name='Normal'))
+        fig.update_layout(height=220, title="Order Values vs Normal Curve", **DL)
+        st.plotly_chart(fig, use_container_width=True, config={"displayModeBar": False})
 
-    st.markdown("""<div class="analogy-box">
-    🏀 <b>Think of it like basketball players' heights:</b>
-    <br><br>
-    Most NBA players are around 6'6" (the peak of the bell). A few are shorter (6'0"), a few are taller (7'2"),
-    but the extremes are rare. If you plotted all their heights, you'd get a beautiful bell shape.
-    <br><br>
-    The bell curve is defined by just <b>two numbers</b>:
-    <br>• <b>μ (mu) = the average</b> — where the peak sits
-    <br>• <b>σ (sigma) = the spread</b> — how wide the bell is
-    <br><br>
-    Small σ = everyone is similar height (tall, narrow bell)<br>
-    Large σ = heights vary a lot (short, wide bell)
-    </div>""", unsafe_allow_html=True)
+    split_row(
+        concept_html="""<div class="concept-card">
+        <b>🤔 What is the Normal Distribution?</b>
+        <br><br>The normal distribution (bell curve) is <b>nature's favorite shape</b>. When you measure almost anything in large quantities — heights, test scores, manufacturing errors — you get this symmetric, bell-shaped pattern.
+        <br><br><b>Why does it happen?</b> When many small, independent factors add up, the result tends toward normal. Your height = genetics + nutrition + sleep + exercise + ... = bell curve!
+        <br><br><b>The two magic numbers:</b>
+        <br>• <b>μ (mean):</b> Where the peak is — the "center" of the bell
+        <br>• <b>σ (std dev):</b> How wide the bell is — the "spread"
+        <br><br><b>Why it matters:</b> If you know data is normal, you can make powerful predictions. "68% of customers spend between $17-$27" — that's actionable!
+        <br><br><b>The 68-95-99.7 Rule:</b> This is the most useful thing about normal distributions:
+        <br>• 68% of data falls within 1σ of the mean
+        <br>• 95% falls within 2σ
+        <br>• 99.7% falls within 3σ
+        <br>• Beyond 3σ? That's a 0.3% event — investigate it!
+        </div>
+        <div class="math-box">
+        <b>📐 68-95-99.7 Rule — Step by Step:</b>
+        <br><br><b>Given:</b> μ = $22, σ = $5
+        <br><br><b>68% range (μ ± 1σ):</b>
+        <br>&nbsp;&nbsp;&nbsp;&nbsp;$22 - $5 to $22 + $5 = <b>$17 to $27</b>
+        <br>&nbsp;&nbsp;&nbsp;&nbsp;→ "Most customers spend $17-$27"
+        <br><br><b>95% range (μ ± 2σ):</b>
+        <br>&nbsp;&nbsp;&nbsp;&nbsp;$22 - $10 to $22 + $10 = <b>$12 to $32</b>
+        <br>&nbsp;&nbsp;&nbsp;&nbsp;→ "Almost all customers spend $12-$32"
+        <br><br><b>99.7% range (μ ± 3σ):</b>
+        <br>&nbsp;&nbsp;&nbsp;&nbsp;$22 - $15 to $22 + $15 = <b>$7 to $37</b>
+        <br>&nbsp;&nbsp;&nbsp;&nbsp;→ "Virtually everyone is in this range"
+        <br><br>🧠 Order > $37 is a 0.15% event — either a big spender or a data error!
+        </div>
+        <div class="insight-box">💡 <b>Real-world use:</b> Quality control uses 3σ limits. If a measurement is beyond 3σ, something is wrong with the process!</div>""",
+        code_str='''from scipy.stats import norm
 
-    st.markdown("#### 🎮 Shape the Bell Curve Yourself")
-    st.caption("Drag the sliders and watch the bell change shape!")
+data = df["avg_order_value"]
+mean = data.mean()
+std = data.std()
 
-    c1, c2 = st.columns(2)
-    mu = c1.slider("📍 Average (μ) — where's the peak?", -5.0, 5.0, 0.0, 0.5, key="m3_mu")
-    sigma = c2.slider("📏 Spread (σ) — how wide?", 0.3, 4.0, 1.0, 0.1, key="m3_sigma")
-
-    x = np.linspace(-10, 10, 500)
-    y = (1/(sigma*np.sqrt(2*np.pi))) * np.exp(-0.5*((x-mu)/sigma)**2)
-    fig = go.Figure()
-    fig.add_trace(go.Scatter(x=x, y=y, fill='tozeroy', fillcolor='rgba(124,106,255,0.2)', line=dict(color='#7c6aff', width=2.5)))
-    fig.add_vline(x=mu, line_dash="dash", line_color="#22d3a7", annotation_text=f"Peak (μ={mu})")
-    fig.add_vrect(x0=mu-sigma, x1=mu+sigma, fillcolor="rgba(34,211,167,0.12)", line_width=0)
-    fig.add_annotation(x=mu, y=max(y)*0.3, text="<b>68% of data</b>", showarrow=False, font=dict(color="#22d3a7", size=12))
-    fig.update_layout(height=350, title=f"Bell Curve: Average={mu}, Spread={sigma}", xaxis_title="Value", yaxis_title="How common?", **DL)
-    st.plotly_chart(fig, use_container_width=True, config={"displayModeBar": False})
-
-    st.markdown(f"""<div class="green-box">
-    💡 <b>What you're seeing:</b> The peak is at μ={mu} — most values cluster here.
-    The green band covers μ±σ = [{mu-sigma:.1f} to {mu+sigma:.1f}] — <b>68%</b> of all data falls in this range.
-    {'The bell is narrow — data is very consistent.' if sigma < 1.0 else 'The bell is wide — data varies a lot.' if sigma > 2.0 else 'A moderate spread.'}
-    <b>Try dragging σ</b> to see the bell get wider/narrower!
-    </div>""", unsafe_allow_html=True)
-
-    # ── Skewed ──
-    st.markdown("---")
-    st.markdown("### 📖 When Data Isn't a Bell: Skewed Distributions")
-
-    st.markdown("""<div class="story-box">
-    Not everything is a nice bell curve. <b>Income</b> is a classic example:
-    most people earn $30K–$80K, but a few billionaires stretch the tail way to the right.
-    <br><br>
-    🔹 <b>Right-skewed</b> (tail goes right): Income, house prices, social media followers<br>
-    🔹 <b>Left-skewed</b> (tail goes left): Age at retirement, easy exam scores<br>
-    🔹 <b>Symmetric</b>: Heights, IQ scores, measurement errors
-    <br><br>
-    <b>Quick test:</b> If mean > median → right-skewed. If mean < median → left-skewed.
-    </div>""", unsafe_allow_html=True)
-
-    skew_type = st.radio("Pick a shape to explore:", ["🔔 Symmetric (Bell Curve)", "➡️ Right-Skewed (Income-like)", "⬅️ Left-Skewed"], horizontal=True, key="m3_skew")
-    np.random.seed(42)
-    if "Symmetric" in skew_type:
-        sdata = np.random.normal(50, 10, 2000)
-        story = "Perfectly balanced — mean and median are the same."
-    elif "Right" in skew_type:
-        sdata = np.random.exponential(20, 2000) + 20
-        story = "Long tail to the right. A few very high values pull the mean above the median."
-    else:
-        sdata = 100 - np.random.exponential(20, 2000)
-        story = "Long tail to the left. A few very low values pull the mean below the median."
-
-    fig_s = go.Figure(go.Histogram(x=sdata, nbinsx=40, marker_color="#22d3a7", opacity=0.7))
-    fig_s.add_vline(x=sdata.mean(), line_dash="dash", line_color="#f45d6d", annotation_text=f"Mean: {sdata.mean():.1f}")
-    fig_s.add_vline(x=np.median(sdata), line_dash="dash", line_color="#7c6aff", annotation_text=f"Median: {np.median(sdata):.1f}")
-    fig_s.update_layout(height=300, title=skew_type.split(" ", 1)[1], **DL)
-    st.plotly_chart(fig_s, use_container_width=True, config={"displayModeBar": False})
-
-    st.markdown(f"""<div class="green-box">💡 {story} Gap between mean and median = {abs(sdata.mean()-np.median(sdata)):.1f}</div>""", unsafe_allow_html=True)
-
-    # ── Poisson ──
-    st.markdown("---")
-    st.markdown("### 📖 Poisson Distribution: Counting Rare Events")
-
-    st.markdown("""<div class="analogy-box">
-    📞 <b>Real-life examples:</b>
-    <br>• How many customers call support per hour?
-    <br>• How many typos per page in a book?
-    <br>• How many goals in a soccer match?
-    <br><br>
-    These are all <b>counts of events</b> in a fixed time/space. The Poisson distribution models them perfectly.
-    It has just one number: <b>λ (lambda) = the average rate</b>.
-    <br><br>
-    If your call center averages 4 calls/hour (λ=4), Poisson tells you the probability of getting 0, 1, 2, ... 10+ calls in any given hour.
-    </div>""", unsafe_allow_html=True)
-
-    lam = st.slider("📞 Average events per hour (λ):", 1, 20, 4, key="m3_lam")
-    pois = np.random.poisson(lam, 5000)
-    fig_p = go.Figure(go.Histogram(x=pois, nbinsx=int(max(pois)-min(pois)+1), marker_color="#f5b731", opacity=0.7))
-    fig_p.add_vline(x=lam, line_dash="dash", line_color="#f45d6d", annotation_text=f"Average: λ={lam}")
-    fig_p.update_layout(height=280, title=f"If you average {lam} events/hour, here's what to expect", xaxis_title="Events in one hour", yaxis_title="How often", **DL)
-    st.plotly_chart(fig_p, use_container_width=True, config={"displayModeBar": False})
-
-    st.markdown(f"""<div class="green-box">💡 If λ={lam} and you suddenly see <b>{lam*3}+ events</b> in one hour, that's a red flag — something unusual is happening!</div>""", unsafe_allow_html=True)
-
-    # ── Binomial ──
-    st.markdown("---")
-    st.markdown("### 📖 Binomial Distribution: Counting Successes")
-
-    st.markdown("""<div class="analogy-box">
-    🎯 <b>The setup:</b> You do something a fixed number of times, and each time it either <b>succeeds</b> or <b>fails</b>.
-    <br><br>
-    • Send 100 emails → how many get opened? (n=100, p=open rate)<br>
-    • Ask 50 customers → how many buy? (n=50, p=conversion rate)<br>
-    • Flip a coin 20 times → how many heads? (n=20, p=0.5)
-    <br><br>
-    Two numbers define it: <b>n</b> (how many tries) and <b>p</b> (chance of success each try).
-    </div>""", unsafe_allow_html=True)
-
-    bc1, bc2 = st.columns(2)
-    n_trials = bc1.slider("🔄 Number of tries (n):", 5, 100, 20, key="m3_binom_n")
-    p_success = bc2.slider("🎯 Success rate (p):", 0.01, 0.99, 0.3, 0.01, key="m3_binom_p")
-
-    np.random.seed(42)
-    binom_data = np.random.binomial(n_trials, p_success, 5000)
-    expected = n_trials * p_success
-
-    fig_b = go.Figure(go.Histogram(x=binom_data, nbinsx=min(n_trials+1, 50), marker_color="#e879a8", opacity=0.7))
-    fig_b.add_vline(x=expected, line_dash="dash", line_color="#22d3a7", annotation_text=f"Expected: {expected:.1f}")
-    fig_b.update_layout(height=280, title=f"Out of {n_trials} tries with {p_success:.0%} success rate", xaxis_title="Number of Successes", yaxis_title="How often", **DL)
-    st.plotly_chart(fig_b, use_container_width=True, config={"displayModeBar": False})
-
-    st.markdown(f"""<div class="green-box">💡 With {n_trials} tries and {p_success:.0%} success rate, expect about <b>{expected:.0f} successes</b>.
-    But it could be anywhere from {int(max(0, expected-3*np.sqrt(expected*(1-p_success))))} to {int(min(n_trials, expected+3*np.sqrt(expected*(1-p_success))))} — that's normal variation!</div>""", unsafe_allow_html=True)
-
-    # ── Why Distributions Matter ──
-    st.markdown("---")
-    st.markdown("### 🧠 Why Should You Care About Distributions?")
-
-    reasons = [
-        ("🔍 Choosing the right tool", "#7c6aff", "Many statistical tests assume your data is bell-shaped. If it's not, those tests give wrong answers. Knowing the shape tells you which tools are safe."),
-        ("🚨 Spotting problems", "#f45d6d", "If you know 'normal' looks like 4 errors/hour, then 15 errors/hour is a red flag. Distributions define what 'normal' looks like."),
-        ("🤖 Better ML models", "#22d3a7", "ML models often work better when data is bell-shaped. That's why data scientists transform skewed data before modeling."),
-        ("📊 Picking the right model", "#f5b731", "Count data → Poisson regression. Yes/no data → Logistic regression. Continuous data → Linear regression. The distribution guides the choice."),
-    ]
-    for title, color, desc in reasons:
-        st.markdown(f"""<div class="story-box" style="border-left:4px solid {color}"><b>{title}</b><br>{desc}</div>""", unsafe_allow_html=True)
-
-    # ── Matching Quiz ──
-    match_quiz("m3_match",
-        "Match each real-world scenario to the right distribution:",
-        ["Heights of adults", "Number of website crashes per month", "Emails opened out of 100 sent"],
-        ["Normal (Bell Curve)", "Poisson", "Binomial"],
-        ["Normal (Bell Curve)", "Poisson", "Binomial"],
-        [
-            "Heights cluster around an average with a bell shape — classic Normal distribution.",
-            "Counting rare events (crashes) in a fixed time period — that's Poisson.",
-            "Fixed number of trials (100 emails), each with a success/fail outcome — Binomial."
-        ]
+# 68-95-99.7 rule
+print(f"68% of data: {mean-std:.0f} to {mean+std:.0f}")
+print(f"95% of data: {mean-2*std:.0f} to {mean+2*std:.0f}")''',
+        output_func=show_normal,
+        concept_title="🔔 Normal Distribution",
+        output_title="Order Values"
     )
 
-    iq([
-        {"q": "What is the normal distribution and why is it important?", "d": "Easy", "c": ["Google", "Amazon"],
-         "a": "Bell-shaped, symmetric, defined by mean and std dev. <b>Important because:</b> (1) Many natural things follow it. (2) The Central Limit Theorem says sample averages become normal. (3) Many statistical tests assume it. (4) Foundation of confidence intervals.",
-         "t": "Mention CLT — it's the bridge between distributions and inferential statistics."},
-        {"q": "When would you use Poisson vs Binomial vs Normal?", "d": "Medium", "c": ["Google", "Netflix"],
-         "a": "<b>Normal:</b> Continuous measurements (height, temperature). <b>Binomial:</b> Count of successes in fixed trials (emails opened out of 100). <b>Poisson:</b> Count of events in fixed time with no upper limit (calls per hour). Key: Binomial has a ceiling (n), Poisson doesn't.",
-         "t": "Show you understand the relationships between distributions."},
-    ])
+    # Row 2: Binomial Distribution
+    def show_binomial():
+        from scipy.stats import binom
+        n, p = 100, 0.10
+        x = np.arange(0, 25)
+        pmf = binom.pmf(x, n, p)
+        expected = n * p
+        
+        mc = st.columns(3)
+        mc[0].metric("Expected", f"{expected:.0f} conversions")
+        mc[1].metric("Std Dev", f"{np.sqrt(n*p*(1-p)):.1f}")
+        mc[2].metric("P(exactly 10)", f"{binom.pmf(10, n, p):.1%}")
+        
+        fig = go.Figure()
+        fig.add_trace(go.Bar(x=x, y=pmf, marker_color="#22d3a7", opacity=0.7))
+        fig.add_vline(x=expected, line_dash="dash", line_color="#f45d6d", annotation_text=f"Expected: {expected}")
+        fig.update_layout(height=220, title="Binomial: 100 emails, 10% conversion", xaxis_title="Conversions", **DL)
+        st.plotly_chart(fig, use_container_width=True, config={"displayModeBar": False})
+
+    split_row(
+        concept_html="""<div class="concept-card">
+        <b>🤔 What is the Binomial Distribution?</b>
+        <br><br>The binomial distribution answers: <b>"If I flip a coin n times, how many heads will I get?"</b> More generally, it counts successes in a fixed number of yes/no trials.
+        <br><br><b>When to use it:</b>
+        <br>• Fixed number of trials (n) — "I'm sending exactly 100 emails"
+        <br>• Each trial is independent — one email's result doesn't affect others
+        <br>• Same probability each time (p) — 10% conversion rate for all
+        <br>• Only two outcomes — convert or don't convert
+        <br><br><b>Real-world examples:</b>
+        <br>• Email campaigns: How many of 100 emails will convert?
+        <br>• Quality control: How many of 50 products are defective?
+        <br>• A/B testing: How many of 1000 visitors will click?
+        <br><br><b>The key insight:</b> Even with a 10% conversion rate, you won't always get exactly 10 conversions from 100 emails. Sometimes 7, sometimes 13. The binomial tells you the probability of each outcome.
+        </div>
+        <div class="math-box">
+        <b>📐 Binomial — Step by Step:</b>
+        <br><br><b>Given:</b> n = 100 emails, p = 10% conversion
+        <br><br><b>Expected conversions:</b>
+        <br>&nbsp;&nbsp;&nbsp;&nbsp;E = n × p = 100 × 0.10 = <b>10</b>
+        <br>&nbsp;&nbsp;&nbsp;&nbsp;→ "On average, expect 10 conversions"
+        <br><br><b>Std Dev (the "typical" variation):</b>
+        <br>&nbsp;&nbsp;&nbsp;&nbsp;σ = √(n × p × (1-p))
+        <br>&nbsp;&nbsp;&nbsp;&nbsp;σ = √(100 × 0.10 × 0.90)
+        <br>&nbsp;&nbsp;&nbsp;&nbsp;σ = √9 = <b>3</b>
+        <br><br><b>68% range:</b> 10 ± 3 = <b>7 to 13 conversions</b>
+        <br><br>🧠 If you get 5 conversions, that's unusual (2σ below). If you get 18, something changed!
+        </div>
+        <div class="warn-box">⚠️ <b>Common mistake:</b> Expecting exactly 10 conversions every time. Reality has variance — that's why we need statistics!</div>""",
+        code_str='''from scipy.stats import binom
+
+n = 100  # emails sent
+p = 0.10  # conversion rate
+
+expected = n * p
+std = np.sqrt(n * p * (1-p))
+p_exactly_10 = binom.pmf(10, n, p)
+
+print(f"Expected: {expected:.0f}")
+print(f"P(exactly 10) = {p_exactly_10:.1%}")''',
+        output_func=show_binomial,
+        concept_title="🎯 Binomial Distribution",
+        output_title="Email Conversions"
+    )
+
+    # Row 3: Poisson Distribution
+    def show_poisson():
+        from scipy.stats import poisson
+        lam = 5
+        x = np.arange(0, 15)
+        pmf = poisson.pmf(x, lam)
+        
+        mc = st.columns(3)
+        mc[0].metric("λ (avg rate)", f"{lam} calls/hour")
+        mc[1].metric("P(exactly 3)", f"{poisson.pmf(3, lam):.1%}")
+        mc[2].metric("P(0 calls)", f"{poisson.pmf(0, lam):.2%}")
+        
+        fig = go.Figure()
+        fig.add_trace(go.Bar(x=x, y=pmf, marker_color="#f5b731", opacity=0.7))
+        fig.add_vline(x=lam, line_dash="dash", line_color="#f45d6d", annotation_text=f"λ = {lam}")
+        fig.update_layout(height=220, title="Poisson: Support calls per hour", xaxis_title="Calls", **DL)
+        st.plotly_chart(fig, use_container_width=True, config={"displayModeBar": False})
+
+    split_row(
+        concept_html="""<div class="concept-card">
+        <b>🤔 What is the Poisson Distribution?</b>
+        <br><br>Poisson answers: <b>"How many events will happen in a given time period?"</b> Unlike binomial (fixed trials), Poisson counts events that could happen any number of times.
+        <br><br><b>When to use it:</b>
+        <br>• Events happen at a known average rate (λ)
+        <br>• Events are independent — one doesn't trigger another
+        <br>• Events can happen any number of times (0, 1, 2, 3...)
+        <br>• You're counting over a fixed interval (per hour, per day, per page)
+        <br><br><b>Real-world examples:</b>
+        <br>• Support calls per hour (λ = 5 calls/hour)
+        <br>• Website crashes per month (λ = 2 crashes/month)
+        <br>• Typos per page (λ = 0.5 typos/page)
+        <br>• Customers arriving at a store per minute
+        <br><br><b>The key insight:</b> λ is both the mean AND the variance! If λ = 5, you expect 5 events on average, with std dev = √5 ≈ 2.2.
+        <br><br><b>Binomial vs Poisson:</b>
+        <br>• Binomial: "Out of 100 emails, how many convert?" (fixed trials)
+        <br>• Poisson: "How many calls will we get this hour?" (events over time)
+        </div>
+        <div class="math-box">
+        <b>📐 Poisson — Step by Step:</b>
+        <br><br><b>Given:</b> λ = 5 calls/hour
+        <br><br><b>P(exactly 3 calls):</b>
+        <br>&nbsp;&nbsp;&nbsp;&nbsp;P(X=3) = (λ³ × e⁻λ) / 3!
+        <br>&nbsp;&nbsp;&nbsp;&nbsp;= (5³ × e⁻⁵) / 6
+        <br>&nbsp;&nbsp;&nbsp;&nbsp;= (125 × 0.0067) / 6
+        <br>&nbsp;&nbsp;&nbsp;&nbsp;= 0.84 / 6 = <b>14%</b>
+        <br><br><b>P(0 calls):</b>
+        <br>&nbsp;&nbsp;&nbsp;&nbsp;P(X=0) = e⁻⁵ = <b>0.67%</b>
+        <br>&nbsp;&nbsp;&nbsp;&nbsp;→ Less than 1% chance of a quiet hour!
+        <br><br><b>Staffing decision:</b>
+        <br>&nbsp;&nbsp;&nbsp;&nbsp;P(≥8 calls) = 1 - P(0 to 7) ≈ 13%
+        <br>&nbsp;&nbsp;&nbsp;&nbsp;→ Staff for 8+ calls 13% of the time
+        </div>
+        <div class="insight-box">💡 <b>Practical use:</b> If your support team can handle 7 calls/hour, and λ=5, you'll be overwhelmed about 13% of the time. Hire more staff or reduce call volume!</div>""",
+        code_str='''from scipy.stats import poisson
+
+lam = 5  # average 5 calls per hour
+
+p_exactly_3 = poisson.pmf(3, lam)
+p_zero = poisson.pmf(0, lam)
+
+print(f"P(exactly 3 calls) = {p_exactly_3:.1%}")
+print(f"P(0 calls) = {p_zero:.2%}")''',
+        output_func=show_poisson,
+        concept_title="📞 Poisson Distribution",
+        output_title="Support Calls"
+    )
 
 
 # ═══════════════════════════════════════
-# MODULE 4: INFERENTIAL STATISTICS
+# M4: INFERENTIAL STATISTICS
 # ═══════════════════════════════════════
 elif module == "🧪 M4: Inferential Statistics":
     st.markdown("# 🧪 Module 4: Inferential Statistics")
-    st.caption("Week 3 · Z-Scores → T-Tests → P-Values — one story, three tools.")
-
-    st.markdown("""<div class="story-box">
-    <b>🎬 The Story:</b> You manage PizzaChain — 50 stores across East and West regions.
-    Three questions keep coming up:
-    <br><br>
-    🔹 <b>"Is Store #1 abnormally good?"</b> → You need a <b>Z-Score</b><br>
-    🔹 <b>"Are East stores really better than West?"</b> → You need a <b>T-Test</b><br>
-    🔹 <b>"Can I trust this result?"</b> → You need a <b>P-Value</b>
-    <br><br>
-    Let's use the <b>same data</b> to walk through all three — step by step, with the actual math.
+    st.caption("Concept on Left · Code + Output on Right")
+    st.markdown("""<div class="concept-card">
+    <b>What is Inferential Statistics?</b> It's about making <b>conclusions from samples</b> — using data from a few to understand the many.
+    You see a difference between two groups. But is it real, or just random noise? Inferential stats answers that.
+    <br><br>🎯 <b>Key concepts:</b> Z-scores (how unusual?), T-tests (are groups different?), P-values (is it significant?).
     </div>""", unsafe_allow_html=True)
+    st.divider()
 
-    # ── Generate the shared dataset ──
-    np.random.seed(42)
-    n_stores = 50
-    store_sales = np.round(np.random.normal(500, 100, n_stores)).astype(int)
-    store_sales[0] = 850  # flagship store
-    mu_all = store_sales.mean()
-    sigma_all = store_sales.std()
+    # Row 1: Z-Score
+    def show_zscore():
+        from scipy.stats import norm
+        data = df["daily_sales"]
+        mean_val, std_val = data.mean(), data.std()
+        flagship = 1200
+        z = (flagship - mean_val) / std_val
+        percentile = norm.cdf(z) * 100
+        
+        mc = st.columns(4)
+        mc[0].metric("Flagship Sales", f"${flagship}")
+        mc[1].metric("Chain Mean", f"${mean_val:.0f}")
+        mc[2].metric("Z-Score", f"{z:.2f}")
+        mc[3].metric("Percentile", f"{percentile:.1f}%")
+        
+        x = np.linspace(mean_val - 4*std_val, mean_val + 4*std_val, 200)
+        y = norm.pdf(x, mean_val, std_val)
+        fig = go.Figure()
+        fig.add_trace(go.Scatter(x=x, y=y, fill='tozeroy', fillcolor='rgba(124,106,255,0.2)', line=dict(color='#7c6aff')))
+        fig.add_vline(x=flagship, line_dash="dash", line_color="#f45d6d", annotation_text=f"Flagship: z={z:.2f}")
+        fig.update_layout(height=200, title="Where does the flagship fall?", **DL)
+        st.plotly_chart(fig, use_container_width=True, config={"displayModeBar": False})
 
-    # East vs West split
-    east_sales = store_sales[:22] + 45  # East is slightly better
-    west_sales = store_sales[22:]
+    split_row(
+        concept_html="""<div class="concept-card">
+        <b>🤔 What is a Z-Score?</b>
+        <br><br>A z-score answers: <b>"How unusual is this value?"</b> It converts any measurement to a universal scale where 0 = average and each unit = one standard deviation.
+        <br><br><b>Why do we need it?</b> Imagine comparing:
+        <br>• A store making $1200/day (when average is $500)
+        <br>• A student scoring 85 on a test (when average is 70)
+        <br>Which is more impressive? Z-scores let you compare apples to oranges!
+        <br><br><b>The formula:</b> z = (value - mean) / std dev
+        <br><br><b>Interpretation:</b>
+        <br>• z = 0 → exactly average
+        <br>• z = 1 → one std dev above average (top 16%)
+        <br>• z = 2 → two std devs above (top 2.5%)
+        <br>• z = 3 → three std devs above (top 0.15% — very rare!)
+        <br>• Negative z → below average
+        <br><br><b>Rule of thumb:</b> |z| > 3 is extremely unusual — either exceptional performance or a data error!
+        </div>
+        <div class="math-box">
+        <b>📐 Z-Score — Step by Step:</b>
+        <br><br><b>Given:</b> Flagship = $1200, μ = $500, σ = $150
+        <br><br><b>Calculate z:</b>
+        <br>&nbsp;&nbsp;&nbsp;&nbsp;z = (x - μ) / σ
+        <br>&nbsp;&nbsp;&nbsp;&nbsp;z = (1200 - 500) / 150
+        <br>&nbsp;&nbsp;&nbsp;&nbsp;z = 700 / 150 = <b>4.67</b>
+        <br><br><b>Interpretation:</b>
+        <br>&nbsp;&nbsp;&nbsp;&nbsp;4.67 std devs above mean!
+        <br>&nbsp;&nbsp;&nbsp;&nbsp;|z| > 3 → extremely rare (<0.1%)
+        <br>&nbsp;&nbsp;&nbsp;&nbsp;Percentile: 99.9998%
+        <br><br>🧠 This store is either exceptional OR there's a data error. Investigate!
+        </div>
+        <div class="warn-box">⚠️ <b>Action item:</b> When you see z > 3, don't just celebrate — verify the data first! Could be a typo ($12000 → $1200).</div>""",
+        code_str='''from scipy.stats import norm
 
-    st.markdown("""<div class="key-box">
-    <b>📋 Our Data:</b> 50 pizza stores. Average daily sales = ${:.0f}, Std Dev = ${:.0f}.
-    Store #1 (flagship) sells $850/day. East region has 22 stores, West has 28.
-    </div>""".format(mu_all, sigma_all), unsafe_allow_html=True)
+data = df["daily_sales"]
+mean = data.mean()
+std = data.std()
 
-    # ═══════════════════════════════════
-    # PART 1: Z-SCORE
-    # ═══════════════════════════════════
-    st.markdown("---")
-    st.markdown("## 📏 Part 1: Z-Score — 'Is This Store Abnormal?'")
+flagship_sales = 1200
+z_score = (flagship_sales - mean) / std
+percentile = norm.cdf(z_score) * 100
 
-    st.markdown("""<div class="story-box">
-    <b>🎬 Scene 1:</b> Your boss points at Store #1: "They made $850 yesterday. Is that genuinely exceptional,
-    or could any store have a day like that?"
-    <br><br>
-    The Z-score answers this by measuring <b>how many standard deviations</b> a value is from the average.
-    Think of it as a <b>ruler for weirdness</b>.
-    </div>""", unsafe_allow_html=True)
-
-    st.markdown("""<div class="analogy-box">
-    🧮 <b>The Math — Step by Step:</b>
-    <br><br>
-    <b>Formula:</b> z = (value − mean) / std dev
-    <br><br>
-    <b>Our numbers:</b><br>
-    • Store #1 sales = $850<br>
-    • Chain average (μ) = ${:.0f}<br>
-    • Chain spread (σ) = ${:.0f}
-    <br><br>
-    <b>Calculation:</b><br>
-    z = (850 − {:.0f}) / {:.0f}<br>
-    z = {:.0f} / {:.0f}<br>
-    z = <b>{:.2f}</b>
-    </div>""".format(mu_all, sigma_all, mu_all, sigma_all, 850 - mu_all, sigma_all, (850 - mu_all) / sigma_all), unsafe_allow_html=True)
-
-    z_flagship = (850 - mu_all) / sigma_all
-    from scipy.stats import norm
-    pct_flagship = norm.cdf(z_flagship) * 100
-
-    mc = st.columns(4)
-    mc[0].metric("Store #1 Sales", "$850")
-    mc[1].metric("Z-Score", f"{z_flagship:.2f}")
-    mc[2].metric("Percentile", f"{pct_flagship:.1f}%")
-    mc[3].metric("Verdict", "😱 Very rare!" if abs(z_flagship) > 2.5 else "🤔 Unusual" if abs(z_flagship) > 2 else "😐 Normal")
-
-    # Bell curve visualization
-    x_bell = np.linspace(mu_all - 4*sigma_all, mu_all + 4*sigma_all, 500)
-    y_bell = norm.pdf(x_bell, mu_all, sigma_all)
-    fig_z = go.Figure()
-    fig_z.add_trace(go.Scatter(x=x_bell, y=y_bell, fill='tozeroy', fillcolor='rgba(124,106,255,0.15)', line=dict(color='#7c6aff', width=2), name='All stores'))
-    x_beyond = x_bell[x_bell >= 850]
-    y_beyond = norm.pdf(x_beyond, mu_all, sigma_all)
-    fig_z.add_trace(go.Scatter(x=np.append(x_beyond, [x_beyond[-1], x_beyond[0]]), y=np.append(y_beyond, [0, 0]),
-                                fill='toself', fillcolor='rgba(244,93,109,0.35)', line=dict(color='rgba(0,0,0,0)'), name=f'Top {100-pct_flagship:.1f}%'))
-    fig_z.add_vline(x=850, line_dash="dash", line_color="#f45d6d", annotation_text=f"Store #1: $850 (z={z_flagship:.2f})")
-    fig_z.add_vline(x=mu_all, line_dash="dot", line_color="#22d3a7", annotation_text=f"Average: ${mu_all:.0f}")
-    for mult in [1, 2, 3]:
-        fig_z.add_vline(x=mu_all + mult*sigma_all, line_dash="dot", line_color="#2d3148")
-        fig_z.add_vline(x=mu_all - mult*sigma_all, line_dash="dot", line_color="#2d3148")
-    fig_z.update_layout(height=350, title="Where does Store #1 fall on the bell curve?", xaxis_title="Daily Sales ($)", yaxis_title="How common?", **DL)
-    st.plotly_chart(fig_z, use_container_width=True, config={"displayModeBar": False})
-
-    st.markdown(f"""<div class="green-box">
-    💡 <b>Inference:</b> z = {z_flagship:.2f} means Store #1 is {z_flagship:.1f} standard deviations above average.
-    Only <b>{100-pct_flagship:.1f}%</b> of stores perform this well. This is NOT normal variation — something special
-    is happening at this store. Investigate what they're doing differently!
-    <br><br>
-    <b>Z-Score Cheat Sheet:</b><br>
-    • |z| < 1.5 → Normal (nothing to see here)<br>
-    • |z| 1.5–2.5 → Unusual (worth a look)<br>
-    • |z| > 2.5 → Very rare (investigate immediately!)
-    </div>""", unsafe_allow_html=True)
-
-    st.markdown("#### 🎮 Try It: Check Any Store")
-    zc1, zc2, zc3 = st.columns(3)
-    z_mean = zc1.number_input("Chain average (μ):", value=float(round(mu_all)), key="m4_zmean")
-    z_std = zc2.number_input("Chain spread (σ):", value=float(round(sigma_all)), min_value=1.0, key="m4_zstd")
-    z_val = zc3.number_input("Store's sales:", value=850.0, key="m4_zval")
-    z_score = (z_val - z_mean) / z_std
-    percentile = norm.cdf(z_score) * 100
-    mc = st.columns(3)
-    mc[0].metric("Z-Score", f"{z_score:.2f}")
-    mc[1].metric("Percentile", f"{percentile:.1f}%")
-    mc[2].metric("How unusual?", "😐 Normal" if abs(z_score) < 1.5 else "🤔 Unusual" if abs(z_score) < 2.5 else "😱 Very rare!")
-
-    # ═══════════════════════════════════
-    # PART 2: T-TEST
-    # ═══════════════════════════════════
-    st.markdown("---")
-    st.markdown("## 🔬 Part 2: T-Test — 'Are East Stores Really Better?'")
-
-    st.markdown("""<div class="story-box">
-    <b>🎬 Scene 2:</b> Your boss looks at the regional report: East stores average ${:.0f}/day,
-    West stores average ${:.0f}/day. "East is clearly better! Let's copy whatever they're doing."
-    <br><br>
-    But wait — is that ${:.0f} difference <b>real</b>, or could it just be random luck?
-    Maybe East just happened to have a few good days. The <b>T-test</b> answers this.
-    </div>""".format(east_sales.mean(), west_sales.mean(), east_sales.mean() - west_sales.mean()), unsafe_allow_html=True)
-
-    st.markdown("""<div class="analogy-box">
-    ⚖️ <b>When to use which test:</b>
-    <br><br>
-    <b>Z-Score:</b> "Is this ONE value weird?" (one store vs the chain)<br>
-    <b>T-Test:</b> "Are these TWO GROUPS different?" (East vs West)<br>
-    <br>
-    <b>Z-Test vs T-Test:</b> Z-test requires knowing the population σ (rare). T-test estimates σ from your sample (what you'll use 99% of the time).
-    </div>""", unsafe_allow_html=True)
-
-    from scipy.stats import ttest_ind
-    mean_diff = east_sales.mean() - west_sales.mean()
-    se = np.sqrt(east_sales.var()/len(east_sales) + west_sales.var()/len(west_sales))
-    t_stat_manual = mean_diff / se
-    t_stat, p_val_tt = ttest_ind(east_sales, west_sales)
-
-    st.markdown("""<div class="analogy-box">
-    🧮 <b>The Math — Step by Step:</b>
-    <br><br>
-    <b>Formula:</b> t = (mean₁ − mean₂) / SE, where SE = √(s₁²/n₁ + s₂²/n₂)
-    <br><br>
-    <b>Step 1: Group stats</b><br>
-    • East: n={}, mean=${:.1f}, std=${:.1f}<br>
-    • West: n={}, mean=${:.1f}, std=${:.1f}
-    <br><br>
-    <b>Step 2: Difference</b><br>
-    mean_east − mean_west = {:.1f} − {:.1f} = <b>${:.1f}</b>
-    <br><br>
-    <b>Step 3: Standard Error</b> (how much could this differ by chance?)<br>
-    SE = √({:.1f}²/{} + {:.1f}²/{}) = √({:.1f} + {:.1f}) = <b>{:.2f}</b>
-    <br><br>
-    <b>Step 4: T-statistic</b> (signal ÷ noise)<br>
-    t = {:.1f} / {:.2f} = <b>{:.2f}</b>
-    <br><br>
-    <b>Step 5: P-value</b> = <b>{:.4f}</b>
-    </div>""".format(
-        len(east_sales), east_sales.mean(), east_sales.std(),
-        len(west_sales), west_sales.mean(), west_sales.std(),
-        east_sales.mean(), west_sales.mean(), mean_diff,
-        east_sales.std(), len(east_sales), west_sales.std(), len(west_sales),
-        east_sales.var()/len(east_sales), west_sales.var()/len(west_sales), se,
-        mean_diff, se, t_stat,
-        p_val_tt
-    ), unsafe_allow_html=True)
-
-    mc = st.columns(4)
-    mc[0].metric("East Mean", f"${east_sales.mean():.0f}")
-    mc[1].metric("West Mean", f"${west_sales.mean():.0f}")
-    mc[2].metric("T-Statistic", f"{t_stat:.2f}")
-    mc[3].metric("P-Value", f"{p_val_tt:.4f}")
-
-    # Visualization
-    fig_tt = go.Figure()
-    fig_tt.add_trace(go.Histogram(x=east_sales, name=f"East (${east_sales.mean():.0f})", marker_color="#7c6aff", opacity=0.5, nbinsx=12))
-    fig_tt.add_trace(go.Histogram(x=west_sales, name=f"West (${west_sales.mean():.0f})", marker_color="#22d3a7", opacity=0.5, nbinsx=12))
-    fig_tt.add_vline(x=east_sales.mean(), line_dash="dash", line_color="#7c6aff")
-    fig_tt.add_vline(x=west_sales.mean(), line_dash="dash", line_color="#22d3a7")
-    fig_tt.update_layout(barmode="overlay", height=300, title="East vs West: Do the distributions actually differ?", xaxis_title="Daily Sales ($)", **DL)
-    st.plotly_chart(fig_tt, use_container_width=True, config={"displayModeBar": False})
-
-    if p_val_tt < 0.05:
-        st.markdown(f"""<div class="green-box">✅ <b>p = {p_val_tt:.4f} < 0.05 → Significant!</b>
-        The ${mean_diff:.0f} difference is real, not random noise. East stores genuinely outperform West.
-        <br>ACTION: Investigate what East is doing differently (location? staff? marketing?).</div>""", unsafe_allow_html=True)
-    else:
-        st.markdown(f"""<div class="red-box">❌ <b>p = {p_val_tt:.4f} ≥ 0.05 → Not significant.</b>
-        The difference could be random variation. We can't conclude East is truly better.</div>""", unsafe_allow_html=True)
-
-    st.markdown("""<div class="key-box">
-    <b>📋 Three Types of T-Tests:</b><br>
-    • <b>One-sample:</b> "Is our average delivery time ≠ 30 min SLA?" (one group vs a target)<br>
-    • <b>Two-sample:</b> "East vs West sales" (two separate groups) ← what we just did<br>
-    • <b>Paired:</b> "Same stores before vs after renovation" (same group, two measurements)
-    </div>""", unsafe_allow_html=True)
-
-    # ═══════════════════════════════════
-    # PART 3: P-VALUE
-    # ═══════════════════════════════════
-    st.markdown("---")
-    st.markdown("## 🎯 Part 3: P-Value — 'Can I Trust This?'")
-
-    st.markdown("""<div class="story-box">
-    <b>🎬 Scene 3:</b> You present the t-test results to your boss. They ask: "What does p = {:.4f} actually mean?"
-    <br><br>
-    The p-value is the <b>probability of seeing a result this extreme IF there were truly no difference</b>.
-    <br><br>
-    Think of it like a courtroom:<br>
-    🔹 <b>H₀ (null):</b> "East and West are the same" (innocent until proven guilty)<br>
-    🔹 <b>H₁ (alternative):</b> "East and West are different"<br>
-    🔹 <b>p-value:</b> "If they ARE the same, what's the chance we'd see a ${:.0f} gap just by luck?"<br>
-    🔹 <b>p < 0.05:</b> "Less than 5% chance → reject H₀ → the difference is real"
-    </div>""".format(p_val_tt, mean_diff), unsafe_allow_html=True)
-
-    st.markdown("#### 🎮 Try It: The Suspicious Coin")
-    st.caption("A simpler example to build intuition. Your friend's coin lands heads 60 out of 100 times. Fair or rigged?")
-
-    n_heads = st.slider("Heads out of 100 flips:", 40, 75, 60, 1, key="m4_pval_heads")
-    from scipy.stats import binom
-    p_value_coin = 1 - binom.cdf(n_heads - 1, 100, 0.5)
-
-    mc = st.columns(3)
-    mc[0].metric("Heads", f"{n_heads} / 100")
-    mc[1].metric("P-Value", f"{p_value_coin:.4f}")
-    mc[2].metric("Verdict", "🟢 Looks fair" if p_value_coin > 0.05 else "🔴 Suspicious!" if p_value_coin > 0.01 else "🔴 Rigged!")
-
-    x_vals = np.arange(30, 71)
-    y_vals = binom.pmf(x_vals, 100, 0.5)
-    colors_pv = ['#f45d6d' if x >= n_heads else '#7c6aff' for x in x_vals]
-    fig_pv = go.Figure()
-    fig_pv.add_trace(go.Bar(x=x_vals, y=y_vals, marker_color=colors_pv, opacity=0.7))
-    fig_pv.add_vline(x=n_heads, line_dash="dash", line_color="#f5b731", annotation_text=f"Your result: {n_heads}")
-    fig_pv.add_vline(x=50, line_dash="dot", line_color="#22d3a7", annotation_text="Expected: 50")
-    fig_pv.update_layout(height=320, title=f"Red area = p-value = {p_value_coin:.4f}", xaxis_title="Number of Heads", yaxis_title="Probability", **DL)
-    st.plotly_chart(fig_pv, use_container_width=True, config={"displayModeBar": False})
-
-    st.markdown(f"""<div class="{'green-box' if p_value_coin > 0.05 else 'red-box'}">
-    📖 <b>Reading this chart:</b> Blue bars = all possible outcomes with a fair coin.
-    <b style="color:#f45d6d">Red bars</b> = outcomes as extreme as yours ({n_heads}+ heads).
-    Red area = p-value = {p_value_coin:.4f}.
-    {'Not unusual for a fair coin.' if p_value_coin > 0.05 else 'Very unlikely with a fair coin — probably rigged!'}
-    </div>""", unsafe_allow_html=True)
-
-    # ── Common Mistakes ──
-    st.markdown("### ⚠️ Three Things P-Value Does NOT Mean")
-    st.markdown("""<div class="red-box">
-    <b>❌</b> "There's a 3% chance the null is true." → <b>✅</b> "IF the null is true, there's a 3% chance of this result."
-    <br><br>
-    <b>❌</b> "The effect is big and important." → <b>✅</b> P-value says nothing about SIZE. A tiny difference can have p=0.001 with enough data.
-    <br><br>
-    <b>❌</b> "p < 0.05 means it's definitely real." → <b>✅</b> 1 in 20 "significant" results is a false alarm by definition.
-    </div>""", unsafe_allow_html=True)
-
-    # ── A/B Test Simulator ──
-    st.markdown("---")
-    st.markdown("### 🎮 A/B Test Simulator")
-    st.caption("Test a new pizza menu. Does it actually improve sales?")
-
-    c1, c2 = st.columns(2)
-    conv_a = c1.slider("🔵 Old menu conversion %:", 1.0, 20.0, 10.0, 0.5, key="m4_ca")
-    conv_b = c2.slider("🟢 New menu conversion %:", 1.0, 20.0, 11.0, 0.5, key="m4_cb")
-    n_users = st.slider("👥 Customers per group:", 100, 50000, 5000, 500, key="m4_users")
-
-    np.random.seed(42)
-    group_a = np.random.binomial(1, conv_a/100, n_users)
-    group_b = np.random.binomial(1, conv_b/100, n_users)
-    t_ab, p_ab = ttest_ind(group_a, group_b)
-    lift = (group_b.mean() - group_a.mean()) / group_a.mean() * 100 if group_a.mean() > 0 else 0
-
-    mc = st.columns(4)
-    mc[0].metric("Old Menu", f"{group_a.mean()*100:.2f}%")
-    mc[1].metric("New Menu", f"{group_b.mean()*100:.2f}%", f"{lift:+.1f}% lift")
-    mc[2].metric("P-Value", f"{p_ab:.4f}")
-    mc[3].metric("Significant?", "✅ Yes!" if p_ab < 0.05 else "❌ Not yet")
-
-    if p_ab < 0.05:
-        st.markdown(f"""<div class="green-box">✅ <b>p = {p_ab:.4f}</b> — Ship it! 🚀</div>""", unsafe_allow_html=True)
-    else:
-        st.markdown(f"""<div class="red-box">❌ <b>p = {p_ab:.4f}</b> — Need more data or a bigger effect.</div>""", unsafe_allow_html=True)
-
-    # ── Decision Flow ──
-    st.markdown("---")
-    st.markdown("### 🗺️ The Decision Flow: When to Use What")
-    st.markdown("""<div class="key-box">
-    <b>1. Is ONE value weird?</b> → Z-Score<br>
-    <b>2. Is a GROUP different from a target?</b> → One-sample T-Test<br>
-    <b>3. Are TWO GROUPS different?</b> → Two-sample T-Test<br>
-    <b>4. Did the SAME group change?</b> → Paired T-Test<br>
-    <b>5. Check p < 0.05?</b> → Statistically significant<br>
-    <b>6. Check effect size?</b> → Practically meaningful
-    </div>""", unsafe_allow_html=True)
-
-    check_quiz("m4_q1",
-        "Store #1 has z=3.2. East vs West t-test gives p=0.03. What should you do?",
-        ["Ignore both — statistics is unreliable", "Investigate Store #1 AND roll out East's strategy to West", "Only look at Store #1, ignore the regional difference"],
-        1,
-        "z=3.2 means Store #1 is genuinely exceptional — learn from them. p=0.03 means East is significantly better — find out why and replicate it."
+print(f"Z-score: {z_score:.2f}")
+print(f"Percentile: {percentile:.1f}%")''',
+        output_func=show_zscore,
+        concept_title="📊 Z-Score",
+        output_title="Is This Store Abnormal?"
     )
 
-    iq([
-        {"q": "Explain p-value to a non-technical stakeholder.", "d": "Medium", "c": ["Meta", "Google"],
-         "a": "A p-value answers: 'If there's truly no effect, how likely would we see results this extreme by pure chance?' p < 0.05 = 'less than 5% chance this is luck.' <b>Critical:</b> p-value does NOT tell you how big the effect is.",
-         "t": "Always mention what p-value does NOT mean."},
-        {"q": "When do you use Z-score vs T-test?", "d": "Medium", "c": ["Google", "Amazon"],
-         "a": "<b>Z-score:</b> Compare ONE value to a population (is this store unusual?). <b>T-test:</b> Compare TWO GROUPS to each other (is East ≠ West?). Z-test needs known σ (rare). T-test estimates σ from the sample (use this 99% of the time).",
-         "t": "Say 'I use t-test 99% of the time' — shows practical experience."},
-        {"q": "What's the difference between Type I and Type II errors?", "d": "Medium", "c": ["Amazon", "Apple"],
-         "a": "<b>Type I (False Positive):</b> You say there's an effect when there isn't. <b>Type II (False Negative):</b> You miss a real effect. <b>Tradeoff:</b> Reducing one increases the other. In A/B testing, Type I is usually worse (launching bad features).",
-         "t": "Give a real-world example and say which error is worse in that context."},
-        {"q": "Your A/B test shows p=0.04. Should you launch?", "d": "Hard", "c": ["Meta", "Google", "Netflix"],
-         "a": "Not automatically. Check: (1) Effect size — is the improvement meaningful? (2) Multiple comparisons — did we test many metrics? (3) Guardrail metrics — did anything get worse? (4) Novelty effect — is it just because it's new? Recommend: 'Promising, but validate with a longer test.'",
-         "t": "Show you don't blindly trust p-values. This is a CLASSIC Meta/Google question."},
-    ])
+    # Row 2: T-Test
+    def show_ttest():
+        from scipy.stats import ttest_ind
+        east = df[df["region"] == "East"]["daily_sales"]
+        west = df[df["region"] == "West"]["daily_sales"]
+        t_stat, p_val = ttest_ind(east, west)
+        
+        mc = st.columns(4)
+        mc[0].metric("East Mean", f"${east.mean():.0f}")
+        mc[1].metric("West Mean", f"${west.mean():.0f}")
+        mc[2].metric("T-Statistic", f"{t_stat:.2f}")
+        mc[3].metric("P-Value", f"{p_val:.4f}")
+        
+        fig = go.Figure()
+        fig.add_trace(go.Histogram(x=east, name="East", marker_color="#7c6aff", opacity=0.5, nbinsx=15))
+        fig.add_trace(go.Histogram(x=west, name="West", marker_color="#22d3a7", opacity=0.5, nbinsx=15))
+        fig.update_layout(barmode="overlay", height=200, title="East vs West Sales", **DL)
+        st.plotly_chart(fig, use_container_width=True, config={"displayModeBar": False})
 
+    split_row(
+        concept_html="""<div class="concept-card">
+        <b>🤔 What is a T-Test?</b>
+        <br><br>A t-test answers: <b>"Are these two groups actually different, or is the difference just random noise?"</b>
+        <br><br><b>The problem:</b> You see East stores average $520 and West stores average $480. That's a $40 difference. But is it REAL or just luck?
+        <br><br><b>Why we need it:</b> If you flip a coin 10 times, you might get 6 heads and 4 tails. That doesn't mean the coin is biased — it's just random variation. Same with business data!
+        <br><br><b>How it works:</b>
+        <br>• Calculate the difference between group means
+        <br>• Divide by the "noise" (standard error)
+        <br>• t = signal / noise
+        <br>• Big t → difference is probably real
+        <br>• Small t → difference might be random
+        <br><br><b>The t-statistic:</b> Think of it as a "signal-to-noise ratio"
+        <br>• |t| > 2 → probably significant
+        <br>• |t| < 2 → probably just noise
+        </div>
+        <div class="math-box">
+        <b>📐 T-Test — Step by Step:</b>
+        <br><br><b>Given:</b>
+        <br>&nbsp;&nbsp;&nbsp;&nbsp;East: mean = $520, n = 18, std = $100
+        <br>&nbsp;&nbsp;&nbsp;&nbsp;West: mean = $480, n = 32, std = $90
+        <br><br><b>Step 1:</b> Calculate difference
+        <br>&nbsp;&nbsp;&nbsp;&nbsp;Difference = 520 - 480 = <b>$40</b>
+        <br><br><b>Step 2:</b> Calculate standard error
+        <br>&nbsp;&nbsp;&nbsp;&nbsp;SE = √(s₁²/n₁ + s₂²/n₂)
+        <br>&nbsp;&nbsp;&nbsp;&nbsp;SE = √(100²/18 + 90²/32)
+        <br>&nbsp;&nbsp;&nbsp;&nbsp;SE = √(556 + 253) = √809 = <b>$28</b>
+        <br><br><b>Step 3:</b> Calculate t
+        <br>&nbsp;&nbsp;&nbsp;&nbsp;t = difference / SE = 40 / 28 = <b>1.43</b>
+        <br><br>🧠 t = 1.43 → signal is only 1.4× the noise. Not convincing!
+        </div>
+        <div class="insight-box">💡 <b>Business translation:</b> "The $40 difference between East and West could easily be random variation. Don't make strategic decisions based on this!"</div>""",
+        code_str='''from scipy.stats import ttest_ind
 
+east = df[df["region"] == "East"]["daily_sales"]
+west = df[df["region"] == "West"]["daily_sales"]
+
+t_statistic, p_value = ttest_ind(east, west)
+
+print(f"East mean: ${east.mean():.0f}")
+print(f"West mean: ${west.mean():.0f}")
+print(f"T-statistic: {t_statistic:.2f}")
+print(f"P-value: {p_value:.4f}")''',
+        output_func=show_ttest,
+        concept_title="⚖️ T-Test",
+        output_title="East vs West Regions"
+    )
+
+    # Row 3: P-Value
+    def show_pvalue():
+        from scipy.stats import ttest_ind
+        east = df[df["region"] == "East"]["daily_sales"]
+        west = df[df["region"] == "West"]["daily_sales"]
+        t_stat, p_val = ttest_ind(east, west)
+        
+        significant = p_val < 0.05
+        if significant:
+            st.markdown(f"""<div class="insight-box">✅ <b>p = {p_val:.4f} < 0.05 → Significant!</b>
+            <br>The difference is real, not random noise.</div>""", unsafe_allow_html=True)
+        else:
+            st.markdown(f"""<div class="warn-box">❌ <b>p = {p_val:.4f} ≥ 0.05 → Not significant.</b>
+            <br>The difference could be random variation.</div>""", unsafe_allow_html=True)
+
+    split_row(
+        concept_html="""<div class="concept-card">
+        <b>🤔 What is a P-Value?</b>
+        <br><br>The p-value answers: <b>"If there's NO real difference, how likely would I see this result by pure chance?"</b>
+        <br><br><b>The logic (proof by contradiction):</b>
+        <br>1. Assume there's NO real difference (null hypothesis)
+        <br>2. Calculate: "How likely is this data under that assumption?"
+        <br>3. If very unlikely (p < 0.05) → reject the assumption → difference is real!
+        <br><br><b>Analogy:</b> You flip a coin 100 times and get 90 heads. 
+        <br>• Assume the coin is fair
+        <br>• P(90+ heads | fair coin) = 0.000000001%
+        <br>• That's so unlikely → the coin must be biased!
+        <br><br><b>The 0.05 threshold:</b>
+        <br>• p < 0.05 → "Statistically significant" (less than 5% chance by luck)
+        <br>• p ≥ 0.05 → "Not significant" (could easily be random)
+        <br><br><b>Common misconception:</b> p = 0.03 does NOT mean "3% chance the result is wrong." It means "3% chance of seeing this if there's no real effect."
+        </div>
+        <div class="math-box">
+        <b>📐 P-Value — Step by Step:</b>
+        <br><br><b>Given:</b> t = 1.43, df = 48
+        <br><br><b>Question:</b> If East and West are truly equal, what's the chance of seeing t ≥ 1.43?
+        <br><br><b>Lookup p-value:</b>
+        <br>&nbsp;&nbsp;&nbsp;&nbsp;p = 0.16 (from t-distribution table)
+        <br><br><b>Decision (α = 0.05):</b>
+        <br>&nbsp;&nbsp;&nbsp;&nbsp;p = 0.16 > 0.05
+        <br>&nbsp;&nbsp;&nbsp;&nbsp;→ <b>Fail to reject null</b>
+        <br>&nbsp;&nbsp;&nbsp;&nbsp;→ Difference not significant
+        <br><br><b>Plain English:</b>
+        <br>&nbsp;&nbsp;&nbsp;&nbsp;"There's a 16% chance we'd see this $40 difference even if East and West are identical. That's too high to claim a real difference."
+        </div>
+        <div class="warn-box">⚠️ <b>p > 0.05 doesn't mean "no difference exists"</b> — it means "we don't have enough evidence." Maybe collect more data!</div>""",
+        code_str='''# P-value interpretation
+if p_value < 0.05:
+    print("Significant! Reject null hypothesis.")
+    print("The difference is real.")
+else:
+    print("Not significant. Fail to reject null.")
+    print("Could be random variation.")''',
+        output_func=show_pvalue,
+        concept_title="🎯 P-Value",
+        output_title="Is It Real or Luck?"
+    )
 
 
 # ═══════════════════════════════════════
-# MODULE 5: CORRELATION
+# M5: CORRELATION
 # ═══════════════════════════════════════
 elif module == "🔗 M5: Correlation":
-    st.markdown("# 🔗 Module 5: Correlation & Relationships")
-    st.caption("Week 3 · Do two things move together? And the biggest trap in data science.")
-
-    st.markdown("""<div class="story-box">
-    <b>🎬 The Story:</b> You notice that cities with more ice cream shops also have more crime.
-    Does ice cream cause crime? 🍦🔪
-    <br><br>
-    Of course not! Both go up in <b>summer</b> (more people outside = more ice cream AND more crime).
-    The hidden factor (summer) is called a <b>confounding variable</b>.
-    <br><br>
-    <b>Correlation</b> measures how two things move together. It's a number from <b>-1 to +1</b>:
-    <br>• <b>+1:</b> They go up together perfectly (study hours ↔ grades)
-    <br>• <b>0:</b> No relationship (shoe size ↔ favorite color)
-    <br>• <b>-1:</b> One goes up, the other goes down (price ↔ demand)
+    st.markdown("# 🔗 Module 5: Correlation")
+    st.caption("Concept on Left · Code + Output on Right")
+    st.markdown("""<div class="concept-card">
+    <b>What is Correlation?</b> It measures how <b>two variables move together</b>. When one goes up, does the other go up too?
+    Correlation ranges from -1 (perfect opposite) to +1 (perfect together), with 0 meaning no relationship.
+    <br><br>🎯 <b>Key insight:</b> Correlation ≠ Causation! Just because two things move together doesn't mean one causes the other.
     </div>""", unsafe_allow_html=True)
+    st.divider()
 
-    st.markdown("""<div class="red-box">
-    🚨 <b>THE GOLDEN RULE:</b> Correlation does NOT mean causation.
-    Just because two things move together doesn't mean one causes the other.
-    Only controlled experiments (A/B tests) can prove causation.
-    </div>""", unsafe_allow_html=True)
+    # Row 1: Pearson Correlation
+    def show_correlation():
+        x, y = df["ad_spend"], df["daily_sales"]
+        r = np.corrcoef(x, y)[0, 1]
+        
+        mc = st.columns(3)
+        mc[0].metric("Correlation (r)", f"{r:.3f}")
+        mc[1].metric("Strength", "Strong" if abs(r) > 0.7 else "Moderate" if abs(r) > 0.4 else "Weak")
+        mc[2].metric("Direction", "Positive" if r > 0 else "Negative")
+        
+        fig = go.Figure()
+        fig.add_trace(go.Scatter(x=x, y=y, mode='markers', marker=dict(color='#22d3a7', size=8, opacity=0.6)))
+        z = np.polyfit(x, y, 1)
+        fig.add_trace(go.Scatter(x=x, y=np.polyval(z, x), mode='lines', line=dict(color='#f45d6d', dash='dash')))
+        fig.update_layout(height=250, title=f"Ad Spend vs Sales (r = {r:.3f})", xaxis_title="Ad Spend ($)", yaxis_title="Daily Sales ($)", **DL)
+        st.plotly_chart(fig, use_container_width=True, config={"displayModeBar": False})
 
-    # ── Interactive Correlation ──
-    st.markdown("### 🎮 Try It: See What Different Correlations Look Like")
-    st.caption("Drag the slider to change the relationship strength.")
+    split_row(
+        concept_html="""<div class="concept-card">
+        <b>🤔 What is Correlation?</b>
+        <br><br>Correlation measures <b>how two things move together</b>. When one goes up, does the other go up too? Down? Or no pattern at all?
+        <br><br><b>The correlation coefficient (r):</b>
+        <br>• r = +1 → Perfect positive: both go up together
+        <br>• r = 0 → No relationship: knowing one tells you nothing about the other
+        <br>• r = -1 → Perfect negative: one goes up, other goes down
+        <br><br><b>Strength interpretation:</b>
+        <br>• |r| < 0.3 → Weak (barely related)
+        <br>• 0.3 ≤ |r| < 0.7 → Moderate (some relationship)
+        <br>• |r| ≥ 0.7 → Strong (closely related)
+        <br><br><b>Real-world examples:</b>
+        <br>• Height & weight: r ≈ +0.7 (taller people tend to weigh more)
+        <br>• Study time & grades: r ≈ +0.5 (more study → better grades, usually)
+        <br>• Price & demand: r ≈ -0.6 (higher price → less demand)
+        <br><br><b>Why it matters:</b> If ad spend and sales have r = 0.78, you know ads are working! But be careful...
+        </div>
+        <div class="math-box">
+        <b>📐 Correlation — Step by Step:</b>
+        <br><br><b>Given:</b> Ad spend & Sales for 5 stores
+        <br>&nbsp;&nbsp;&nbsp;&nbsp;X = [100, 150, 200, 250, 300]
+        <br>&nbsp;&nbsp;&nbsp;&nbsp;Y = [400, 450, 520, 580, 650]
+        <br><br><b>Step 1:</b> Calculate means
+        <br>&nbsp;&nbsp;&nbsp;&nbsp;x̄ = 200, ȳ = 520
+        <br><br><b>Step 2:</b> Calculate deviations
+        <br>&nbsp;&nbsp;&nbsp;&nbsp;(100-200)(400-520) = (-100)(-120) = 12000
+        <br>&nbsp;&nbsp;&nbsp;&nbsp;(150-200)(450-520) = (-50)(-70) = 3500
+        <br>&nbsp;&nbsp;&nbsp;&nbsp;... and so on
+        <br><br><b>Step 3:</b> Covariance = Σ(deviations) / n = <b>5000</b>
+        <br><br><b>Step 4:</b> Std devs: σx = 71, σy = 90
+        <br><br><b>Step 5:</b> r = Cov / (σx × σy) = 5000 / (71×90) = <b>0.78</b>
+        <br><br>🧠 Strong positive correlation! More ad spend → more sales
+        </div>
+        <div class="warn-box">⚠️ <b>CRITICAL:</b> Correlation ≠ Causation! Ice cream sales and drowning deaths are correlated (both increase in summer). Ice cream doesn't cause drowning — summer does!</div>""",
+        code_str='''import numpy as np
 
-    target_r = st.slider("Correlation strength (r):", -1.0, 1.0, 0.7, 0.05, key="m5_r")
+x = df["ad_spend"]
+y = df["daily_sales"]
 
-    np.random.seed(42)
-    x = np.random.normal(0, 1, 200)
-    noise = np.random.normal(0, 1, 200)
-    y = target_r * x + np.sqrt(max(0.01, 1 - target_r**2)) * noise
-    actual_r = np.corrcoef(x, y)[0, 1]
+# Method 1: numpy
+r = np.corrcoef(x, y)[0, 1]
 
-    abs_r = abs(actual_r)
-    strength = "💪 Very strong" if abs_r > 0.8 else "Strong" if abs_r > 0.6 else "Moderate" if abs_r > 0.4 else "Weak" if abs_r > 0.2 else "🤷 None"
-    direction = "positive (both go up together)" if actual_r > 0.05 else "negative (one goes up, other goes down)" if actual_r < -0.05 else "no relationship"
+# Method 2: pandas
+r = df["ad_spend"].corr(df["daily_sales"])
 
-    fig = go.Figure()
-    fig.add_trace(go.Scatter(x=x, y=y, mode='markers', marker=dict(color='#22d3a7', size=5, opacity=0.6)))
-    z = np.polyfit(x, y, 1); x_l = np.linspace(x.min(), x.max(), 100)
-    fig.add_trace(go.Scatter(x=x_l, y=np.polyval(z, x_l), mode='lines', line=dict(color='#f45d6d', width=2, dash='dash'), name='Trend line'))
-    fig.update_layout(height=350, title=f"r = {actual_r:.2f} — {strength} {direction}", xaxis_title="Variable X", yaxis_title="Variable Y", **DL)
-    st.plotly_chart(fig, use_container_width=True, config={"displayModeBar": False})
-
-    st.markdown(f"""<div class="green-box">
-    💡 <b>What you're seeing:</b> Each dot is one data point. The trend line shows the overall direction.
-    <br>• r near +1 → dots form a tight upward line
-    <br>• r near 0 → dots are a random cloud (no pattern)
-    <br>• r near -1 → dots form a tight downward line
-    <br><br><b>Drag the slider</b> from -1 to +1 and watch the pattern change!
-    </div>""", unsafe_allow_html=True)
-
-    # ── Correlation Heatmap ──
-    st.markdown("---")
-    st.markdown("### 🗺️ Correlation Heatmap: The Big Picture")
-    st.caption("A heatmap shows ALL relationships at once. Green = positive, Red = negative, Dark = no relationship.")
-
-    np.random.seed(42); n = 300
-    age = np.random.normal(35, 10, n)
-    hm = pd.DataFrame({
-        "Age": age,
-        "Income": age*1200 + np.random.normal(0, 8000, n),
-        "Spending": age*800 + np.random.normal(0, 5000, n),
-        "Satisfaction": np.random.normal(7, 2, n)
-    })
-    corr = hm.corr()
-    fig_hm = go.Figure(go.Heatmap(z=corr.values, x=corr.columns, y=corr.columns,
-        colorscale=[[0,'#f45d6d'],[0.5,'#1a1d2e'],[1,'#22d3a7']], zmin=-1, zmax=1,
-        text=corr.values.round(2), texttemplate="%{text}", textfont=dict(size=13)))
-    fig_hm.update_layout(height=380, title="Which variables are related?", **DL)
-    st.plotly_chart(fig_hm, use_container_width=True, config={"displayModeBar": False})
-
-    st.markdown("""<div class="green-box">
-    💡 <b>How to read this:</b> Age, Income, and Spending are all correlated (older people tend to earn and spend more).
-    But Satisfaction has near-zero correlation with everything — it's independent.
-    <br><br>In real data science, this is your <b>first step in feature selection</b> — find which variables are related to your target.
-    </div>""", unsafe_allow_html=True)
-
-    # ── Quiz ──
-    check_quiz("m5_q1",
-        "A study finds that countries with more Nobel Prize winners also consume more chocolate. What should you conclude?",
-        ["Chocolate makes you smarter!", "There's a hidden factor (like wealth) causing both", "Nobel Prizes cause chocolate consumption"],
-        1,
-        "Wealthy countries can afford both more chocolate AND better education/research. Wealth is the confounding variable. Correlation ≠ causation!"
+print(f"Correlation: {r:.3f}")''',
+        output_func=show_correlation,
+        concept_title="📈 Pearson Correlation",
+        output_title="Ad Spend vs Sales"
     )
 
-    iq([
-        {"q": "Explain correlation to a non-technical PM.", "d": "Easy", "c": ["Google", "Meta"],
-         "a": "Correlation measures how two things move together, from -1 to +1. Example: 'Customers who call support more are more likely to churn (r=0.65). But support calls don't CAUSE churn — the underlying service problems cause both.'",
-         "t": "Always end with 'correlation ≠ causation.'"},
-        {"q": "Pearson vs Spearman — when do you use each?", "d": "Medium", "c": ["Google", "Netflix"],
-         "a": "<b>Pearson:</b> Linear relationships, continuous data. <b>Spearman:</b> Monotonic relationships (consistently up/down but not necessarily a straight line), ordinal data, robust to outliers.",
-         "t": "Mention that Spearman is often more useful for feature selection in ML."},
-        {"q": "Two features have r=0.95. Should you keep both in your model?", "d": "Medium", "c": ["Amazon", "Google"],
-         "a": "Probably not — they carry the same information (collinear). Keep the one more correlated with the target, or combine them. Tree-based models handle this better than linear models.",
-         "t": "Mention VIF > 5-10 as a formal collinearity check."},
-    ])
+    # Row 2: Correlation Heatmap
+    def show_heatmap():
+        num_cols = ["daily_sales", "avg_order_value", "delivery_time_min", "employees", "ad_spend"]
+        corr = df[num_cols].corr()
+        
+        fig = go.Figure(go.Heatmap(
+            z=corr.values, x=corr.columns, y=corr.columns,
+            colorscale=[[0,'#f45d6d'],[0.5,'#1a1d2e'],[1,'#22d3a7']], zmin=-1, zmax=1,
+            text=corr.values.round(2), texttemplate="%{text}", textfont=dict(size=10)
+        ))
+        fig.update_layout(height=300, **DL)
+        st.plotly_chart(fig, use_container_width=True, config={"displayModeBar": False})
+
+    split_row(
+        concept_html="""<div class="concept-card">
+        <b>🤔 Why use a Correlation Heatmap?</b>
+        <br><br>When you have many variables, checking correlations one by one is tedious. A heatmap shows ALL relationships at once!
+        <br><br><b>How to read it:</b>
+        <br>• 🟢 Green = positive correlation (both increase together)
+        <br>• 🔴 Red = negative correlation (one up, other down)
+        <br>• ⚫ Dark/Black = no correlation (independent)
+        <br>• Diagonal is always 1.0 (variable correlates perfectly with itself)
+        <br><br><b>What to look for:</b>
+        <br>• <b>Strong greens:</b> Variables that move together — potential predictors!
+        <br>• <b>Strong reds:</b> Variables that move opposite — interesting relationships
+        <br>• <b>Multicollinearity:</b> If two predictors are highly correlated (r > 0.8), you might only need one
+        <br><br><b>Business insight:</b> If "ad_spend" and "daily_sales" are green, ads might be working. If "delivery_time" and "customer_rating" are red, slow delivery hurts ratings.
+        </div>
+        <div class="math-box">
+        <b>📐 Reading the Heatmap:</b>
+        <br><br><b>Example findings:</b>
+        <br>&nbsp;&nbsp;&nbsp;&nbsp;ad_spend ↔ daily_sales: r = 0.78 (strong positive)
+        <br>&nbsp;&nbsp;&nbsp;&nbsp;→ More ad spend → more sales
+        <br><br>&nbsp;&nbsp;&nbsp;&nbsp;delivery_time ↔ rating: r = -0.45 (moderate negative)
+        <br>&nbsp;&nbsp;&nbsp;&nbsp;→ Longer delivery → lower ratings
+        <br><br>&nbsp;&nbsp;&nbsp;&nbsp;employees ↔ sales: r = 0.12 (weak)
+        <br>&nbsp;&nbsp;&nbsp;&nbsp;→ More staff doesn't guarantee more sales
+        <br><br>🧠 <b>Action:</b> Focus on ad spend (strong effect) rather than hiring (weak effect)
+        </div>
+        <div class="warn-box">⚠️ <b>Correlation ≠ Causation!</b>
+        <br>Ice cream sales and drowning deaths are correlated — but ice cream doesn't cause drowning! (Summer causes both)
+        <br><br>Always ask: "Is there a hidden third variable?"</div>""",
+        code_str='''# Correlation matrix
+num_cols = ["daily_sales", "avg_order_value", 
+            "delivery_time_min", "employees", "ad_spend"]
+
+corr_matrix = df[num_cols].corr()
+print(corr_matrix.round(2))
+
+# Visualize as heatmap
+import seaborn as sns
+sns.heatmap(corr_matrix, annot=True, cmap='RdYlGn', 
+            center=0, vmin=-1, vmax=1)''',
+        output_func=show_heatmap,
+        concept_title="🗺️ Correlation Heatmap",
+        output_title="All Variables"
+    )
 
 
 # ═══════════════════════════════════════
-# MODULE 6: REGRESSION INTUITION
+# M6: REGRESSION
 # ═══════════════════════════════════════
-elif module == "📉 M6: Regression Intuition":
-    st.markdown("# 📉 Module 6: Regression Intuition")
-    st.caption("Week 4 · Drawing the best line through data — where statistics meets machine learning.")
-
-    st.markdown("""<div class="story-box">
-    <b>🎬 The Story:</b> You're a real estate agent. A client asks: "I have a 1,500 sq ft house. What should I price it?"
-    <br><br>
-    You look at recent sales: 1,000 sqft sold for $200K, 1,200 sqft for $240K, 1,800 sqft for $350K...
-    You see a pattern — bigger houses cost more. If you could draw a <b>line</b> through this data,
-    you could predict the price for ANY size.
-    <br><br>
-    That line is <b>linear regression</b>: <b>price = slope × sqft + base price</b>
-    <br>• <b>Slope:</b> "For every extra square foot, price goes up by $___"
-    <br>• <b>Intercept:</b> The starting price (when sqft = 0, which is theoretical)
-    <br><br>
-    This is the simplest ML model — and understanding it deeply makes everything else click.
+elif module == "📉 M6: Regression":
+    st.markdown("# 📉 Module 6: Regression")
+    st.caption("Concept on Left · Code + Output on Right")
+    st.markdown("""<div class="concept-card">
+    <b>What is Regression?</b> It's about <b>predicting one variable from another</b> by finding the best-fit line through your data.
+    "If I spend $X on ads, how much sales can I expect?" — regression answers this with a formula.
+    <br><br>🎯 <b>Key concepts:</b> Slope (rate of change), intercept (starting point), R² (how good is the fit?).
     </div>""", unsafe_allow_html=True)
+    st.divider()
 
-    # ── Interactive Regression ──
-    st.markdown("### 🎮 Try It: Fit the Line Yourself!")
-    st.caption("Drag the slope and intercept to match the data. Then compare with the computer's best answer.")
+    # Row 1: Linear Regression
+    def show_regression():
+        x = df["ad_spend"].values
+        y = df["daily_sales"].values
+        slope, intercept = np.polyfit(x, y, 1)
+        y_pred = slope * x + intercept
+        
+        ss_res = np.sum((y - y_pred) ** 2)
+        ss_tot = np.sum((y - y.mean()) ** 2)
+        r_squared = 1 - (ss_res / ss_tot)
+        
+        mc = st.columns(3)
+        mc[0].metric("Slope", f"${slope:.2f}/$ ad spend")
+        mc[1].metric("Intercept", f"${intercept:.0f}")
+        mc[2].metric("R²", f"{r_squared:.3f}")
+        
+        fig = go.Figure()
+        fig.add_trace(go.Scatter(x=x, y=y, mode='markers', marker=dict(color='#22d3a7', size=8, opacity=0.6), name='Stores'))
+        fig.add_trace(go.Scatter(x=x, y=y_pred, mode='lines', line=dict(color='#f45d6d', width=2), name='Best Fit'))
+        fig.update_layout(height=250, title=f"Sales = {slope:.2f} × Ad Spend + {intercept:.0f}", xaxis_title="Ad Spend ($)", yaxis_title="Daily Sales ($)", **DL)
+        st.plotly_chart(fig, use_container_width=True, config={"displayModeBar": False})
 
-    np.random.seed(42)
-    x_data = np.linspace(0, 10, 30)
-    y_true = 3 * x_data + 10 + np.random.normal(0, 5, 30)
+    split_row(
+        concept_html="""<div class="concept-card">
+        <b>🤔 What is Linear Regression?</b>
+        <br><br>Linear regression finds the <b>best straight line through your data</b> so you can make predictions. It's the bridge from "these things are correlated" to "I can predict one from the other."
+        <br><br><b>The equation:</b> y = mx + b
+        <br>• <b>m (slope):</b> "For every $1 more in ad spend, sales change by $m"
+        <br>• <b>b (intercept):</b> "If ad spend is $0, sales would be $b"
+        <br><br><b>Why "best" line?</b> The line that minimizes the total squared distance from all points. This is called "least squares" — it finds the line where prediction errors are as small as possible.
+        <br><br><b>Real-world use:</b>
+        <br>• "If I spend $300 on ads, how much sales can I expect?"
+        <br>• "How much should I budget for ads to hit $600 in sales?"
+        <br><br><b>The power:</b> Regression turns correlation into a formula you can use for planning and forecasting!
+        </div>
+        <div class="math-box">
+        <b>📐 Linear Regression — Step by Step:</b>
+        <br><br><b>Given:</b> x̄ = $200, ȳ = $520
+        <br>&nbsp;&nbsp;&nbsp;&nbsp;Cov(X,Y) = 5000, Var(X) = 5000
+        <br><br><b>Step 1:</b> Calculate slope
+        <br>&nbsp;&nbsp;&nbsp;&nbsp;m = Cov(X,Y) / Var(X)
+        <br>&nbsp;&nbsp;&nbsp;&nbsp;m = 5000 / 5000 = <b>1.0</b>
+        <br>&nbsp;&nbsp;&nbsp;&nbsp;→ "Every $1 ad spend → $1 more sales"
+        <br><br><b>Step 2:</b> Calculate intercept
+        <br>&nbsp;&nbsp;&nbsp;&nbsp;b = ȳ - m × x̄
+        <br>&nbsp;&nbsp;&nbsp;&nbsp;b = 520 - 1.0 × 200 = <b>320</b>
+        <br>&nbsp;&nbsp;&nbsp;&nbsp;→ "Base sales without ads = $320"
+        <br><br><b>Equation:</b> Sales = 1.0 × AdSpend + 320
+        <br><br><b>Prediction:</b> If ad spend = $250:
+        <br>&nbsp;&nbsp;&nbsp;&nbsp;Sales = 1.0 × 250 + 320 = <b>$570</b>
+        </div>
+        <div class="insight-box">💡 <b>Business insight:</b> With slope = 1.0, every dollar in ads returns a dollar in sales. That's break-even! You need slope > 1 for ads to be profitable (after costs).</div>""",
+        code_str='''from sklearn.linear_model import LinearRegression
 
-    c1, c2 = st.columns(2)
-    user_m = c1.slider("📐 Your slope (how steep?):", 0.0, 6.0, 1.0, 0.1, key="m6_m")
-    user_b = c2.slider("📍 Your intercept (where does it start?):", 0.0, 20.0, 5.0, 0.5, key="m6_b")
+X = df[["ad_spend"]]
+y = df["daily_sales"]
 
-    best_m, best_b = np.polyfit(x_data, y_true, 1)
-    user_pred = user_m * x_data + user_b
-    best_pred = best_m * x_data + best_b
-    user_mse = np.mean((y_true - user_pred)**2)
-    best_mse = np.mean((y_true - best_pred)**2)
+model = LinearRegression()
+model.fit(X, y)
 
-    fig = go.Figure()
-    fig.add_trace(go.Scatter(x=x_data, y=y_true, mode='markers', marker=dict(color='#22d3a7', size=8), name='Actual data'))
-    fig.add_trace(go.Scatter(x=x_data, y=user_pred, mode='lines', line=dict(color='#f5b731', width=2.5), name=f'Your line'))
-    fig.add_trace(go.Scatter(x=x_data, y=best_pred, mode='lines', line=dict(color='#7c6aff', width=2, dash='dash'), name=f'Best fit'))
-    fig.update_layout(height=380, title="Can you beat the computer?", xaxis_title="X", yaxis_title="Y", **DL)
-    st.plotly_chart(fig, use_container_width=True, config={"displayModeBar": False})
+slope = model.coef_[0]
+intercept = model.intercept_
+r_squared = model.score(X, y)
 
-    mc = st.columns(3)
-    mc[0].metric("Your Error", f"{user_mse:.1f}", help="Lower is better!")
-    mc[1].metric("Best Possible Error", f"{best_mse:.1f}")
-    ratio = user_mse/best_mse if best_mse > 0 else float('inf')
-    mc[2].metric("How close?", f"{ratio:.1f}x", help="1.0x = perfect match")
+print(f"Equation: y = {slope:.2f}x + {intercept:.0f}")
+print(f"R² = {r_squared:.3f}")''',
+        output_func=show_regression,
+        concept_title="📏 Linear Regression",
+        output_title="Ad Spend → Sales"
+    )
 
-    if ratio < 1.2:
-        st.markdown("""<div class="green-box">🎯 <b>Nailed it!</b> Your line is very close to the optimal one. You've got good intuition!</div>""", unsafe_allow_html=True)
-    elif ratio < 2.0:
-        st.markdown("""<div class="story-box">🤏 <b>Getting close!</b> Try adjusting the slope to about {:.1f} and intercept to about {:.1f}.</div>""".format(best_m, best_b), unsafe_allow_html=True)
-    else:
-        st.markdown("""<div class="red-box">📐 <b>Keep trying!</b> The best slope is around {:.1f} and intercept around {:.1f}. Drag the sliders closer to those values.</div>""".format(best_m, best_b), unsafe_allow_html=True)
+    # Row 2: R-Squared & Predictions
+    def show_r_squared():
+        x = df["ad_spend"].values
+        y = df["daily_sales"].values
+        slope, intercept = np.polyfit(x, y, 1)
+        y_pred = slope * x + intercept
+        
+        ss_res = np.sum((y - y_pred) ** 2)
+        ss_tot = np.sum((y - y.mean()) ** 2)
+        r_squared = 1 - (ss_res / ss_tot)
+        
+        st.markdown(f"""<div class="insight-box">
+        <b>R² = {r_squared:.3f}</b> means ad spend explains <b>{r_squared*100:.1f}%</b> of the variation in sales.
+        </div>""", unsafe_allow_html=True)
+        
+        new_ad_spend = st.slider("Predict sales for ad spend:", 100, 400, 250)
+        predicted = slope * new_ad_spend + intercept
+        st.metric(f"Predicted Sales (${new_ad_spend} ad spend)", f"${predicted:.0f}")
 
-    # ── Residuals ──
-    st.markdown("---")
-    st.markdown("### 📖 Residuals: How Wrong Is Each Prediction?")
+    split_row(
+        concept_html="""<div class="concept-card">
+        <b>🤔 What is R² (R-Squared)?</b>
+        <br><br>R² answers: <b>"How much of the variation in Y does my model explain?"</b>
+        <br><br><b>The intuition:</b>
+        <br>• Sales vary from store to store (some make $400, others $600)
+        <br>• Part of that variation is explained by ad spend
+        <br>• Part is unexplained (other factors, randomness)
+        <br>• R² = explained variation / total variation
+        <br><br><b>Interpretation:</b>
+        <br>• R² = 0 → Model explains nothing (useless)
+        <br>• R² = 0.5 → Model explains 50% of variation (decent)
+        <br>• R² = 0.8 → Model explains 80% of variation (good!)
+        <br>• R² = 1.0 → Model explains everything (perfect, but suspicious)
+        <br><br><b>What about the unexplained part?</b>
+        <br>If R² = 0.6, then 40% of sales variation comes from other factors: location, staff quality, competition, weather, etc.
+        <br><br><b>Warning:</b> High R² doesn't mean the model is correct! You can get high R² with overfitting or spurious correlations.
+        </div>
+        <div class="math-box">
+        <b>📐 R² — Step by Step:</b>
+        <br><br><b>Given:</b> Actual Y = [400, 450, 520, 580, 650]
+        <br>&nbsp;&nbsp;&nbsp;&nbsp;Predicted Ŷ = [420, 470, 520, 570, 620]
+        <br>&nbsp;&nbsp;&nbsp;&nbsp;Mean ȳ = 520
+        <br><br><b>Step 1:</b> SS_residual (prediction errors²)
+        <br>&nbsp;&nbsp;&nbsp;&nbsp;= (400-420)² + (450-470)² + (520-520)² + (580-570)² + (650-620)²
+        <br>&nbsp;&nbsp;&nbsp;&nbsp;= 400 + 400 + 0 + 100 + 900 = <b>1800</b>
+        <br><br><b>Step 2:</b> SS_total (variance from mean)
+        <br>&nbsp;&nbsp;&nbsp;&nbsp;= (400-520)² + (450-520)² + ... + (650-520)²
+        <br>&nbsp;&nbsp;&nbsp;&nbsp;= 14400 + 4900 + 0 + 3600 + 16900 = <b>39800</b>
+        <br><br><b>Step 3:</b> R² = 1 - SS_res/SS_tot
+        <br>&nbsp;&nbsp;&nbsp;&nbsp;R² = 1 - 1800/39800 = 1 - 0.045 = <b>0.955</b>
+        <br><br>🧠 Model explains 95.5% of sales variation!
+        </div>
+        <div class="warn-box">⚠️ <b>Don't chase R² blindly!</b> A model with R² = 0.99 might be overfitting. A model with R² = 0.4 might still be useful for business decisions.</div>""",
+        code_str='''# R-squared
+r_squared = model.score(X, y)
+print(f"R² = {r_squared:.3f}")
+print(f"Model explains {r_squared*100:.1f}% of variance")
 
-    st.markdown("""<div class="analogy-box">
-    🎯 <b>Archery analogy:</b> Each prediction is like shooting an arrow at a target.
-    The <b>residual</b> is how far your arrow landed from the bullseye.
-    <br><br>
-    • Residual = actual value − predicted value<br>
-    • Good model → small, random residuals (arrows scattered evenly around the bullseye)<br>
-    • Bad model → residuals show a pattern (arrows consistently off to one side)
-    </div>""", unsafe_allow_html=True)
-
-    residuals = y_true - best_pred
-    fig_r = go.Figure()
-    colors_r = ['#22d3a7' if r > 0 else '#f45d6d' for r in residuals]
-    fig_r.add_trace(go.Bar(x=list(range(len(residuals))), y=residuals, marker_color=colors_r, opacity=0.7))
-    fig_r.add_hline(y=0, line_dash="dash", line_color="#7c6aff")
-    fig_r.update_layout(height=250, title="Residuals — green (over-predicted) vs red (under-predicted)", xaxis_title="Data Point", yaxis_title="Error", **DL)
-    st.plotly_chart(fig_r, use_container_width=True, config={"displayModeBar": False})
-
-    st.markdown("""<div class="green-box">💡 <b>Good sign:</b> The errors are scattered randomly above and below zero — no pattern.
-    If you saw a curve or funnel shape, the model would be missing something important.</div>""", unsafe_allow_html=True)
-
-    # ── Overfitting ──
-    st.markdown("---")
-    st.markdown("### 📖 Overfitting vs Underfitting: The Goldilocks Problem")
-
-    st.markdown("""<div class="story-box">
-    <b>🎬 The Student Analogy:</b>
-    <br><br>
-    📚 <b>Underfitting</b> = A student who only reads chapter titles. They get the gist but miss all the details. On the exam, they fail.
-    <br><br>
-    📝 <b>Overfitting</b> = A student who memorizes the textbook word-for-word, including typos. They ace practice tests but bomb the real exam because they memorized noise, not concepts.
-    <br><br>
-    ✅ <b>Good fit</b> = A student who understands the concepts. They can handle new questions they've never seen before.
-    </div>""", unsafe_allow_html=True)
-
-    fit_type = st.radio("See each type:", ["📉 Underfit (too simple)", "✅ Good fit (just right)", "⚠️ Overfit (too complex)"], horizontal=True, key="m6_fit")
-
-    fig_f = go.Figure()
-    fig_f.add_trace(go.Scatter(x=x_data, y=y_true, mode='markers', marker=dict(color='#22d3a7', size=8), name='Data'))
-    x_s = np.linspace(0, 10, 200)
-    if "Underfit" in fit_type:
-        fig_f.add_trace(go.Scatter(x=x_s, y=np.full_like(x_s, y_true.mean()), mode='lines', line=dict(color='#f5b731', width=3), name='Model (flat line)'))
-        msg = "The model is too simple — it just predicts the average for everything. It misses the obvious upward trend."
-    elif "Good" in fit_type:
-        fig_f.add_trace(go.Scatter(x=x_s, y=np.polyval(np.polyfit(x_data, y_true, 1), x_s), mode='lines', line=dict(color='#7c6aff', width=3), name='Model (straight line)'))
-        msg = "The model captures the real trend without chasing random noise. It will work well on new data."
-    else:
-        fig_f.add_trace(go.Scatter(x=x_s, y=np.polyval(np.polyfit(x_data, y_true, 15), x_s).clip(-10, 60), mode='lines', line=dict(color='#f45d6d', width=3), name='Model (wiggly line)'))
-        msg = "The model passes through every point perfectly — but it's memorizing noise. On new data, those wiggles will be completely wrong."
-    fig_f.update_layout(height=320, title=fit_type.split(" ", 1)[1], **DL)
-    st.plotly_chart(fig_f, use_container_width=True, config={"displayModeBar": False})
-
-    st.markdown(f"""<div class="{'green-box' if 'Good' in fit_type else 'red-box'}">{msg}</div>""", unsafe_allow_html=True)
-
-    # ── Order Quiz ──
-    order_quiz("m6_order",
-        "Put these regression steps in the right order:",
-        ["Check residuals for patterns", "Collect and explore data", "Fit the model (find best line)", "Split data into train/test"],
-        ["Collect and explore data", "Split data into train/test", "Fit the model (find best line)", "Check residuals for patterns"],
-        "First explore your data, then split it (so you can test later), then fit the model, then check if the model is any good by looking at residuals."
+# Make predictions
+new_ad_spend = 250
+predicted_sales = model.predict([[new_ad_spend]])[0]
+print(f"Predicted: ${predicted_sales:.0f}")''',
+        output_func=show_r_squared,
+        concept_title="📊 R-Squared & Predictions",
+        output_title="Model Quality"
     )
 
     iq([
         {"q": "Explain linear regression to a non-technical person.", "d": "Easy", "c": ["Google", "Amazon"],
-         "a": "Linear regression draws the <b>best straight line</b> through data to make predictions. Example: 'For every extra square foot, house price goes up by $150.' The line captures the relationship: y = 150×sqft + 50,000.",
-         "t": "Use the house price example — everyone understands it."},
-        {"q": "What is overfitting? How do you detect and prevent it?", "d": "Medium", "c": ["Google", "Meta", "Amazon"],
-         "a": "<b>Overfitting:</b> Model performs great on training data but poorly on new data. <b>Detection:</b> Big gap between training and test accuracy. <b>Prevention:</b> Train/test split, cross-validation, regularization, simpler model, more data.",
-         "t": "Use the student analogy: memorizing answers vs understanding concepts."},
-        {"q": "What assumptions does linear regression make?", "d": "Hard", "c": ["Google", "Apple"],
-         "a": "<b>1. Linearity</b> (relationship is a straight line). <b>2. Independence</b> (observations don't affect each other). <b>3. Constant spread</b> (residuals don't fan out). <b>4. Normal residuals</b> (for inference). <b>5. No multicollinearity</b> (features aren't copies of each other). Mild violations are usually fine with large samples.",
-         "t": "Don't just list them — say which ones matter most in practice."},
+         "a": "Linear regression draws the <b>best straight line</b> through data to make predictions. Example: 'For every extra $1 in ad spend, sales go up by $1.16.'",
+         "t": "Use a concrete example everyone understands."},
     ])
