@@ -1119,7 +1119,15 @@ print(f"Theoretical SE: {population.std()/np.sqrt(sample_size):.2f}")''',
         fig = go.Figure()
         fig.add_trace(go.Scatter(x=[ci_lower, ci_upper], y=[1, 1], mode='lines', line=dict(color='#22d3a7', width=8), name='95% CI'))
         fig.add_trace(go.Scatter(x=[mean], y=[1], mode='markers', marker=dict(color='#f45d6d', size=15), name='Sample Mean'))
-        fig.update_layout(height=120, showlegend=True, yaxis=dict(visible=False), xaxis_title="Daily Sales ($)", **DL)
+        fig.update_layout(
+            height=120, showlegend=True, 
+            xaxis_title="Daily Sales ($)",
+            yaxis=dict(visible=False, gridcolor='#2d3148'),
+            xaxis=dict(gridcolor='#2d3148', tickfont=dict(color='#8892b0'), title_font=dict(color='#8892b0')),
+            paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
+            font=dict(color='#e2e8f0'), legend=dict(font=dict(color='#8892b0')),
+            margin=dict(t=40, b=40, l=40, r=40)
+        )
         st.plotly_chart(fig, use_container_width=True, config={"displayModeBar": False})
 
     split_row(
