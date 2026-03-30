@@ -10,7 +10,9 @@ st.set_page_config(page_title="🤖 Phase 3: ML Concepts", page_icon="🤖", lay
 st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
-.stApp { font-family: 'Inter', sans-serif; }
+.stApp { font-family: 'Inter', sans-serif; background-color: #000000; }
+[data-testid="stSidebar"] { background-color: #000000; }
+.main .block-container { background-color: #000000; }
 .concept-card {
     background: linear-gradient(135deg, #1a1d2e, #1f2235);
     border: 1px solid #2d3148; border-radius: 14px; padding: 1.1rem 1.3rem;

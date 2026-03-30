@@ -5,7 +5,23 @@ st.set_page_config(page_title="🧭 AI & DS Learning Roadmap", page_icon="🧭",
 st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
-.stApp { font-family: 'Inter', sans-serif; }
+
+/* Black background for entire app */
+.stApp {
+    font-family: 'Inter', sans-serif;
+    background-color: #000000;
+}
+
+/* Sidebar black background */
+[data-testid="stSidebar"] {
+    background-color: #000000;
+}
+
+/* Main content area */
+.main .block-container {
+    background-color: #000000;
+}
+
 .phase-card {
     background: linear-gradient(135deg, #1a1d2e, #252840);
     border: 1px solid #2d3148; border-radius: 20px; padding: 1.8rem;
