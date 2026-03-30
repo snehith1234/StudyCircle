@@ -999,6 +999,180 @@ else:
         output_title="Is It Real or Luck?"
     )
 
+    # Row 4: Central Limit Theorem
+    def show_clt():
+        np.random.seed(42)
+        # Create skewed population (exponential)
+        population = np.random.exponential(scale=20, size=10000)
+        
+        sample_sizes = [5, 30, 100]
+        n_samples = 500
+        
+        fig = go.Figure()
+        colors = ['#f45d6d', '#f5b731', '#22d3a7']
+        
+        for idx, n in enumerate(sample_sizes):
+            sample_means = [np.random.choice(population, size=n).mean() for _ in range(n_samples)]
+            fig.add_trace(go.Histogram(x=sample_means, name=f'n={n}', marker_color=colors[idx], opacity=0.6, nbinsx=30))
+        
+        fig.add_vline(x=population.mean(), line_dash="dash", line_color="white", annotation_text=f"μ={population.mean():.1f}")
+        fig.update_layout(barmode='overlay', height=250, title="Distribution of Sample Means (from skewed population)", **DL)
+        st.plotly_chart(fig, use_container_width=True, config={"displayModeBar": False})
+        
+        mc = st.columns(3)
+        mc[0].metric("Population μ", f"{population.mean():.1f}")
+        for idx, n in enumerate(sample_sizes):
+            sample_means = [np.random.choice(population, size=n).mean() for _ in range(n_samples)]
+            if idx < 2:
+                mc[idx+1].metric(f"SE (n={n})", f"{np.std(sample_means):.2f}")
+
+    split_row(
+        concept_html="""<div class="concept-card">
+        <b>🤔 What is the Central Limit Theorem (CLT)?</b>
+        <br><br>The CLT is the <b>most important theorem in statistics</b>. It says:
+        <br><br><b>"When you take many samples and calculate their means, those means will be normally distributed — even if the original data is NOT normal!"</b>
+        <br><br><b>Why does this matter?</b>
+        <br>• Real-world data is often skewed (income, delivery times, etc.)
+        <br>• But sample MEANS are always normal (if n is large enough)
+        <br>• This is WHY t-tests and confidence intervals work!
+        <br><br><b>Key implications:</b>
+        <br>• Mean of sample means = Population mean (μ)
+        <br>• Standard Error = σ/√n (gets smaller as n increases)
+        <br>• n ≥ 30 is usually "large enough" for CLT to kick in
+        <br><br><b>Analogy:</b> Individual pizza delivery times are all over the place (15-60 min). But the AVERAGE delivery time across 30 orders? That's very predictable and bell-shaped!
+        </div>
+        <div class="math-box">
+        <b>📐 CLT — Step by Step:</b>
+        <br><br><b>Given:</b> Population is exponential (skewed right)
+        <br>&nbsp;&nbsp;&nbsp;&nbsp;μ = 20, σ = 20
+        <br><br><b>Take 500 samples of size n, calculate means:</b>
+        <br><br><b>n = 5:</b> Sample means are still somewhat skewed
+        <br>&nbsp;&nbsp;&nbsp;&nbsp;SE = σ/√5 = 20/2.24 = <b>8.9</b>
+        <br><br><b>n = 30:</b> Sample means look normal!
+        <br>&nbsp;&nbsp;&nbsp;&nbsp;SE = σ/√30 = 20/5.48 = <b>3.7</b>
+        <br><br><b>n = 100:</b> Sample means are very normal, tight
+        <br>&nbsp;&nbsp;&nbsp;&nbsp;SE = σ/√100 = 20/10 = <b>2.0</b>
+        <br><br>🧠 Larger n → narrower distribution → more precise estimates!
+        </div>
+        <div class="insight-box">💡 <b>This is why we can use normal-based tests (t-tests, z-tests) even when data isn't normal — we're testing the MEAN, not individual values!</b></div>""",
+        code_str='''import numpy as np
+
+# Skewed population (exponential)
+population = np.random.exponential(scale=20, size=10000)
+
+# Take many samples, calculate means
+n_samples = 500
+sample_size = 30
+
+sample_means = [
+    np.random.choice(population, size=sample_size).mean() 
+    for _ in range(n_samples)
+]
+
+# Sample means are normally distributed!
+print(f"Population mean: {population.mean():.1f}")
+print(f"Mean of sample means: {np.mean(sample_means):.1f}")
+print(f"Standard Error: {np.std(sample_means):.2f}")
+print(f"Theoretical SE: {population.std()/np.sqrt(sample_size):.2f}")''',
+        output_func=show_clt,
+        concept_title="🔔 Central Limit Theorem",
+        output_title="Sample Means Become Normal!"
+    )
+
+    # Row 5: Confidence Intervals
+    def show_ci():
+        from scipy.stats import t
+        data = df["daily_sales"]
+        n = len(data)
+        mean = data.mean()
+        std = data.std()
+        se = std / np.sqrt(n)
+        
+        confidence = 0.95
+        t_crit = t.ppf((1 + confidence) / 2, df=n-1)
+        margin = t_crit * se
+        ci_lower, ci_upper = mean - margin, mean + margin
+        
+        mc = st.columns(4)
+        mc[0].metric("Sample Mean", f"${mean:.0f}")
+        mc[1].metric("Std Error", f"${se:.1f}")
+        mc[2].metric("95% CI Lower", f"${ci_lower:.0f}")
+        mc[3].metric("95% CI Upper", f"${ci_upper:.0f}")
+        
+        fig = go.Figure()
+        fig.add_trace(go.Scatter(x=[ci_lower, ci_upper], y=[1, 1], mode='lines', line=dict(color='#22d3a7', width=8), name='95% CI'))
+        fig.add_trace(go.Scatter(x=[mean], y=[1], mode='markers', marker=dict(color='#f45d6d', size=15), name='Sample Mean'))
+        fig.update_layout(height=120, showlegend=True, yaxis=dict(visible=False), xaxis_title="Daily Sales ($)", **DL)
+        st.plotly_chart(fig, use_container_width=True, config={"displayModeBar": False})
+
+    split_row(
+        concept_html="""<div class="concept-card">
+        <b>🤔 What is a Confidence Interval?</b>
+        <br><br>A confidence interval gives you a <b>range of plausible values</b> for the true population parameter, not just a single point estimate.
+        <br><br><b>The problem with point estimates:</b>
+        <br>• Sample mean = $500. But how confident are you?
+        <br>• Could the true mean be $450? $550? $600?
+        <br><br><b>95% Confidence Interval:</b>
+        <br>• "We're 95% confident the true mean is between $470 and $530"
+        <br>• If we repeated this study 100 times, ~95 of those intervals would contain the true mean
+        <br><br><b>The formula:</b>
+        <br>&nbsp;&nbsp;&nbsp;&nbsp;CI = x̄ ± (t × SE)
+        <br>&nbsp;&nbsp;&nbsp;&nbsp;where SE = s/√n
+        <br><br><b>Width depends on:</b>
+        <br>• <b>Sample size (n):</b> Larger n → narrower CI (more precise)
+        <br>• <b>Variability (s):</b> More spread → wider CI (less certain)
+        <br>• <b>Confidence level:</b> 99% CI is wider than 95% CI
+        </div>
+        <div class="math-box">
+        <b>📐 Confidence Interval — Step by Step:</b>
+        <br><br><b>Given:</b> n=50, x̄=$500, s=$100
+        <br><br><b>Step 1:</b> Calculate Standard Error
+        <br>&nbsp;&nbsp;&nbsp;&nbsp;SE = s/√n = 100/√50 = 100/7.07 = <b>$14.14</b>
+        <br><br><b>Step 2:</b> Find t-critical (95%, df=49)
+        <br>&nbsp;&nbsp;&nbsp;&nbsp;t = <b>2.01</b> (from t-table)
+        <br><br><b>Step 3:</b> Calculate margin of error
+        <br>&nbsp;&nbsp;&nbsp;&nbsp;Margin = t × SE = 2.01 × 14.14 = <b>$28.42</b>
+        <br><br><b>Step 4:</b> Build interval
+        <br>&nbsp;&nbsp;&nbsp;&nbsp;CI = 500 ± 28.42
+        <br>&nbsp;&nbsp;&nbsp;&nbsp;CI = <b>[$472, $528]</b>
+        <br><br>🧠 "We're 95% confident the true average daily sales is between $472 and $528"
+        </div>
+        <div class="warn-box">⚠️ <b>Common misconception:</b> "95% CI" does NOT mean "95% chance the true mean is in this interval." The true mean is fixed — either it's in there or it's not. The 95% refers to the method's long-run success rate.</div>""",
+        code_str='''from scipy.stats import t
+
+data = df["daily_sales"]
+n = len(data)
+mean = data.mean()
+std = data.std()
+se = std / np.sqrt(n)
+
+# 95% confidence interval
+confidence = 0.95
+t_critical = t.ppf((1 + confidence) / 2, df=n-1)
+margin = t_critical * se
+
+ci_lower = mean - margin
+ci_upper = mean + margin
+
+print(f"Sample mean: ${mean:.0f}")
+print(f"95% CI: [${ci_lower:.0f}, ${ci_upper:.0f}]")''',
+        output_func=show_ci,
+        concept_title="📏 Confidence Intervals",
+        output_title="95% CI for Mean Sales"
+    )
+
+    iq([
+        {"q": "Explain the Central Limit Theorem and why it's important.", "d": "Medium", "c": ["Google", "Meta"],
+         "a": "<b>CLT:</b> Sample means are normally distributed regardless of population shape (if n is large enough). <b>Why important:</b> It's the foundation for hypothesis testing and confidence intervals — we can use normal-based methods even with non-normal data.",
+         "t": "Mention that n≥30 is the common rule of thumb."},
+        {"q": "What's the difference between standard deviation and standard error?", "d": "Easy", "c": ["Amazon", "Netflix"],
+         "a": "<b>Std Dev (σ):</b> Measures spread of individual data points. <b>Std Error (SE):</b> Measures precision of the sample mean estimate. SE = σ/√n. SE gets smaller as sample size increases.",
+         "t": "SE tells you how much the sample mean would vary if you repeated the study."},
+        {"q": "Interpret a 95% confidence interval of [$450, $550] for mean sales.", "d": "Medium", "c": ["Google", "Apple"],
+         "a": "We're 95% confident the true population mean falls between $450 and $550. If we repeated this sampling 100 times, about 95 of those intervals would contain the true mean.",
+         "t": "Avoid saying '95% probability the true mean is in this range' — that's a common misconception."},
+    ])
+
 
 # ═══════════════════════════════════════
 # M5: CORRELATION
