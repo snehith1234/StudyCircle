@@ -270,6 +270,27 @@ with col3:
 
 st.divider()
 
+# If Run All is clicked, execute all cells first before rendering
+if run_all:
+    with st.spinner("Running all cells..."):
+        code_idx = 0
+        for cell_idx, cell in enumerate(cells):
+            cell_type = cell.get("cell_type", "")
+            source = "".join(cell.get("source", []))
+            
+            if not source.strip() or cell_type != "code":
+                continue
+            
+            code_idx += 1
+            cell_key = f"{selected_key}_{cell_idx}"
+            
+            # Execute if not already executed
+            if not st.session_state.nb_executed.get(cell_key, False):
+                output = execute_code(source, st.session_state.nb_namespace)
+                st.session_state.nb_outputs[cell_key] = output
+                st.session_state.nb_executed[cell_key] = True
+    st.rerun()
+
 # Render cells
 code_count = 0
 for cell_idx, cell in enumerate(cells):
@@ -307,8 +328,8 @@ for cell_idx, cell in enumerate(cells):
         # Show code
         st.code(source, language="python")
         
-        # Execute if button clicked or run_all
-        if run_cell or (run_all and not is_executed):
+        # Execute if individual run button clicked
+        if run_cell:
             with st.spinner("Running..."):
                 output = execute_code(source, st.session_state.nb_namespace)
                 st.session_state.nb_outputs[cell_key] = output
