@@ -10,9 +10,16 @@ st.set_page_config(page_title="📓 Notebooks", page_icon="📓", layout="wide")
 st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
-.stApp { font-family: 'Inter', sans-serif; background-color: #000000; }
-[data-testid="stSidebar"] { background-color: #000000; }
-.main .block-container { background-color: #000000; }
+
+/* Force black background everywhere */
+.stApp, .main, [data-testid="stAppViewContainer"], [data-testid="stHeader"], 
+.block-container, [data-testid="stSidebar"], [data-testid="stSidebarContent"] {
+    background-color: #000000 !important;
+}
+.stApp, .stMarkdown, p, span, label { color: #e2e8f0 !important; }
+h1, h2, h3, h4, h5, h6 { color: #ffffff !important; }
+
+.stApp { font-family: 'Inter', sans-serif; }
 .nb-output {
     background: #0d1117; border: 1px solid #2d3148; border-radius: 8px;
     padding: 0.8rem; margin: 0.3rem 0; font-family: 'Fira Code', monospace;

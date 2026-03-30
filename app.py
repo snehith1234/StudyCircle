@@ -6,21 +6,23 @@ st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
-/* Black background for entire app */
-.stApp {
-    font-family: 'Inter', sans-serif;
-    background-color: #000000;
+/* Force black background everywhere */
+.stApp, .main, [data-testid="stAppViewContainer"], [data-testid="stHeader"], 
+[data-testid="stToolbar"], [data-testid="stDecoration"], [data-testid="stStatusWidget"],
+.block-container, [data-testid="stSidebar"], [data-testid="stSidebarContent"] {
+    background-color: #000000 !important;
 }
 
-/* Sidebar black background */
-[data-testid="stSidebar"] {
-    background-color: #000000;
+/* Ensure text is visible */
+.stApp, .stMarkdown, p, span, label, .stText {
+    color: #e2e8f0 !important;
 }
 
-/* Main content area */
-.main .block-container {
-    background-color: #000000;
+h1, h2, h3, h4, h5, h6 {
+    color: #ffffff !important;
 }
+
+.stApp { font-family: 'Inter', sans-serif; }
 
 .phase-card {
     background: linear-gradient(135deg, #1a1d2e, #252840);
@@ -28,15 +30,15 @@ st.markdown("""
     border-top: 4px solid; min-height: 260px;
 }
 .phase-num { font-size: 2.5rem; font-weight: 800; opacity: 0.12; }
-.phase-title { font-size: 1.2rem; font-weight: 700; margin: 0.3rem 0; }
-.phase-desc { font-size: 0.84rem; color: #8892b0; line-height: 1.6; }
+.phase-title { font-size: 1.2rem; font-weight: 700; margin: 0.3rem 0; color: #ffffff !important; }
+.phase-desc { font-size: 0.84rem; color: #8892b0 !important; line-height: 1.6; }
 .phase-weeks { font-size: 0.75rem; font-weight: 600; margin-top: 0.8rem; }
 .advice-box {
     background: #181a27; border: 1px solid #2d3148; border-radius: 14px;
     padding: 1.2rem 1.5rem; border-left: 4px solid; margin-bottom: 0.6rem;
-    color: #c8cfe0; font-size: 0.92rem; line-height: 1.7;
+    color: #c8cfe0 !important; font-size: 0.92rem; line-height: 1.7;
 }
-.advice-box b { color: #e2e8f0; }
+.advice-box b { color: #e2e8f0 !important; }
 </style>
 """, unsafe_allow_html=True)
 

@@ -11,59 +11,64 @@ st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
-/* Black background for entire app */
-.stApp {
-    font-family: 'Inter', sans-serif;
-    background-color: #000000;
+/* Force black background everywhere */
+.stApp, .main, [data-testid="stAppViewContainer"], [data-testid="stHeader"], 
+[data-testid="stToolbar"], [data-testid="stDecoration"], [data-testid="stStatusWidget"],
+.block-container, [data-testid="stSidebar"], [data-testid="stSidebarContent"] {
+    background-color: #000000 !important;
 }
-[data-testid="stSidebar"] { background-color: #000000; }
-.main .block-container { background-color: #000000; }
+
+/* Ensure text is visible */
+.stApp, .stMarkdown, p, span, label, .stText { color: #e2e8f0 !important; }
+h1, h2, h3, h4, h5, h6 { color: #ffffff !important; }
+
+.stApp { font-family: 'Inter', sans-serif; }
 
 .concept-card {
     background: linear-gradient(135deg, #1a1d2e, #1f2235);
     border: 1px solid #2d3148; border-radius: 14px; padding: 1.1rem 1.3rem;
-    margin: 0.4rem 0; line-height: 1.85; font-size: 0.91rem; color: #c8cfe0;
+    margin: 0.4rem 0; line-height: 1.85; font-size: 0.91rem; color: #c8cfe0 !important;
 }
-.concept-card b { color: #e2e8f0; }
+.concept-card b { color: #e2e8f0 !important; }
 .output-label {
-    display: inline-block; background: #22d3a722; color: #22d3a7;
+    display: inline-block; background: #22d3a722; color: #22d3a7 !important;
     font-size: 0.72rem; padding: 3px 10px; border-radius: 8px;
     font-weight: 700; margin-bottom: 6px; letter-spacing: 0.5px;
 }
 .concept-label {
-    display: inline-block; background: #7c6aff22; color: #7c6aff;
+    display: inline-block; background: #7c6aff22; color: #7c6aff !important;
     font-size: 0.72rem; padding: 3px 10px; border-radius: 8px;
     font-weight: 700; margin-bottom: 6px; letter-spacing: 0.5px;
 }
 .insight-box {
     background: linear-gradient(135deg, #1a2a1f, #1f3528);
     border: 1px solid #2a5a3a; border-radius: 12px; padding: 0.9rem 1.1rem;
-    margin: 0.4rem 0; font-size: 0.87rem; color: #c8d8c0; line-height: 1.7;
+    margin: 0.4rem 0; font-size: 0.87rem; color: #c8d8c0 !important; line-height: 1.7;
 }
-.insight-box b { color: #d0f0e0; }
+.insight-box b { color: #d0f0e0 !important; }
 .warn-box {
     background: linear-gradient(135deg, #2a1a1e, #351f25);
     border: 1px solid #5a2a3a; border-radius: 12px; padding: 0.9rem 1.1rem;
-    margin: 0.4rem 0; font-size: 0.87rem; color: #d8a8b8; line-height: 1.7;
+    margin: 0.4rem 0; font-size: 0.87rem; color: #d8a8b8 !important; line-height: 1.7;
 }
-.warn-box b { color: #f0c8d8; }
+.warn-box b { color: #f0c8d8 !important; }
 .math-box {
     background: #252840; border-left: 4px solid #f5b731;
     border-radius: 0 10px 10px 0; padding: 0.9rem 1.1rem;
-    margin: 0.4rem 0; font-size: 0.87rem; color: #c8cfe0; line-height: 1.8;
+    margin: 0.4rem 0; font-size: 0.87rem; color: #c8cfe0 !important; line-height: 1.8;
 }
-.math-box b { color: #f5b731; }
+.math-box b { color: #f5b731 !important; }
 .iq-card {
     background: #181a27; border: 1px solid #2d3148; border-radius: 14px;
     padding: 1.1rem 1.4rem; margin-bottom: 0.5rem; border-left: 4px solid;
 }
-.iq-title { font-size: 0.93rem; font-weight: 700; color: #e2e8f0; line-height: 1.5; }
+.iq-title { font-size: 0.93rem; font-weight: 700; color: #e2e8f0 !important; line-height: 1.5; }
 .iq-meta { font-size: 0.7rem; margin-top: 5px; }
 .iq-tag { display: inline-block; padding: 2px 7px; border-radius: 6px; font-size: 0.67rem; font-weight: 600; }
-.iq-answer { background: #1a2a1f; border: 1px solid #2a5a3a; border-radius: 12px; padding: 1rem 1.3rem; margin-top: 0.3rem; color: #c8d8c0; font-size: 0.88rem; line-height: 1.8; }
-.iq-answer b { color: #d0f0e0; }
-.iq-tip { background: #252840; border-left: 4px solid #f5b731; border-radius: 0 10px 10px 0; padding: 0.6rem 1rem; margin-top: 0.3rem; font-size: 0.84rem; color: #c8cfe0; line-height: 1.6; }
-.iq-tip b { color: #e2e8f0; }
+.iq-answer { background: #1a2a1f; border: 1px solid #2a5a3a; border-radius: 12px; padding: 1rem 1.3rem; margin-top: 0.3rem; color: #c8d8c0 !important; font-size: 0.88rem; line-height: 1.8; }
+.iq-answer b { color: #d0f0e0 !important; }
+.iq-tip { background: #252840; border-left: 4px solid #f5b731; border-radius: 0 10px 10px 0; padding: 0.6rem 1rem; margin-top: 0.3rem; font-size: 0.84rem; color: #c8cfe0 !important; line-height: 1.6; }
+.iq-tip b { color: #e2e8f0 !important; }
 </style>
 """, unsafe_allow_html=True)
 
