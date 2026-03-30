@@ -60,7 +60,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 DL = dict(
-    paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
+    paper_bgcolor='#0e1117', plot_bgcolor='#0e1117',
     xaxis=dict(gridcolor='#2d3148', tickfont=dict(color='#8892b0'), title_font=dict(color='#8892b0')),
     yaxis=dict(gridcolor='#2d3148', tickfont=dict(color='#8892b0'), title_font=dict(color='#8892b0')),
     font=dict(color='#e2e8f0'), legend=dict(font=dict(color='#8892b0')),
@@ -1124,7 +1124,7 @@ print(f"Theoretical SE: {population.std()/np.sqrt(sample_size):.2f}")''',
             xaxis_title="Daily Sales ($)",
             yaxis=dict(visible=False, gridcolor='#2d3148'),
             xaxis=dict(gridcolor='#2d3148', tickfont=dict(color='#8892b0'), title_font=dict(color='#8892b0')),
-            paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
+            paper_bgcolor='#0e1117', plot_bgcolor='#0e1117',
             font=dict(color='#e2e8f0'), legend=dict(font=dict(color='#8892b0')),
             margin=dict(t=40, b=40, l=40, r=40)
         )

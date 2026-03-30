@@ -69,7 +69,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 DL = dict(
-    paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
+    paper_bgcolor='#0e1117', plot_bgcolor='#0e1117',
     xaxis=dict(gridcolor='#2d3148', tickfont=dict(color='#8892b0'), title_font=dict(color='#8892b0')),
     yaxis=dict(gridcolor='#2d3148', tickfont=dict(color='#8892b0'), title_font=dict(color='#8892b0')),
     font=dict(color='#e2e8f0'), legend=dict(font=dict(color='#8892b0')),
