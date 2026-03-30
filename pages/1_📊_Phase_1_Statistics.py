@@ -674,8 +674,19 @@ print(f"95% of data: {mean-2*std:.0f} to {mean+2*std:.0f}")''',
         fig = go.Figure()
         fig.add_trace(go.Bar(x=x, y=pmf, marker_color="#22d3a7", opacity=0.7))
         fig.add_vline(x=expected, line_dash="dash", line_color="#f45d6d", annotation_text=f"Expected: {expected}")
-        fig.update_layout(height=220, title="Binomial: 100 emails, 10% conversion", xaxis_title="Conversions", **DL)
+        fig.update_layout(height=220, title="Binomial: 100 emails, 10% conversion", xaxis_title="Number of Conversions (k)", yaxis_title="Probability P(X=k)", **DL)
         st.plotly_chart(fig, use_container_width=True, config={"displayModeBar": False})
+        
+        # Graph interpretation
+        st.markdown("""<div class="insight-box">
+        <b>📊 Reading the Graph:</b>
+        <br>• <b>X-axis:</b> Number of conversions (0, 1, 2, ... 24)
+        <br>• <b>Y-axis:</b> Probability of getting exactly that many conversions
+        <br>• <b>Bar height:</b> Taller bar = more likely outcome
+        <br>• <b>Peak at 10:</b> Most likely outcome (but only ~13% chance!)
+        <br>• <b>Bell shape:</b> Values near expected (10) are common; extremes (0 or 20+) are rare
+        <br>• <b>Red line:</b> Expected value (mean) = n × p = 10
+        </div>""", unsafe_allow_html=True)
 
     split_row(
         concept_html="""<div class="concept-card">
@@ -693,30 +704,36 @@ print(f"95% of data: {mean-2*std:.0f} to {mean+2*std:.0f}")''',
         <br><br><b>The key insight:</b> Even with a 10% conversion rate, you won't always get exactly 10 conversions from 100 emails. Sometimes 7, sometimes 13. The binomial tells you the probability of each outcome.
         </div>
         <div class="math-box">
-        <b>📐 Binomial — Step by Step:</b>
-        <br><br><b>Given:</b> n = 100 emails, p = 10% conversion
-        <br><br><b>Expected conversions:</b>
-        <br>&nbsp;&nbsp;&nbsp;&nbsp;E = n × p = 100 × 0.10 = <b>10</b>
-        <br>&nbsp;&nbsp;&nbsp;&nbsp;→ "On average, expect 10 conversions"
-        <br><br><b>Std Dev (the "typical" variation):</b>
-        <br>&nbsp;&nbsp;&nbsp;&nbsp;σ = √(n × p × (1-p))
-        <br>&nbsp;&nbsp;&nbsp;&nbsp;σ = √(100 × 0.10 × 0.90)
-        <br>&nbsp;&nbsp;&nbsp;&nbsp;σ = √9 = <b>3</b>
-        <br><br><b>68% range:</b> 10 ± 3 = <b>7 to 13 conversions</b>
-        <br><br>🧠 If you get 5 conversions, that's unusual (2σ below). If you get 18, something changed!
+        <b>📐 How to Read the Binomial Graph:</b>
+        <br><br><b>Each bar answers:</b> "What's the probability of getting exactly k successes?"
+        <br><br><b>Example from graph:</b>
+        <br>• P(X = 10) ≈ 13% → tallest bar, most likely
+        <br>• P(X = 5) ≈ 2% → short bar, unlikely
+        <br>• P(X = 20) ≈ 0.01% → almost invisible, very rare
+        <br><br><b>The shape tells you:</b>
+        <br>• <b>Center:</b> Where the peak is (expected value = n×p)
+        <br>• <b>Spread:</b> How wide the "hump" is (std dev = √(np(1-p)))
+        <br>• <b>Skew:</b> If p is small, skewed right; if p is large, skewed left
+        <br><br><b>Sum of all bars = 1</b> (100% — something must happen!)
         </div>
-        <div class="warn-box">⚠️ <b>Common mistake:</b> Expecting exactly 10 conversions every time. Reality has variance — that's why we need statistics!</div>""",
+        <div class="warn-box">⚠️ <b>Key insight:</b> The tallest bar (most likely outcome) still has only ~13% probability! There's 87% chance of getting something OTHER than exactly 10 conversions.</div>""",
         code_str='''from scipy.stats import binom
 
 n = 100  # emails sent
 p = 0.10  # conversion rate
 
-expected = n * p
-std = np.sqrt(n * p * (1-p))
-p_exactly_10 = binom.pmf(10, n, p)
+# PMF: Probability Mass Function
+# P(X = k) = probability of exactly k successes
+x = np.arange(0, 25)  # possible outcomes
+pmf = binom.pmf(x, n, p)  # probability of each
+
+# Key values
+expected = n * p  # mean = 10
+std = np.sqrt(n * p * (1-p))  # std dev = 3
 
 print(f"Expected: {expected:.0f}")
-print(f"P(exactly 10) = {p_exactly_10:.1%}")''',
+print(f"P(exactly 10) = {binom.pmf(10, n, p):.1%}")
+print(f"P(7 to 13) = {binom.cdf(13, n, p) - binom.cdf(6, n, p):.1%}")''',
         output_func=show_binomial,
         concept_title="🎯 Binomial Distribution",
         output_title="Email Conversions"
