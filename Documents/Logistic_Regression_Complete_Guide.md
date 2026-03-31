@@ -289,8 +289,38 @@ log(L) = Σ [y_i × log(p_i) + (1-y_i) × log(1-p_i)]
 
 **Step D: Negate (minimize loss instead of maximize likelihood)**
 
+Why negate? It's a convention in optimization. Here's the reasoning:
+
 ```
+We WANT: weights that MAXIMIZE the likelihood (make our data most probable)
+But optimization algorithms are built to MINIMIZE things.
+
+So we flip the sign:
+  Maximize log(L)  ←→  Minimize -log(L)
+
+It's like asking:
+  "Find the highest mountain" ←→ "Find the lowest point if we flip the landscape upside down"
+  The answer is the SAME POINT, just approached differently.
+
 Loss = -log(L) = -Σ [y_i × log(p_i) + (1-y_i) × log(1-p_i)]
+```
+
+Why does this make sense intuitively?
+
+```
+log(L) is NEGATIVE (because log of numbers between 0 and 1 is negative)
+  Example: log(0.9) = -0.105, log(0.5) = -0.693, log(0.1) = -2.303
+
+So log(L) = -0.105 + (-0.223) + ... = some negative number like -1.601
+
+Negating it: Loss = -(-1.601) = +1.601 (a positive number!)
+
+Now:
+  Good predictions → log(L) close to 0 → Loss close to 0 ✅
+  Bad predictions → log(L) very negative → Loss very large ❌
+
+We minimize Loss → push it toward 0 → which means pushing log(L) toward 0
+→ which means making predictions as accurate as possible!
 ```
 
 ### Computing Loss for Each Store
@@ -367,15 +397,135 @@ Total Loss = (1/8) × (0.437 + 0.131 + 0.302 + 0.077 + 0.734 + 0.263 + 0.562 + 0
 
 ---
 
-## STEP 6: Gradient Descent — Updating the Weights
+## STEP 6: Gradient Descent — How the Model Finds the Best Weights
 
-### The gradient (how much to adjust each weight)
+### Why do we need gradient descent?
+
+We have a loss function (Step 5) that tells us "how wrong" the model is.
+Now we need to find the weights (β₀, β₁, β₂) that make the loss as SMALL as possible.
+
+```
+Problem: We can't solve this with algebra (no closed-form solution).
+         Unlike linear regression where we can solve β = (XᵀX)⁻¹Xᵀy directly,
+         the sigmoid makes the equation non-linear.
+
+Solution: GRADIENT DESCENT — an iterative algorithm.
+         Start somewhere, look which direction is "downhill", take a small step.
+         Repeat until you reach the bottom.
+```
+
+Think of it like this:
+
+```
+You're blindfolded on a hilly landscape.
+You can feel the slope under your feet.
+To find the lowest point:
+  1. Feel which direction slopes downward (= compute gradient)
+  2. Take a small step in that direction (= update weights)
+  3. Repeat until the ground feels flat (= gradient ≈ 0, you've converged)
+```
+
+### What is a gradient?
+
+The gradient is the DERIVATIVE of the loss with respect to each weight.
+It tells you: "If I increase this weight by a tiny amount, how much does the loss change?"
+
+```
+∂Loss/∂β₁ = "How much does the loss change when I nudge β₁?"
+
+If ∂Loss/∂β₁ is POSITIVE → increasing β₁ increases loss → we should DECREASE β₁
+If ∂Loss/∂β₁ is NEGATIVE → increasing β₁ decreases loss → we should INCREASE β₁
+
+Update rule: β₁_new = β₁_old - η × ∂Loss/∂β₁
+                                ↑ minus sign flips the direction (go DOWNHILL)
+                             ↑ η = learning rate (how big a step)
+```
+
+### Deriving the gradient formula step by step
+
+This is where the magic happens. We need ∂Loss/∂βⱼ.
+
+**Our loss for one data point:**
+```
+Loss_i = -[yᵢ × log(pᵢ) + (1-yᵢ) × log(1-pᵢ)]
+
+Where pᵢ = σ(zᵢ) = 1/(1+e^(-zᵢ))  and  zᵢ = β₀ + β₁x₁ᵢ + β₂x₂ᵢ
+```
+
+We need to use the CHAIN RULE (calculus):
+```
+∂Loss_i/∂βⱼ = (∂Loss_i/∂pᵢ) × (∂pᵢ/∂zᵢ) × (∂zᵢ/∂βⱼ)
+               ↑ how loss changes with p  ↑ how p changes with z  ↑ how z changes with β
+```
+
+**Part 1: ∂Loss_i/∂pᵢ (how loss changes with predicted probability)**
+```
+Loss_i = -yᵢ × log(pᵢ) - (1-yᵢ) × log(1-pᵢ)
+
+∂Loss_i/∂pᵢ = -yᵢ/pᵢ - (1-yᵢ) × (-1)/(1-pᵢ)
+             = -yᵢ/pᵢ + (1-yᵢ)/(1-pᵢ)
+
+Using derivative rules: d/dp[log(p)] = 1/p  and  d/dp[log(1-p)] = -1/(1-p)
+```
+
+**Part 2: ∂pᵢ/∂zᵢ (how sigmoid changes with z)**
+
+This is a famous result — the sigmoid derivative is beautifully simple:
+```
+p = σ(z) = 1/(1+e^(-z))
+
+∂p/∂z = σ(z) × (1 - σ(z)) = p × (1-p)
+
+Proof:
+  p = (1+e^(-z))^(-1)
+  ∂p/∂z = -1 × (1+e^(-z))^(-2) × (-e^(-z))    ← chain rule
+         = e^(-z) / (1+e^(-z))²
+         = [1/(1+e^(-z))] × [e^(-z)/(1+e^(-z))]
+         = p × [(1+e^(-z)-1)/(1+e^(-z))]
+         = p × [1 - 1/(1+e^(-z))]
+         = p × (1-p)  ✅
+```
+
+**Part 3: ∂zᵢ/∂βⱼ (how z changes with weight)**
+```
+z = β₀ + β₁x₁ + β₂x₂
+
+∂z/∂β₀ = 1
+∂z/∂β₁ = x₁
+∂z/∂β₂ = x₂
+
+In general: ∂z/∂βⱼ = xⱼ
+```
+
+**Putting it all together (chain rule):**
+```
+∂Loss_i/∂βⱼ = (∂Loss_i/∂pᵢ) × (∂pᵢ/∂zᵢ) × (∂zᵢ/∂βⱼ)
+
+= [-yᵢ/pᵢ + (1-yᵢ)/(1-pᵢ)] × [pᵢ(1-pᵢ)] × [xᵢⱼ]
+
+Let's simplify the first two parts:
+  [-yᵢ/pᵢ + (1-yᵢ)/(1-pᵢ)] × pᵢ(1-pᵢ)
+
+  = -yᵢ/pᵢ × pᵢ(1-pᵢ) + (1-yᵢ)/(1-pᵢ) × pᵢ(1-pᵢ)
+  = -yᵢ(1-pᵢ) + (1-yᵢ)pᵢ
+  = -yᵢ + yᵢpᵢ + pᵢ - yᵢpᵢ
+  = pᵢ - yᵢ
+
+So:
+  ∂Loss_i/∂βⱼ = (pᵢ - yᵢ) × xᵢⱼ
+```
+
+**That's it! The complex chain rule simplifies to something beautiful:**
 
 ```
 ∂Loss/∂βⱼ = (1/n) × Σ (pᵢ - yᵢ) × xᵢⱼ
 ```
 
-This is just: **average of (prediction error × feature value)**
+**In plain English:** The gradient for each weight is the average of
+(prediction error) × (feature value) across all data points.
+
+This elegant result is NOT a coincidence — it's because log loss is the
+"natural" loss function for the sigmoid (they were designed to work together).
 
 ### Computing gradients with our data
 
