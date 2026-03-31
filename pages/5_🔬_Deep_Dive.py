@@ -190,35 +190,187 @@ if topic == "📈 Logistic Regression":
 
     # ── STEP 4: COST FUNCTION ──
     st.divider()
-    st.markdown("## Step 4: How It Learns — Log Loss")
+    st.markdown("## Step 4: How It Learns — Log Loss (Full Derivation)")
 
     st.markdown("""<div class="dd-step" style="border-left-color: #f5b731">
     <b style="color:#f5b731">🎯 Goal:</b> Find weights (β₀, β₁, β₂) that minimize prediction errors.
     <br>Uses <b>Log Loss</b> (Binary Cross-Entropy) — not MSE like linear regression.
+    <br><br>But WHY this formula? Let's derive it from scratch using <b>Maximum Likelihood Estimation</b>.
     </div>""", unsafe_allow_html=True)
+
+    # ── PART A: WHY NOT MSE? ──
+    st.markdown("### Part A: Why Not Use MSE (Mean Squared Error)?")
+
+    p_range_mse = np.linspace(0.01, 0.99, 100)
+    mse_y1 = (1 - p_range_mse)**2
+    log_y1 = -np.log(p_range_mse)
+
+    fig_why = go.Figure()
+    fig_why.add_trace(go.Scatter(x=p_range_mse, y=mse_y1, mode='lines', line=dict(color='#f45d6d', width=2), name='MSE: (1-p)²'))
+    fig_why.add_trace(go.Scatter(x=p_range_mse, y=log_y1, mode='lines', line=dict(color='#22d3a7', width=2), name='Log Loss: -log(p)'))
+    fig_why.update_layout(height=250, title="When actual=1: Log Loss penalizes bad predictions much harder",
+                          xaxis_title="Predicted Probability (p)", yaxis_title="Loss", **DL)
+    st.plotly_chart(fig_why, use_container_width=True, config={"displayModeBar": False})
+
+    st.markdown("""<div class="dd-math">
+    <b>📐 Problem with MSE for classification:</b>
+    <br><br>If actual = 1 and predicted = 0.01 (terrible prediction):
+    <br>&nbsp;&nbsp;MSE loss = (1 - 0.01)² = 0.98 ← bad, but not THAT bad
+    <br>&nbsp;&nbsp;Log loss = -log(0.01) = <b>4.61</b> ← HUGE penalty!
+    <br><br>MSE treats "predicted 0.01" and "predicted 0.3" almost the same.
+    <br>Log Loss says: "predicting 0.01 when actual is 1 is CATASTROPHIC."
+    <br><br>Also, MSE + sigmoid creates a <b>non-convex</b> loss surface (many local minima).
+    <br>Log Loss + sigmoid is <b>convex</b> → guaranteed to find the global minimum!
+    </div>""", unsafe_allow_html=True)
+
+    # ── PART B: LIKELIHOOD ──
+    st.markdown("### Part B: Starting Point — What is Likelihood?")
+
+    st.markdown("""<div class="dd-math">
+    <b>📐 Likelihood = "How probable is my data given my model?"</b>
+    <br><br>Our model predicts P(success) = p for each store.
+    <br><br><b>For a single store:</b>
+    <br>&nbsp;&nbsp;If store IS successful (y=1): we want P to be high → Likelihood = p
+    <br>&nbsp;&nbsp;If store is NOT successful (y=0): we want P to be low → Likelihood = (1-p)
+    <br><br><b>Combine into one formula:</b>
+    <br>&nbsp;&nbsp;L(one store) = p^y × (1-p)^(1-y)
+    <br><br><b>Check it works:</b>
+    <br>&nbsp;&nbsp;If y=1: p¹ × (1-p)⁰ = p × 1 = p ✅
+    <br>&nbsp;&nbsp;If y=0: p⁰ × (1-p)¹ = 1 × (1-p) = (1-p) ✅
+    <br><br>This is the <b>Bernoulli distribution</b> — the probability distribution for yes/no outcomes.
+    </div>""", unsafe_allow_html=True)
+
+    # ── PART C: FULL LIKELIHOOD ──
+    st.markdown("### Part C: Likelihood for All Data Points")
+
+    st.markdown("""<div class="dd-math">
+    <b>📐 For n independent stores, multiply their likelihoods:</b>
+    <br><br>L(all data) = Π pᵢ^yᵢ × (1-pᵢ)^(1-yᵢ)&nbsp;&nbsp;&nbsp;&nbsp;(product over all i)
+    <br><br><b>Example with 4 stores:</b>
+    <br>&nbsp;&nbsp;Store 1: y=1, p=0.9 → L₁ = 0.9¹ × 0.1⁰ = 0.9
+    <br>&nbsp;&nbsp;Store 2: y=0, p=0.2 → L₂ = 0.2⁰ × 0.8¹ = 0.8
+    <br>&nbsp;&nbsp;Store 3: y=1, p=0.7 → L₃ = 0.7¹ × 0.3⁰ = 0.7
+    <br>&nbsp;&nbsp;Store 4: y=0, p=0.6 → L₄ = 0.6⁰ × 0.4¹ = 0.4
+    <br><br>&nbsp;&nbsp;L(all) = 0.9 × 0.8 × 0.7 × 0.4 = <b>0.2016</b>
+    <br><br>We want to MAXIMIZE this. Find weights β that make L as large as possible.
+    </div>""", unsafe_allow_html=True)
+
+    # ── PART D: LOG LIKELIHOOD ──
+    st.markdown("### Part D: Take the Log (Log-Likelihood)")
+
+    st.markdown("""<div class="dd-math">
+    <b>📐 Problem:</b> Multiplying many small numbers → tiny result (underflow).
+    <br><b>Solution:</b> Take the log! log turns products into sums.
+    <br><br><b>Log-Likelihood:</b>
+    <br>&nbsp;&nbsp;ℓ = log(L) = log(Π pᵢ^yᵢ × (1-pᵢ)^(1-yᵢ))
+    <br><br>&nbsp;&nbsp;ℓ = Σ [yᵢ × log(pᵢ) + (1-yᵢ) × log(1-pᵢ)]
+    <br><br><b>Why this works:</b>
+    <br>&nbsp;&nbsp;log(A × B) = log(A) + log(B)&nbsp;&nbsp;&nbsp;&nbsp;← products become sums
+    <br>&nbsp;&nbsp;log(A^n) = n × log(A)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;← exponents become multipliers
+    <br><br><b>Same example:</b>
+    <br>&nbsp;&nbsp;ℓ = log(0.9) + log(0.8) + log(0.7) + log(0.4)
+    <br>&nbsp;&nbsp;ℓ = -0.105 + (-0.223) + (-0.357) + (-0.916)
+    <br>&nbsp;&nbsp;ℓ = <b>-1.601</b>
+    <br><br>Maximizing log(L) is the same as maximizing L (log is monotonic).
+    </div>""", unsafe_allow_html=True)
+
+    # ── PART E: NEGATE → LOSS ──
+    st.markdown("### Part E: Negate It → Loss Function")
+
+    st.markdown("""<div class="dd-math">
+    <b>📐 Convention: We MINIMIZE loss, not maximize likelihood.</b>
+    <br><br>Just negate the log-likelihood:
+    <br><br>&nbsp;&nbsp;Loss = -ℓ = <b>-Σ [yᵢ × log(pᵢ) + (1-yᵢ) × log(1-pᵢ)]</b>
+    <br><br>For a single data point:
+    <br><br>&nbsp;&nbsp;<b>Loss = -[y × log(p) + (1-y) × log(1-p)]</b>
+    <br><br>That's it! That's where the formula comes from.
+    <br><br><b>The full derivation chain:</b>
+    <br>&nbsp;&nbsp;Bernoulli distribution
+    <br>&nbsp;&nbsp;&nbsp;&nbsp;↓ multiply for all data points
+    <br>&nbsp;&nbsp;Likelihood: L = Π pᵢ^yᵢ × (1-pᵢ)^(1-yᵢ)
+    <br>&nbsp;&nbsp;&nbsp;&nbsp;↓ take log (for numerical stability)
+    <br>&nbsp;&nbsp;Log-Likelihood: ℓ = Σ [yᵢ log(pᵢ) + (1-yᵢ) log(1-pᵢ)]
+    <br>&nbsp;&nbsp;&nbsp;&nbsp;↓ negate (minimize instead of maximize)
+    <br>&nbsp;&nbsp;<b>Log Loss = -Σ [yᵢ log(pᵢ) + (1-yᵢ) log(1-pᵢ)]</b>
+    </div>""", unsafe_allow_html=True)
+
+    # ── PART F: VISUAL ──
+    st.markdown("### Part F: Visualizing the Loss")
 
     p_range = np.linspace(0.01, 0.99, 100)
     loss_y1 = -np.log(p_range)
     loss_y0 = -np.log(1 - p_range)
 
     fig_loss = go.Figure()
-    fig_loss.add_trace(go.Scatter(x=p_range, y=loss_y1, mode='lines', line=dict(color='#22d3a7', width=2), name='Actual=1 (success)'))
-    fig_loss.add_trace(go.Scatter(x=p_range, y=loss_y0, mode='lines', line=dict(color='#f45d6d', width=2), name='Actual=0 (failure)'))
-    fig_loss.update_layout(height=280, title="Log Loss: Penalizes confident wrong predictions heavily",
-                           xaxis_title="Predicted Probability", yaxis_title="Loss", **DL)
+    fig_loss.add_trace(go.Scatter(x=p_range, y=loss_y1, mode='lines', line=dict(color='#22d3a7', width=3), name='Actual=1: -log(p)'))
+    fig_loss.add_trace(go.Scatter(x=p_range, y=loss_y0, mode='lines', line=dict(color='#f45d6d', width=3), name='Actual=0: -log(1-p)'))
+    fig_loss.update_layout(height=300, title="Log Loss: Penalizes confident wrong predictions exponentially",
+                           xaxis_title="Predicted Probability (p)", yaxis_title="Loss", **DL)
     st.plotly_chart(fig_loss, use_container_width=True, config={"displayModeBar": False})
 
+    col1, col2 = st.columns(2)
+    with col1:
+        st.markdown("""<div class="dd-step" style="border-left-color: #22d3a7">
+        <b style="color:#22d3a7">When actual = 1 (green curve)</b>
+        <br>Loss = -log(p)
+        <br><br>p = 0.99 → Loss = 0.01 (great!)
+        <br>p = 0.50 → Loss = 0.69 (uncertain)
+        <br>p = 0.10 → Loss = 2.30 (bad!)
+        <br>p = 0.01 → Loss = 4.61 (catastrophic!)
+        <br><br>Predicting low p when actual is 1
+        <br>→ loss explodes toward infinity
+        </div>""", unsafe_allow_html=True)
+    with col2:
+        st.markdown("""<div class="dd-step" style="border-left-color: #f45d6d">
+        <b style="color:#f45d6d">When actual = 0 (red curve)</b>
+        <br>Loss = -log(1-p)
+        <br><br>p = 0.01 → Loss = 0.01 (great!)
+        <br>p = 0.50 → Loss = 0.69 (uncertain)
+        <br>p = 0.90 → Loss = 2.30 (bad!)
+        <br>p = 0.99 → Loss = 4.61 (catastrophic!)
+        <br><br>Predicting high p when actual is 0
+        <br>→ loss explodes toward infinity
+        </div>""", unsafe_allow_html=True)
+
+    # ── PART G: GRADIENT DESCENT ──
+    st.markdown("### Part G: How Gradient Descent Finds the Weights")
+
     st.markdown("""<div class="dd-math">
-    <b>📐 Log Loss Formula:</b>
-    <br><br><b>Loss = -[y × log(p) + (1-y) × log(1-p)]</b>
-    <br><br>Where y = actual (0 or 1), p = predicted probability
-    <br><br><b>Example 1:</b> Actual = 1 (success), Predicted = 0.9
-    <br>&nbsp;&nbsp;Loss = -[1×log(0.9) + 0×log(0.1)]
-    <br>&nbsp;&nbsp;Loss = -[-0.105] = <b>0.105</b> ← Low loss (good prediction!)
-    <br><br><b>Example 2:</b> Actual = 1 (success), Predicted = 0.1
-    <br>&nbsp;&nbsp;Loss = -[1×log(0.1) + 0×log(0.9)]
-    <br>&nbsp;&nbsp;Loss = -[-2.303] = <b>2.303</b> ← High loss (terrible prediction!)
-    <br><br>🧠 Predicting 0.1 when actual is 1 → 22× more penalty than predicting 0.9!
+    <b>📐 The gradient (derivative) of Log Loss with respect to weights:</b>
+    <br><br>∂Loss/∂βⱼ = Σ (pᵢ - yᵢ) × xᵢⱼ
+    <br><br><b>This is beautifully simple!</b> The gradient is just:
+    <br>&nbsp;&nbsp;(predicted - actual) × feature value
+    <br><br><b>Update rule:</b>
+    <br>&nbsp;&nbsp;βⱼ = βⱼ - η × ∂Loss/∂βⱼ
+    <br>&nbsp;&nbsp;βⱼ = βⱼ - η × Σ (pᵢ - yᵢ) × xᵢⱼ
+    <br><br><b>Example:</b>
+    <br>&nbsp;&nbsp;Store has Rating=4.2, actual=1 (success), predicted p=0.3
+    <br>&nbsp;&nbsp;Error = p - y = 0.3 - 1 = -0.7 (underpredicted!)
+    <br>&nbsp;&nbsp;Gradient for β₁(Rating) = -0.7 × 4.2 = -2.94
+    <br>&nbsp;&nbsp;Update: β₁ = β₁ - 0.1 × (-2.94) = β₁ + 0.294
+    <br>&nbsp;&nbsp;→ β₁ increases → next time, high rating → higher p ✅
+    </div>""", unsafe_allow_html=True)
+
+    # Gradient descent animation
+    np.random.seed(42)
+    steps = list(range(20))
+    loss_curve = [0.7 * np.exp(-0.15 * s) + 0.15 + np.random.normal(0, 0.01) for s in steps]
+
+    fig_gd = go.Figure()
+    fig_gd.add_trace(go.Scatter(x=steps, y=loss_curve, mode='lines+markers',
+                                line=dict(color='#7c6aff', width=2), marker=dict(size=6)))
+    fig_gd.update_layout(height=220, title="Gradient Descent: Loss decreases each iteration",
+                         xaxis_title="Iteration", yaxis_title="Loss", **DL)
+    st.plotly_chart(fig_gd, use_container_width=True, config={"displayModeBar": False})
+
+    st.markdown("""<div class="dd-insight">
+    💡 <b>Summary of the derivation:</b>
+    <br>1. We assume data follows a <b>Bernoulli distribution</b> (yes/no outcomes)
+    <br>2. We write the <b>likelihood</b> of observing our data given the model
+    <br>3. We take the <b>log</b> (turns products into sums, numerically stable)
+    <br>4. We <b>negate</b> it (convention: minimize loss instead of maximize likelihood)
+    <br>5. Result: <b>Log Loss = -[y log(p) + (1-y) log(1-p)]</b>
+    <br>6. The gradient is elegantly simple: <b>(predicted - actual) × feature</b>
     </div>""", unsafe_allow_html=True)
 
     # ── STEP 5: COEFFICIENTS ──
