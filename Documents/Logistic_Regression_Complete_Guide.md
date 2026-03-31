@@ -445,6 +445,78 @@ Update rule: β₁_new = β₁_old - η × ∂Loss/∂β₁
 
 This is where the magic happens. We need ∂Loss/∂βⱼ.
 
+But first — we need a calculus tool called the **Chain Rule**.
+
+### What is the Chain Rule?
+
+The chain rule answers: "How do I take the derivative of a function INSIDE another function?"
+
+**Everyday analogy:**
+
+```
+You're driving a car.
+  Pedal pressure → Speed → Fuel consumption
+
+"If I press the pedal harder, how much more fuel do I burn?"
+
+You can't jump directly from pedal to fuel.
+You go THROUGH speed:
+
+  (how fuel changes with speed) × (how speed changes with pedal)
+
+That's the chain rule. When things are connected in a chain, MULTIPLY the rates.
+```
+
+**The math:**
+
+```
+If y = f(g(x)) — a function inside a function:
+
+  dy/dx = (dy/dg) × (dg/dx)
+
+"Rate of change of y with respect to x"
+  = "rate of y with respect to the middle thing"
+  × "rate of the middle thing with respect to x"
+```
+
+**Simple example:**
+
+```
+y = (3x + 2)²
+
+outer function: (something)²     → derivative: 2 × (something)
+inner function: 3x + 2           → derivative: 3
+
+Chain rule: dy/dx = 2(3x + 2) × 3 = 6(3x + 2)
+```
+
+**In logistic regression, the prediction goes through 3 steps:**
+
+```
+weights (β) ──→ z (linear combo) ──→ p (sigmoid) ──→ Loss
+
+β changes z → z changes p → p changes Loss
+```
+
+We want: "How does Loss change when we change β?"
+
+```
+∂Loss/∂β = (∂Loss/∂p) × (∂p/∂z) × (∂z/∂β)
+            ↑               ↑            ↑
+         how Loss         how p        how z
+         changes          changes      changes
+         with p           with z       with β
+```
+
+Each piece is easy on its own. The chain rule lets us multiply them to get the full answer.
+
+This is also how neural networks learn — **backpropagation** is just the chain rule
+applied through many layers: Input → Layer 1 → Layer 2 → ... → Loss.
+
+---
+
+Now let's compute each piece.
+
 **Our loss for one data point:**
 ```
 Loss_i = -[yᵢ × log(pᵢ) + (1-yᵢ) × log(1-pᵢ)]
@@ -452,10 +524,10 @@ Loss_i = -[yᵢ × log(pᵢ) + (1-yᵢ) × log(1-pᵢ)]
 Where pᵢ = σ(zᵢ) = 1/(1+e^(-zᵢ))  and  zᵢ = β₀ + β₁x₁ᵢ + β₂x₂ᵢ
 ```
 
-We need to use the CHAIN RULE (calculus):
+We apply the chain rule:
 ```
 ∂Loss_i/∂βⱼ = (∂Loss_i/∂pᵢ) × (∂pᵢ/∂zᵢ) × (∂zᵢ/∂βⱼ)
-               ↑ how loss changes with p  ↑ how p changes with z  ↑ how z changes with β
+               ↑ Part 1            ↑ Part 2        ↑ Part 3
 ```
 
 **Part 1: ∂Loss_i/∂pᵢ (how loss changes with predicted probability)**
