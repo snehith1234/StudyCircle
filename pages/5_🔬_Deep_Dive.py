@@ -773,45 +773,194 @@ elif topic == "🌳 Random Forest":
     # WHY IT WORKS
     # ═══════════════════════════════════════
     st.divider()
-    st.markdown("## Why Random Forest Works: Variance Reduction")
+    st.markdown("## Why Random Forest Works: Variance Reduction (Full Math)")
 
-    st.markdown("""<div class="dd-math">
-    <b>📐 The Math Behind the Magic:</b>
-    <br><br><b>Single tree error</b> = Bias² + Variance + Noise
-    <br><br><b>Random Forest reduces VARIANCE by averaging:</b>
-    <br><br>If trees were independent:
-    <br>&nbsp;&nbsp;Var(average of N trees) = Var(single tree) / N
-    <br><br>But trees aren't fully independent, so:
-    <br>&nbsp;&nbsp;<b>Var(RF) = ρ × σ² + (1-ρ)/N × σ²</b>
-    <br><br>Where:
-    <br>&nbsp;&nbsp;ρ = correlation between trees (lower is better)
-    <br>&nbsp;&nbsp;σ² = variance of a single tree
-    <br>&nbsp;&nbsp;N = number of trees
-    <br><br>Random feature selection → lower ρ → lower variance → better predictions!
+    st.markdown("""<div class="dd-card">
+    <b>The core idea:</b> Averaging multiple noisy estimates gives a better estimate.
+    <br>Random Forest averages many trees. But HOW MUCH better depends on how <b>correlated</b> the trees are.
     </div>""", unsafe_allow_html=True)
 
-    # Bias-Variance visual
-    fig_bv = go.Figure()
-    trees_range = [1, 5, 10, 25, 50, 100, 200, 500]
-    single_var = 0.15
-    rho = 0.3
-    variances = [rho * single_var + (1-rho)/n * single_var for n in trees_range]
-    bias = [0.05] * len(trees_range)
-    total = [b + v for b, v in zip(bias, variances)]
+    # ── PART A: VARIANCE OF AN AVERAGE ──
+    st.markdown("### Part A: Variance of an Average (Independent Case)")
 
+    st.markdown("""<div class="dd-math">
+    <b>📐 Start with basics: Variance of an average</b>
+    <br><br>If you have N <b>independent</b> random variables, each with variance σ²:
+    <br><br>&nbsp;&nbsp;X̄ = (X₁ + X₂ + ... + Xₙ) / N
+    <br><br>&nbsp;&nbsp;Var(X̄) = Var((X₁ + X₂ + ... + Xₙ) / N)
+    <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= (1/N²) × Var(X₁ + X₂ + ... + Xₙ)
+    <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= (1/N²) × (Var(X₁) + Var(X₂) + ... + Var(Xₙ))  ← independence!
+    <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= (1/N²) × N × σ²
+    <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= <b>σ² / N</b>
+    <br><br>🧠 <b>If trees were independent:</b> 100 trees → variance drops to σ²/100 = 1% of original!
+    <br><br>But trees in Random Forest are NOT fully independent (they all see similar data).
+    </div>""", unsafe_allow_html=True)
+
+    # ── PART B: CORRELATED CASE ──
+    st.markdown("### Part B: Variance with Correlated Trees")
+
+    st.markdown("""<div class="dd-math">
+    <b>📐 When variables are correlated:</b>
+    <br><br>For N random variables with pairwise correlation ρ and each with variance σ²:
+    <br><br>&nbsp;&nbsp;Var(X̄) = Var((X₁ + X₂ + ... + Xₙ) / N)
+    <br><br>&nbsp;&nbsp;= (1/N²) × [Σᵢ Var(Xᵢ) + Σᵢ≠ⱼ Cov(Xᵢ, Xⱼ)]
+    <br><br>Since Cov(Xᵢ, Xⱼ) = ρ × σ² (by definition of correlation):
+    <br><br>&nbsp;&nbsp;= (1/N²) × [N × σ² + N(N-1) × ρσ²]
+    <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↑ N variance terms&nbsp;&nbsp;&nbsp;&nbsp;↑ N(N-1) covariance pairs
+    <br><br>&nbsp;&nbsp;= (1/N²) × σ² × [N + N(N-1)ρ]
+    <br>&nbsp;&nbsp;= (1/N²) × σ² × N × [1 + (N-1)ρ]
+    <br>&nbsp;&nbsp;= (σ²/N) × [1 + (N-1)ρ]
+    <br><br>Rearranging:
+    <br>&nbsp;&nbsp;= σ²/N + σ²(N-1)ρ/N
+    <br>&nbsp;&nbsp;= σ²(1-ρ)/N + σ²ρ&nbsp;&nbsp;&nbsp;&nbsp;← (when N is large, (N-1)/N ≈ 1)
+    <br><br><b>Var(RF) = ρσ² + (1-ρ)σ²/N</b>
+    <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↑ can't reduce&nbsp;&nbsp;&nbsp;&nbsp;↑ shrinks with more trees
+    </div>""", unsafe_allow_html=True)
+
+    # ── PART C: WHAT EACH TERM MEANS ──
+    st.markdown("### Part C: Understanding Each Term")
+
+    col1, col2 = st.columns(2)
+    with col1:
+        st.markdown("""<div class="dd-step" style="border-left-color: #f45d6d">
+        <b style="color:#f45d6d">ρσ² — The "Floor" (irreducible)</b>
+        <br><br>This term does NOT depend on N.
+        <br>Even with infinite trees, you can't go below this.
+        <br><br>ρ = correlation between trees.
+        <br>If all trees are identical (ρ=1): Var = σ²
+        <br>→ Averaging identical things doesn't help!
+        <br><br><b>To lower this floor: reduce ρ</b>
+        <br>→ Random feature selection does this!
+        </div>""", unsafe_allow_html=True)
+    with col2:
+        st.markdown("""<div class="dd-step" style="border-left-color: #22d3a7">
+        <b style="color:#22d3a7">(1-ρ)σ²/N — The "Reducible" part</b>
+        <br><br>This term shrinks as N increases.
+        <br>More trees → this approaches 0.
+        <br><br>N=1: (1-ρ)σ²/1 = (1-ρ)σ² (large)
+        <br>N=100: (1-ρ)σ²/100 (tiny)
+        <br>N=∞: 0
+        <br><br><b>To shrink faster: add more trees</b>
+        <br>→ n_estimators = 100-500
+        </div>""", unsafe_allow_html=True)
+
+    # ── PART D: NUMERICAL EXAMPLE ──
+    st.markdown("### Part D: Numerical Example")
+
+    st.markdown("""<div class="dd-math">
+    <b>📐 Example with real numbers:</b>
+    <br><br><b>Given:</b>
+    <br>&nbsp;&nbsp;σ² = 0.15 (variance of a single decision tree)
+    <br>&nbsp;&nbsp;ρ = 0.30 (correlation between trees — Random Forest with max_features=√p)
+    <br><br><b>Calculate Var(RF) for different N:</b>
+    <br><br><b>N = 1 tree (single tree):</b>
+    <br>&nbsp;&nbsp;Var = 0.30 × 0.15 + (1-0.30) × 0.15 / 1
+    <br>&nbsp;&nbsp;Var = 0.045 + 0.105 = <b>0.150</b> (= σ², no improvement)
+    <br><br><b>N = 10 trees:</b>
+    <br>&nbsp;&nbsp;Var = 0.30 × 0.15 + (0.70 × 0.15) / 10
+    <br>&nbsp;&nbsp;Var = 0.045 + 0.0105 = <b>0.0555</b> (63% reduction!)
+    <br><br><b>N = 100 trees:</b>
+    <br>&nbsp;&nbsp;Var = 0.30 × 0.15 + (0.70 × 0.15) / 100
+    <br>&nbsp;&nbsp;Var = 0.045 + 0.00105 = <b>0.0461</b> (69% reduction)
+    <br><br><b>N = 500 trees:</b>
+    <br>&nbsp;&nbsp;Var = 0.30 × 0.15 + (0.70 × 0.15) / 500
+    <br>&nbsp;&nbsp;Var = 0.045 + 0.00021 = <b>0.0452</b> (70% reduction)
+    <br><br><b>N = ∞ trees:</b>
+    <br>&nbsp;&nbsp;Var = 0.30 × 0.15 + 0 = <b>0.045</b> (floor — can't go lower!)
+    <br><br>🧠 After ~100 trees, you're already near the floor. Diminishing returns!
+    </div>""", unsafe_allow_html=True)
+
+    # ── INTERACTIVE CHART ──
+    st.markdown("### Part E: Interactive Visualization")
+
+    col_rho, col_sigma = st.columns(2)
+    with col_rho:
+        rho_val = st.slider("ρ (tree correlation)", 0.0, 1.0, 0.30, 0.05)
+    with col_sigma:
+        sigma_val = st.slider("σ² (single tree variance)", 0.05, 0.50, 0.15, 0.05)
+
+    trees_range = [1, 2, 5, 10, 25, 50, 100, 200, 500]
+    variances = [rho_val * sigma_val + (1-rho_val) * sigma_val / n for n in trees_range]
+    floor_line = [rho_val * sigma_val] * len(trees_range)
+    single_tree = [sigma_val] * len(trees_range)
+
+    fig_bv = go.Figure()
+    fig_bv.add_trace(go.Scatter(x=trees_range, y=single_tree, mode='lines',
+                                name=f'Single Tree (σ²={sigma_val})', line=dict(color='#4a4e6a', width=1, dash='dot')))
     fig_bv.add_trace(go.Scatter(x=trees_range, y=variances, mode='lines+markers',
-                                name='Variance', line=dict(color='#f45d6d', width=2)))
-    fig_bv.add_trace(go.Scatter(x=trees_range, y=bias, mode='lines+markers',
-                                name='Bias²', line=dict(color='#22d3a7', width=2)))
-    fig_bv.add_trace(go.Scatter(x=trees_range, y=total, mode='lines+markers',
-                                name='Total Error', line=dict(color='#f5b731', width=2)))
-    fig_bv.update_layout(height=280, title="More Trees → Lower Variance → Lower Error",
-                         xaxis_title="Number of Trees", yaxis_title="Error", **DL)
+                                name=f'RF Variance', line=dict(color='#f45d6d', width=3), marker=dict(size=8)))
+    fig_bv.add_trace(go.Scatter(x=trees_range, y=floor_line, mode='lines',
+                                name=f'Floor: ρσ²={rho_val*sigma_val:.3f}', line=dict(color='#f5b731', width=2, dash='dash')))
+    fig_bv.update_layout(height=320, title=f"RF Variance: ρ={rho_val}, σ²={sigma_val}",
+                         xaxis_title="Number of Trees (N)", yaxis_title="Variance", **DL)
     st.plotly_chart(fig_bv, use_container_width=True, config={"displayModeBar": False})
+
+    mc = st.columns(4)
+    mc[0].metric("Single Tree", f"{sigma_val:.3f}")
+    mc[1].metric("RF (N=10)", f"{rho_val*sigma_val + (1-rho_val)*sigma_val/10:.4f}")
+    mc[2].metric("RF (N=100)", f"{rho_val*sigma_val + (1-rho_val)*sigma_val/100:.4f}")
+    mc[3].metric("Floor (N=∞)", f"{rho_val*sigma_val:.4f}")
+
+    reduction = (1 - (rho_val*sigma_val + (1-rho_val)*sigma_val/100) / sigma_val) * 100
+    st.markdown(f"""<div class="dd-insight">
+    💡 With ρ={rho_val} and 100 trees: <b>{reduction:.0f}% variance reduction</b> vs single tree.
+    <br>The floor is ρσ² = {rho_val*sigma_val:.3f}. No amount of trees can go below this.
+    <br><br><b>To lower the floor further:</b> reduce ρ by using fewer features per split (max_features).
+    </div>""", unsafe_allow_html=True)
+
+    # ── PART F: WHERE DO ρ AND σ² COME FROM? ──
+    st.markdown("### Part F: Where Do ρ and σ² Come From?")
+
+    st.markdown("""<div class="dd-math">
+    <b>📐 How to estimate ρ and σ² in practice:</b>
+    <br><br><b>σ² (single tree variance):</b>
+    <br>&nbsp;&nbsp;1. Train many single trees on bootstrap samples
+    <br>&nbsp;&nbsp;2. For each test point, collect predictions from all trees
+    <br>&nbsp;&nbsp;3. σ² = average variance of predictions across test points
+    <br>&nbsp;&nbsp;σ² = (1/M) × Σⱼ Var(predictions for point j)
+    <br><br><b>ρ (pairwise tree correlation):</b>
+    <br>&nbsp;&nbsp;1. For each pair of trees (i, k), compute correlation of their predictions
+    <br>&nbsp;&nbsp;2. ρ = average pairwise correlation
+    <br>&nbsp;&nbsp;ρ = (2 / N(N-1)) × Σᵢ<ₖ Corr(Treeᵢ predictions, Treeₖ predictions)
+    <br><br><b>What affects ρ?</b>
+    <br>&nbsp;&nbsp;• max_features = all features → ρ ≈ 0.8-0.9 (trees very similar)
+    <br>&nbsp;&nbsp;• max_features = √p → ρ ≈ 0.2-0.4 (good diversity)
+    <br>&nbsp;&nbsp;• max_features = 1 → ρ ≈ 0.05-0.1 (very diverse, but each tree is weak)
+    <br><br><b>The tradeoff:</b>
+    <br>&nbsp;&nbsp;Fewer features per split → lower ρ (good!) but higher σ² per tree (bad!)
+    <br>&nbsp;&nbsp;√p is the sweet spot that balances both.
+    </div>""", unsafe_allow_html=True)
+
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        st.markdown("""<div class="dd-step" style="border-left-color: #f45d6d">
+        <b>max_features = all</b>
+        <br>ρ ≈ 0.85, σ² = 0.10
+        <br>Floor = 0.085
+        <br>RF(100) = 0.086
+        <br><i>Trees too similar!</i>
+        </div>""", unsafe_allow_html=True)
+    with col2:
+        st.markdown("""<div class="dd-step" style="border-left-color: #22d3a7">
+        <b>max_features = √p ✅</b>
+        <br>ρ ≈ 0.30, σ² = 0.15
+        <br>Floor = 0.045
+        <br>RF(100) = 0.046
+        <br><i>Best balance!</i>
+        </div>""", unsafe_allow_html=True)
+    with col3:
+        st.markdown("""<div class="dd-step" style="border-left-color: #f5b731">
+        <b>max_features = 1</b>
+        <br>ρ ≈ 0.05, σ² = 0.40
+        <br>Floor = 0.020
+        <br>RF(100) = 0.024
+        <br><i>Low floor but weak trees</i>
+        </div>""", unsafe_allow_html=True)
 
     st.markdown("""<div class="dd-insight">
     💡 <b>Key insight:</b> Adding more trees reduces variance but NEVER increases bias.
     That's why Random Forest rarely overfits — more trees is almost always better (just slower).
+    The real tuning lever is <b>max_features</b> which controls the ρ vs σ² tradeoff.
     </div>""", unsafe_allow_html=True)
 
     # ═══════════════════════════════════════
