@@ -102,20 +102,23 @@ Yellow = start (rewrite). Blue/Purple = calculus steps (chain rule, split, simpl
 
 ### All Three Gradients Compared
 
-Each activation's gradient is derived differently but the results explain everything about their behavior in deep networks.
+Each activation's gradient is derived differently but the results explain everything about their behavior in deep networks. The "typical" values come from what the gradient formula gives at common activation levels — most neurons don't sit at the perfect z=0 point.
 
 ```
 Sigmoid derivation:                    Result: σ(z) × (1 − σ(z))
-  Uses: chain rule, power rule         Max gradient: 0.25
-  5 steps of algebra                   Vanishes for large |z| ❌
+  Max gradient: 0.25 (at z=0)         Through 10 layers: 0.25¹⁰ = 0.000001
+  Vanishes for large |z| ❌
 
 Tanh derivation:                       Result: 1 − tanh²(z)
-  Uses: quotient rule                  Max gradient: 1.0
-  Numerator simplifies beautifully     Still vanishes for large |z| ❌
+  Max gradient: 1.0 (at z=0)          Best case 10 layers: 1.0¹⁰ = 1.0
+  But at typical activation            Typical neuron has tanh(z) ≈ 0.7
+  (tanh(z) ≈ 0.7): gradient           so gradient ≈ 1 − 0.49 = 0.51
+  = 1 − 0.49 = 0.51                   Through 10 layers: 0.51¹⁰ = 0.001
+  Still vanishes for large |z| ❌      1000× shrinkage — better than sigmoid but still bad
 
 ReLU derivation:                       Result: 0 or 1
-  Uses: nothing! It's piecewise        Gradient: exactly 1 for positive
-  z > 0 → slope = 1, z < 0 → slope = 0   Never vanishes ✅
+  Gradient: exactly 1 for positive     Through 10 layers: 1¹⁰ = 1.0
+  Never vanishes ✅                    Perfect gradient flow regardless of activation level
 ```
 
 ### Why This Matters: The Gradient Through 10 Layers
@@ -126,7 +129,7 @@ The derivation results directly explain why deep networks were impossible before
 %%{init: {'theme': 'dark', 'themeVariables': {'darkMode': true, 'background': '#0e1117', 'primaryColor': '#1a1d2e', 'primaryTextColor': '#e2e8f0', 'primaryBorderColor': '#2d3148', 'lineColor': '#8892b0', 'secondaryColor': '#252840', 'tertiaryColor': '#1a1d2e', 'fontSize': '14px', 'edgeLabelBackground': '#0e1117'}, 'flowchart': {'nodeSpacing': 30, 'rankSpacing': 40, 'padding': 15, 'htmlLabels': true}}}%%
 graph TD
     SIG10["Sigmoid through 10 layers<br/>0.25 × 0.25 × ... × 0.25<br/>= 0.25¹⁰ = <b>0.00000095</b><br/><i>Layer 1 is frozen</i>"]
-    TANH10["Tanh through 10 layers<br/>Best case: 1.0¹⁰ = 1.0<br/>Typical: 0.5¹⁰ = 0.001<br/><i>Better but still vanishes</i>"]
+    TANH10["Tanh through 10 layers<br/>Best (z=0): 1.0¹⁰ = 1.0<br/>Typical (tanh≈0.7): 0.51¹⁰ = 0.001<br/><i>1000× shrinkage</i>"]
     RELU10["ReLU through 10 layers<br/>1 × 1 × 1 × ... × 1<br/>= <b>1.0</b><br/><i>Perfect gradient flow!</i>"]
 
     style SIG10 fill:#2a1a1f,stroke:#f45d6d,color:#d8a8b8
