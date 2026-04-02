@@ -81,21 +81,28 @@ with st.sidebar:
 # LOGISTIC REGRESSION DEEP DIVE
 # ═══════════════════════════════════════
 if topic == "📈 Logistic Regression":
-    st.markdown("# 📈 Logistic Regression: Complete Visual Guide")
-    st.caption("Step-by-step visualization with math at every stage")
+    st.markdown("# 📈 Logistic Regression: The Full Story")
+    st.caption("A pizza store journey — from problem to prediction, with every math step explained")
 
     st.markdown("""<div class="dd-card">
-    <b>Logistic Regression predicts the PROBABILITY of a yes/no outcome.</b>
-    <br><br>Despite the name, it's a <b>classification</b> algorithm, not regression.
-    <br>It answers: "What's the probability this store is successful?" → 0.82 → ✅ Yes (>0.5)
-    <br><br>🔹 Uses the <b>Sigmoid function</b> to squash any number into [0, 1]
-    <br>🔹 Learns <b>weights</b> for each feature via gradient descent
-    <br>🔹 Decision boundary at <b>0.5</b> (customizable)
+    <b>🍕 The Story:</b> You're a data analyst at PizzaChain. Your boss walks in and says:
+    <br><br><i>"We're opening 5 new stores next month. I need to know which ones will succeed and which will fail.
+    Can you build something that predicts this?"</i>
+    <br><br>You have data from 50 existing stores — their ratings, delivery times, and whether they're successful.
+    <br>You need a model that takes a store's features and outputs: <b>"72% chance of success"</b>.
+    <br><br>This is a <b>classification</b> problem (yes/no), but you need <b>probabilities</b>, not just labels.
+    <br>That's exactly what Logistic Regression does.
     </div>""", unsafe_allow_html=True)
 
-    # ── STEP 1: THE PROBLEM ──
+    # ── CHAPTER 1: THE PROBLEM ──
     st.divider()
-    st.markdown("## Step 1: The Problem — Why Not Linear Regression?")
+    st.markdown("## Chapter 1: Your First Attempt Fails")
+
+    st.markdown("""<div class="dd-step" style="border-left-color: #f45d6d">
+    <b style="color:#f45d6d">💭 Your thinking:</b> "I know linear regression! It predicts numbers.
+    Success is 1, failure is 0. I'll just predict that!"
+    <br><br>So you try: <code>ŷ = β₀ + β₁×Rating + β₂×Delivery</code>
+    </div>""", unsafe_allow_html=True)
 
     x_vals = np.linspace(1, 5, 50)
     y_linear = -0.8 + 0.4 * x_vals
@@ -109,7 +116,7 @@ if topic == "📈 Logistic Regression":
         fig_bad.add_trace(go.Scatter(x=x_vals, y=y_linear, mode='lines', line=dict(color='#f45d6d', width=2, dash='dash'), name='Linear'))
         fig_bad.add_hline(y=0, line_dash="dot", line_color="#4a4e6a")
         fig_bad.add_hline(y=1, line_dash="dot", line_color="#4a4e6a")
-        fig_bad.update_layout(height=250, title="❌ Linear Regression: Predicts outside [0,1]!", **DL)
+        fig_bad.update_layout(height=250, title="❌ Linear Regression: Predicts -0.3 and 1.5!", **DL)
         st.plotly_chart(fig_bad, use_container_width=True, config={"displayModeBar": False})
 
     with col2:
@@ -117,17 +124,30 @@ if topic == "📈 Logistic Regression":
         fig_good.add_trace(go.Scatter(x=x_vals, y=y_actual, mode='markers', marker=dict(color='#22d3a7', size=8), name='Actual'))
         fig_good.add_trace(go.Scatter(x=x_vals, y=y_sigmoid, mode='lines', line=dict(color='#7c6aff', width=3), name='Logistic'))
         fig_good.add_hline(y=0.5, line_dash="dash", line_color="#f5b731", annotation_text="Decision boundary: 0.5")
-        fig_good.update_layout(height=250, title="✅ Logistic Regression: Always between [0,1]", **DL)
+        fig_good.update_layout(height=250, title="✅ Logistic Regression: Always 0 to 1", **DL)
         st.plotly_chart(fig_good, use_container_width=True, config={"displayModeBar": False})
 
-    st.markdown("""<div class="dd-insight">
-    💡 Linear regression can predict -0.3 or 1.5 for a probability — that's nonsense!
-    Logistic regression uses the <b>sigmoid function</b> to keep predictions between 0 and 1.
+    st.markdown("""<div class="dd-warn">
+    ⚠️ <b>Problem!</b> Your boss asks: "What's the probability for Store #47?"
+    <br>Linear regression says: <b>-0.18</b>. Negative probability? That's nonsense!
+    <br>Another store gets <b>1.35</b>. 135% probability? Also nonsense!
+    <br><br>Probability MUST be between 0 and 1. You need a different approach.
     </div>""", unsafe_allow_html=True)
 
-    # ── STEP 2: SIGMOID ──
+    st.markdown("""<div class="dd-insight">
+    💡 <b>The fix:</b> What if we could take that linear output and <b>squash</b> it into [0, 1]?
+    <br>That's exactly what the <b>sigmoid function</b> does. It's the secret ingredient of logistic regression.
+    </div>""", unsafe_allow_html=True)
+
+    # ── CHAPTER 2: THE SIGMOID ──
     st.divider()
-    st.markdown("## Step 2: The Sigmoid Function")
+    st.markdown("## Chapter 2: The Magic S-Curve")
+
+    st.markdown("""<div class="dd-step" style="border-left-color: #7c6aff">
+    <b style="color:#7c6aff">💭 Your thinking:</b> "I need a function that takes any number and squashes it between 0 and 1.
+    <br>Big positive numbers → close to 1. Big negative numbers → close to 0. Zero → exactly 0.5."
+    <br><br>Mathematicians already invented this. It's called the <b>sigmoid</b> (meaning "S-shaped").
+    </div>""", unsafe_allow_html=True)
 
     z = np.linspace(-8, 8, 200)
     sig = 1 / (1 + np.exp(-z))
@@ -138,48 +158,55 @@ if topic == "📈 Logistic Regression":
     fig_sig.add_vline(x=0, line_dash="dot", line_color="#4a4e6a")
     fig_sig.add_annotation(x=4, y=0.9, text="z > 0 → P > 0.5 → ✅", showarrow=False, font=dict(color='#22d3a7'))
     fig_sig.add_annotation(x=-4, y=0.1, text="z < 0 → P < 0.5 → ❌", showarrow=False, font=dict(color='#f45d6d'))
-    fig_sig.update_layout(height=280, title="Sigmoid: σ(z) = 1 / (1 + e⁻ᶻ)", xaxis_title="z (linear combination)", yaxis_title="P(success)", **DL)
+    fig_sig.update_layout(height=280, title="The Sigmoid: Any number in → probability out", xaxis_title="z (your linear score)", yaxis_title="P(success)", **DL)
     st.plotly_chart(fig_sig, use_container_width=True, config={"displayModeBar": False})
 
     st.markdown("""<div class="dd-math">
-    <b>📐 Sigmoid Function:</b>
+    <b>📐 The Sigmoid Formula:</b>
     <br><br><b>σ(z) = 1 / (1 + e⁻ᶻ)</b>
-    <br><br>Where z = β₀ + β₁x₁ + β₂x₂ + ... (linear combination of features)
-    <br><br><b>Properties:</b>
-    <br>&nbsp;&nbsp;• z = 0 → σ(0) = 1/(1+1) = <b>0.5</b> (50/50)
-    <br>&nbsp;&nbsp;• z = +∞ → σ(∞) = 1/(1+0) = <b>1.0</b> (certain yes)
-    <br>&nbsp;&nbsp;• z = -∞ → σ(-∞) = 1/(1+∞) = <b>0.0</b> (certain no)
-    <br>&nbsp;&nbsp;• z = 2 → σ(2) = 1/(1+e⁻²) = 1/(1+0.135) = <b>0.88</b>
-    <br>&nbsp;&nbsp;• z = -2 → σ(-2) = 1/(1+e²) = 1/(1+7.389) = <b>0.12</b>
+    <br><br>Where z = β₀ + β₁x₁ + β₂x₂ (your linear score from features)
+    <br><br><b>Let's compute it by hand for a few values:</b>
+    <br><br>z = 0: σ(0) = 1/(1+e⁰) = 1/(1+1) = 1/2 = <b>0.50</b> → "coin flip, no idea"
+    <br>z = 2: σ(2) = 1/(1+e⁻²) = 1/(1+0.135) = 1/1.135 = <b>0.88</b> → "pretty confident yes"
+    <br>z = -2: σ(-2) = 1/(1+e²) = 1/(1+7.389) = 1/8.389 = <b>0.12</b> → "pretty confident no"
+    <br>z = 5: σ(5) = 1/(1+e⁻⁵) = 1/(1+0.007) = <b>0.993</b> → "almost certain yes"
+    <br>z = -5: σ(-5) = 1/(1+e⁵) = 1/(1+148.4) = <b>0.007</b> → "almost certain no"
     </div>""", unsafe_allow_html=True)
 
-    # ── STEP 3: EXAMPLE ──
+    st.markdown("""<div class="dd-insight">
+    💡 <b>The beautiful thing:</b> No matter what z is — whether it's -1000 or +1000 — the sigmoid
+    always gives you a number between 0 and 1. Problem solved!
+    <br><br>Now the plan is: compute a linear score z, then pass it through sigmoid to get a probability.
+    </div>""", unsafe_allow_html=True)
+
+    # ── CHAPTER 3: MAKING A PREDICTION ──
     st.divider()
-    st.markdown("## Step 3: Prediction — Step by Step")
+    st.markdown("## Chapter 3: Your First Prediction")
 
     st.markdown("""<div class="dd-step" style="border-left-color: #7c6aff">
-    <b style="color:#7c6aff">🍕 Scenario:</b> Predict if a pizza store is successful.
-    <br>Features: Rating (x₁), Delivery_Min (x₂)
-    <br>Learned weights: β₀ = -5.0, β₁ = 1.5, β₂ = -0.05
+    <b style="color:#7c6aff">🍕 The scenario:</b> After training on 50 stores, the model learned these weights:
+    <br>β₀ = -5.0 (baseline), β₁ = +1.5 (Rating), β₂ = -0.05 (Delivery_Min)
+    <br><br>Your boss asks: <i>"What about the new store on Oak Street? Rating 4.2, delivery 25 min."</i>
+    <br><br>Let's walk through exactly what the model does — three simple steps.
     </div>""", unsafe_allow_html=True)
 
-    st.markdown("#### New Store: Rating = 4.2, Delivery = 25 min")
-
     st.markdown("""<div class="dd-math">
-    <b>📐 Step-by-Step Prediction:</b>
-    <br><br><b>Step 1: Calculate z (linear combination)</b>
-    <br>&nbsp;&nbsp;z = β₀ + β₁×Rating + β₂×Delivery
-    <br>&nbsp;&nbsp;z = -5.0 + 1.5×(4.2) + (-0.05)×(25)
+    <b>📐 Step 1: Calculate the linear score (z)</b>
+    <br><br>z is just a weighted sum of features — like a "score" for this store:
+    <br><br>&nbsp;&nbsp;z = β₀ + β₁ × Rating + β₂ × Delivery
+    <br>&nbsp;&nbsp;z = -5.0 + 1.5 × (4.2) + (-0.05) × (25)
     <br>&nbsp;&nbsp;z = -5.0 + 6.3 - 1.25
-    <br>&nbsp;&nbsp;z = <b>0.05</b>
-    <br><br><b>Step 2: Apply sigmoid</b>
-    <br>&nbsp;&nbsp;P = σ(z) = 1 / (1 + e⁻⁰·⁰⁵)
+    <br>&nbsp;&nbsp;z = <b>+0.05</b>
+    <br><br>Positive z means "leaning toward success" (but barely — it's close to 0).
+    <br><br><b>📐 Step 2: Squash z through the sigmoid to get probability</b>
+    <br><br>&nbsp;&nbsp;P = σ(0.05) = 1 / (1 + e⁻⁰·⁰⁵)
     <br>&nbsp;&nbsp;P = 1 / (1 + 0.951)
     <br>&nbsp;&nbsp;P = 1 / 1.951
     <br>&nbsp;&nbsp;P = <b>0.512 = 51.2%</b>
-    <br><br><b>Step 3: Apply decision boundary</b>
-    <br>&nbsp;&nbsp;P = 0.512 > 0.5 → <b>✅ Successful</b>
-    <br><br>🧠 Barely above the threshold! This store is borderline.
+    <br><br><b>📐 Step 3: Make the decision</b>
+    <br><br>&nbsp;&nbsp;P = 0.512 > 0.5 → Predict: <b>✅ Successful</b>
+    <br><br>🧠 But barely! You'd tell your boss: "It's basically a coin flip. The rating is good
+    <br>but delivery is a bit slow. If they can shave off 5 minutes, I'd be much more confident."
     </div>""", unsafe_allow_html=True)
 
     mc = st.columns(4)
@@ -188,18 +215,27 @@ if topic == "📈 Logistic Regression":
     mc[2].metric("Threshold", "50%")
     mc[3].metric("Prediction", "✅ Yes")
 
-    # ── STEP 4: COST FUNCTION ──
+    # ── CHAPTER 4: HOW THE MODEL LEARNS ──
     st.divider()
-    st.markdown("## Step 4: How It Learns — Log Loss (Full Derivation)")
+    st.markdown("## Chapter 4: But Wait — How Did It Learn Those Weights?")
 
     st.markdown("""<div class="dd-step" style="border-left-color: #f5b731">
-    <b style="color:#f5b731">🎯 Goal:</b> Find weights (β₀, β₁, β₂) that minimize prediction errors.
-    <br>Uses <b>Log Loss</b> (Binary Cross-Entropy) — not MSE like linear regression.
-    <br><br>But WHY this formula? Let's derive it from scratch using <b>Maximum Likelihood Estimation</b>.
+    <b style="color:#f5b731">💭 Your thinking:</b> "The model used β₀=-5, β₁=+1.5, β₂=-0.05. But where did those come from?
+    <br>Nobody told it those numbers. It had to FIGURE THEM OUT from the data."
+    <br><br>This is the learning process. It has 3 parts:
+    <br>1. A <b>loss function</b> that measures "how wrong am I?"
+    <br>2. A <b>gradient</b> that says "which direction should I adjust?"
+    <br>3. <b>Gradient descent</b> that actually adjusts the weights
+    <br><br>Let's derive each one from scratch.
     </div>""", unsafe_allow_html=True)
 
-    # ── PART A: WHY NOT MSE? ──
     st.markdown("### Part A: Why Not Use MSE (Mean Squared Error)?")
+
+    st.markdown("""<div class="dd-card">
+    <b>💭 Your first instinct:</b> "For linear regression, I used MSE = (actual - predicted)².
+    <br>Can't I just use that here too?"
+    <br><br>You can try, but it has two problems:
+    </div>""", unsafe_allow_html=True)
 
     p_range_mse = np.linspace(0.01, 0.99, 100)
     mse_y1 = (1 - p_range_mse)**2
@@ -224,7 +260,16 @@ if topic == "📈 Logistic Regression":
     </div>""", unsafe_allow_html=True)
 
     # ── PART B: LIKELIHOOD ──
-    st.markdown("### Part B: Starting Point — What is Likelihood?")
+    st.markdown("### Part B: A Better Approach — Ask 'How Probable Is My Data?'")
+
+    st.markdown("""<div class="dd-card">
+    <b>💭 New idea:</b> Instead of measuring error, let's think about it differently.
+    <br><br>The model predicts probabilities. For each store, it says "70% chance of success."
+    <br>If that store IS successful, 70% was a decent prediction.
+    <br>If that store is NOT successful, 70% was a terrible prediction.
+    <br><br>So let's ask: <b>"Given my model's predictions, how probable is the data I actually observed?"</b>
+    <br>This is called <b>likelihood</b>.
+    </div>""", unsafe_allow_html=True)
 
     st.markdown("""<div class="dd-math">
     <b>📐 Likelihood = "How probable is my data given my model?"</b>
@@ -275,7 +320,15 @@ if topic == "📈 Logistic Regression":
     </div>""", unsafe_allow_html=True)
 
     # ── PART E: NEGATE → LOSS ──
-    st.markdown("### Part E: Negate It → Loss Function")
+    st.markdown("### Part E: Flip It — From 'Maximize' to 'Minimize'")
+
+    st.markdown("""<div class="dd-card">
+    <b>💭 The situation:</b> We want to MAXIMIZE the log-likelihood (make data most probable).
+    <br>But every optimization tool in the world is built to MINIMIZE things.
+    <br><br><b>Simple fix:</b> Multiply by -1. Now "maximize log-likelihood" becomes "minimize negative log-likelihood."
+    <br><br>It's like asking "find the tallest mountain" vs "flip the landscape upside down and find the lowest point."
+    <br>The answer is the same spot — just approached from the other direction.
+    </div>""", unsafe_allow_html=True)
 
     st.markdown("""<div class="dd-math">
     <b>📐 Convention: We MINIMIZE loss, not maximize likelihood.</b>
@@ -333,22 +386,70 @@ if topic == "📈 Logistic Regression":
         </div>""", unsafe_allow_html=True)
 
     # ── PART G: GRADIENT DESCENT ──
-    st.markdown("### Part G: How Gradient Descent Finds the Weights")
+    st.markdown("### Part G: Teaching the Model — Gradient Descent")
+
+    st.markdown("""<div class="dd-card">
+    <b>💭 The situation so far:</b> We have a loss function that tells us "how wrong" the model is.
+    <br>But the model starts with random weights (β₀=0, β₁=0, β₂=0). It's completely clueless.
+    <br><br><b>The question:</b> How does it find the RIGHT weights?
+    <br><br><b>The answer:</b> It can't solve it in one step (unlike linear regression, which has a direct formula).
+    <br>The sigmoid makes the equation non-linear — there's no way to rearrange it to isolate β.
+    <br><br>So it uses an <b>iterative</b> approach: start somewhere, figure out which direction is "downhill,"
+    <br>take a small step, and repeat. This is <b>gradient descent</b>.
+    </div>""", unsafe_allow_html=True)
+
+    st.markdown("""<div class="dd-step" style="border-left-color: #22d3a7">
+    <b style="color:#22d3a7">🏔️ Analogy:</b> You're blindfolded on a hilly landscape. You want to find the lowest valley.
+    <br><br>1. <b>Feel the slope</b> under your feet (= compute the gradient)
+    <br>2. <b>Step downhill</b> (= adjust weights in the opposite direction of the gradient)
+    <br>3. <b>Repeat</b> until the ground feels flat (= gradient ≈ 0, you've converged)
+    <br><br>The gradient tells you: "If I increase this weight, does the loss go up or down? And by how much?"
+    </div>""", unsafe_allow_html=True)
+
+    st.markdown("#### The Gradient Formula (and where it comes from)")
 
     st.markdown("""<div class="dd-math">
-    <b>📐 The gradient (derivative) of Log Loss with respect to weights:</b>
-    <br><br>∂Loss/∂βⱼ = Σ (pᵢ - yᵢ) × xᵢⱼ
-    <br><br><b>This is beautifully simple!</b> The gradient is just:
-    <br>&nbsp;&nbsp;(predicted - actual) × feature value
-    <br><br><b>Update rule:</b>
-    <br>&nbsp;&nbsp;βⱼ = βⱼ - η × ∂Loss/∂βⱼ
-    <br>&nbsp;&nbsp;βⱼ = βⱼ - η × Σ (pᵢ - yᵢ) × xᵢⱼ
+    <b>📐 We need: ∂Loss/∂βⱼ = "how does loss change when I nudge weight βⱼ?"</b>
+    <br><br>The prediction goes through 3 steps:
+    <br>&nbsp;&nbsp;β (weights) → z (linear score) → p (sigmoid) → Loss
+    <br><br>We use the <b>chain rule</b> from calculus — when things are connected in a chain,
+    <br>multiply the rates of change:
+    <br><br>&nbsp;&nbsp;∂Loss/∂β = (∂Loss/∂p) × (∂p/∂z) × (∂z/∂β)
+    <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↑ how loss changes with p
+    <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↑ how p changes with z
+    <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↑ how z changes with β
+    <br><br><b>Piece 1:</b> ∂Loss/∂p = -y/p + (1-y)/(1-p)
+    <br><b>Piece 2:</b> ∂p/∂z = p × (1-p)&nbsp;&nbsp;&nbsp;&nbsp;← sigmoid's derivative is beautifully simple!
+    <br><b>Piece 3:</b> ∂z/∂βⱼ = xⱼ&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;← z = β₀ + β₁x₁ + β₂x₂, so derivative is just xⱼ
+    <br><br><b>Multiply them:</b>
+    <br>&nbsp;&nbsp;[-y/p + (1-y)/(1-p)] × [p(1-p)] × [xⱼ]
+    <br><br><b>The first two pieces simplify magically:</b>
+    <br>&nbsp;&nbsp;[-y/p + (1-y)/(1-p)] × p(1-p)
+    <br>&nbsp;&nbsp;= -y(1-p) + (1-y)p
+    <br>&nbsp;&nbsp;= -y + yp + p - yp
+    <br>&nbsp;&nbsp;= p - y
+    <br><br><b>Final result:</b>
+    <br>&nbsp;&nbsp;<b>∂Loss/∂βⱼ = (p - y) × xⱼ</b>
+    <br><br>That's it! The gradient is just: <b>(prediction error) × (feature value)</b>
+    <br><br>For all data points, average them:
+    <br>&nbsp;&nbsp;<b>∂Loss/∂βⱼ = (1/n) × Σ (pᵢ - yᵢ) × xᵢⱼ</b>
+    </div>""", unsafe_allow_html=True)
+
+    st.markdown("#### The Update Rule")
+
+    st.markdown("""<div class="dd-math">
+    <b>📐 Now adjust the weights:</b>
+    <br><br>&nbsp;&nbsp;βⱼ_new = βⱼ_old - η × ∂Loss/∂βⱼ
+    <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↑ minus sign: go OPPOSITE to gradient (downhill)
+    <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↑ η = learning rate (step size, e.g., 0.1)
     <br><br><b>Example:</b>
-    <br>&nbsp;&nbsp;Store has Rating=4.2, actual=1 (success), predicted p=0.3
-    <br>&nbsp;&nbsp;Error = p - y = 0.3 - 1 = -0.7 (underpredicted!)
-    <br>&nbsp;&nbsp;Gradient for β₁(Rating) = -0.7 × 4.2 = -2.94
+    <br>&nbsp;&nbsp;Store: Rating=4.2, actual=1 (success), model predicted p=0.3
+    <br>&nbsp;&nbsp;Error = p - y = 0.3 - 1 = -0.7 (underpredicted by a lot!)
+    <br>&nbsp;&nbsp;Gradient for β₁ = -0.7 × 4.2 = -2.94
     <br>&nbsp;&nbsp;Update: β₁ = β₁ - 0.1 × (-2.94) = β₁ + 0.294
-    <br>&nbsp;&nbsp;→ β₁ increases → next time, high rating → higher p ✅
+    <br><br>&nbsp;&nbsp;β₁ increased! Next time, a high rating will push z higher → higher p → closer to 1 ✅
+    <br><br>🧠 <b>The intuition:</b> The model underpredicted for a high-rating store,
+    <br>so it increases the weight for Rating. Makes sense!
     </div>""", unsafe_allow_html=True)
 
     # Gradient descent animation
@@ -373,9 +474,55 @@ if topic == "📈 Logistic Regression":
     <br>6. The gradient is elegantly simple: <b>(predicted - actual) × feature</b>
     </div>""", unsafe_allow_html=True)
 
-    # ── STEP 5: COEFFICIENTS ──
+    # ── CHAPTER 5: READING THE RESULTS ──
     st.divider()
-    st.markdown("## Step 5: Interpreting Coefficients")
+    st.markdown("## Chapter 5: What Do the Weights Actually Mean?")
+
+    st.markdown("""<div class="dd-card">
+    <b>💭 Your boss asks:</b> "The model says β₁ = +1.5 for Rating. What does that mean in English?"
+    <br><br>To answer this, we need to understand <b>odds</b> — a different way to express probability.
+    </div>""", unsafe_allow_html=True)
+
+    st.markdown("### First: What Are Odds?")
+
+    st.markdown("""<div class="dd-math">
+    <b>📐 Odds = P / (1-P) = chance of YES / chance of NO</b>
+    <br><br>P = 0.75: Odds = 0.75/0.25 = <b>3.0</b> → "3 to 1 in favor" (like betting)
+    <br>P = 0.50: Odds = 0.50/0.50 = <b>1.0</b> → "even odds"
+    <br>P = 0.25: Odds = 0.25/0.75 = <b>0.33</b> → "1 to 3 against"
+    <br>P = 0.90: Odds = 0.90/0.10 = <b>9.0</b> → "9 to 1 in favor"
+    <br><br>Odds > 1 = more likely yes. Odds < 1 = more likely no.
+    </div>""", unsafe_allow_html=True)
+
+    st.markdown("### The Key Insight: Logistic Regression Is Linear in Log-Odds")
+
+    st.markdown("""<div class="dd-math">
+    <b>📐 log(odds) = log(P/(1-P)) = z = β₀ + β₁x₁ + β₂x₂</b>
+    <br><br>The model doesn't predict probability directly. It predicts <b>log-odds</b>.
+    <br>Then sigmoid converts log-odds → probability.
+    <br><br>So when β₁ = +1.5:
+    <br>&nbsp;&nbsp;"+1 Rating → log-odds increase by 1.5"
+    <br><br>But what does that mean for actual odds?
+    <br>&nbsp;&nbsp;Odds multiply by e^β₁ = e^1.5 = <b>4.48×</b>
+    </div>""", unsafe_allow_html=True)
+
+    st.markdown("### Concrete Example: Rating Goes from 3.0 to 4.0")
+
+    st.markdown("""<div class="dd-math">
+    <b>📐 Store A: Rating = 3.0, Delivery = 25</b>
+    <br>&nbsp;&nbsp;z = -5.0 + 1.5(3.0) + (-0.05)(25) = -5.0 + 4.5 - 1.25 = <b>-1.75</b>
+    <br>&nbsp;&nbsp;Odds = e^(-1.75) = <b>0.174</b>
+    <br>&nbsp;&nbsp;P = 0.174/(1+0.174) = <b>14.8%</b>
+    <br><br><b>📐 Store B: Rating = 4.0, Delivery = 25</b> (only Rating changed by +1)
+    <br>&nbsp;&nbsp;z = -5.0 + 1.5(4.0) + (-0.05)(25) = -5.0 + 6.0 - 1.25 = <b>-0.25</b>
+    <br>&nbsp;&nbsp;Odds = e^(-0.25) = <b>0.779</b>
+    <br>&nbsp;&nbsp;P = 0.779/(1+0.779) = <b>43.8%</b>
+    <br><br><b>What changed?</b>
+    <br>&nbsp;&nbsp;Log-odds: -1.75 → -0.25 (increased by exactly <b>1.5 = β₁</b>) ✅
+    <br>&nbsp;&nbsp;Odds: 0.174 → 0.779 (multiplied by 0.779/0.174 = <b>4.48 = e^1.5</b>) ✅
+    <br>&nbsp;&nbsp;Probability: 14.8% → 43.8%
+    <br><br>🧠 <b>In English:</b> "Each extra rating point makes a store 4.5× more likely to succeed."
+    </div>""", unsafe_allow_html=True)
 
     st.markdown("""<div class="dd-math">
     <b>📐 What the weights mean:</b>
@@ -397,13 +544,16 @@ if topic == "📈 Logistic Regression":
     fig_coef = go.Figure()
     fig_coef.add_trace(go.Bar(y=["Delivery_Min", "Rating"], x=[-0.05, 1.5], orientation='h',
                               marker_color=["#f45d6d", "#22d3a7"],
-                              text=["-0.05 (hurts)", "+1.50 (helps)"], textposition="auto"))
-    fig_coef.update_layout(height=160, title="Coefficients: Direction & Magnitude", xaxis_title="Weight (β)", **DL)
+                              text=["β=-0.05 → e^β=0.95 (5% less odds/min)", "β=+1.5 → e^β=4.48 (4.5× more odds/point)"], textposition="auto"))
+    fig_coef.update_layout(height=180, title="Coefficients: What Each Feature Does to the Odds", xaxis_title="Weight (β)", **DL)
     st.plotly_chart(fig_coef, use_container_width=True, config={"displayModeBar": False})
 
     st.markdown("""<div class="dd-warn">
-    ⚠️ <b>Interview tip:</b> "How do you interpret logistic regression coefficients?"
-    → "A coefficient of 1.5 for Rating means each 1-point increase multiplies the odds of success by e¹·⁵ ≈ 4.5×"
+    ⚠️ <b>Interview answer:</b> "How do you interpret logistic regression coefficients?"
+    <br><br><i>"Each coefficient β represents the change in log-odds for a one-unit increase in that feature.
+    <br>The odds ratio e^β tells you how much the odds multiply.
+    <br>For example, β=1.5 for Rating means each extra rating point multiplies the odds of success by e^1.5 = 4.48×.
+    <br>A negative β like -0.05 for Delivery means each extra minute multiplies odds by e^(-0.05) = 0.95, reducing them by 5%."</i>
     </div>""", unsafe_allow_html=True)
 
 

@@ -558,6 +558,8 @@ Proof:
          = p × (1-p)  ✅
 ```
 
+What does p × (1-p) mean? Both p and (1-p) are between 0 and 1 (since p is a probability). Multiplying two numbers in (0,1) always gives something smaller. The product is maximized when p = 0.5, giving 0.5 × 0.5 = 0.25. This means the sigmoid derivative can never exceed 0.25 — and for confident predictions (p near 0 or 1), the derivative approaches 0. This is fine for logistic regression (single layer), but becomes the vanishing gradient problem in deep networks where this 0.25 multiplies through many layers.
+
 **Part 3: ∂zᵢ/∂βⱼ (how z changes with weight)**
 ```
 z = β₀ + β₁x₁ + β₂x₂
