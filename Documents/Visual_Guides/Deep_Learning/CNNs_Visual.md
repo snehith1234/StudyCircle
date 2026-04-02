@@ -37,7 +37,7 @@ A filter (kernel) is a small matrix of learnable weights, typically 3x3. It slid
 graph LR
     INPUT["Input Image 5x5<br/>pixel values"] --> FILTER["3x3 Filter<br/>learnable weights<br/><i>e.g. vertical edge detector</i>"]
     FILTER --> SLIDE["Slide across image<br/>dot product at each position<br/>stride=1, no padding"]
-    SLIDE --> FMAP["Feature Map 3x3<br/>output = (5 neg 3)/1 plus 1 = 3<br/><i>Shows WHERE pattern appears</i>"]
+    SLIDE --> FMAP["Feature Map 3x3<br/>output = (5 neg 3)/1 + 1 = 3<br/><i>Shows WHERE pattern appears</i>"]
 
     style INPUT fill:#252840,stroke:#f5b731,color:#c8cfe0
     style FILTER fill:#1a1d2e,stroke:#5eaeff,color:#e2e8f0
@@ -45,7 +45,7 @@ graph LR
     style FMAP fill:#1a2a1f,stroke:#22d3a7,color:#c8d8c0
 ```
 
-Yellow = raw input image. Blue = the filter (small, learnable). Purple = the sliding operation. Green = the output feature map. The output size formula is: (input neg filter plus 2 x padding) / stride plus 1. With 32 different filters, you get 32 feature maps — 32 different views of the image.
+Yellow = raw input image. Blue = the filter (small, learnable). Purple = the sliding operation. Green = the output feature map. The output size formula is: (input neg filter + 2 x padding) / stride + 1. With 32 different filters, you get 32 feature maps — 32 different views of the image.
 
 ---
 
@@ -219,7 +219,7 @@ graph TD
     style EF fill:#1a2a1f,stroke:#22d3a7,color:#c8d8c0
 ```
 
-Yellow = the pioneer (LeNet). Blue/Purple = the breakthroughs (AlexNet, VGG). Green = the modern standards (ResNet, EfficientNet). ResNet's skip connections are the most important innovation — they allow gradients to flow directly through the network, enabling training of 100 plus layer networks without vanishing gradients.
+Yellow = the pioneer (LeNet). Blue/Purple = the breakthroughs (AlexNet, VGG). Green = the modern standards (ResNet, EfficientNet). ResNet's skip connections are the most important innovation — they allow gradients to flow directly through the network, enabling training of 100+ layer networks without vanishing gradients.
 
 ### ResNet Skip Connection
 
@@ -230,7 +230,7 @@ The key idea: instead of learning the full transformation, learn only the residu
 graph TD
     X["Input x"] --> CONV["Conv, ReLU, Conv<br/>learns F(x)"]
     X --> SKIP["Skip Connection<br/>identity shortcut"]
-    CONV --> ADD["Output = F(x) plus x<br/><i>Residual plus original</i>"]
+    CONV --> ADD["Output = F(x) + x<br/><i>Residual + original</i>"]
     SKIP --> ADD
 
     style X fill:#252840,stroke:#f5b731,color:#c8cfe0

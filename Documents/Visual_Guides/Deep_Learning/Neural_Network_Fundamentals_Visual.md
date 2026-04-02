@@ -59,7 +59,7 @@ graph TD
     Q -->|"Hidden layer"| RELU["ReLU (default)<br/>Gradient = 1 for positive<br/>Fast, no vanishing gradient"]
     Q -->|"Hidden, neurons dying"| LRELU["Leaky ReLU<br/>Small slope for negative<br/>No dead neurons"]
     Q -->|"Output: yes/no"| SIG["Sigmoid<br/>Output in (0, 1)<br/>= probability"]
-    Q -->|"Output: 3 plus classes"| SOFT["Softmax<br/>Outputs sum to 1.0<br/>= probability distribution"]
+    Q -->|"Output: 3 + classes"| SOFT["Softmax<br/>Outputs sum to 1.0<br/>= probability distribution"]
     Q -->|"Output: any number"| LIN["Linear (none)<br/>No squashing<br/>For regression"]
 
     style Q fill:#252840,stroke:#f5b731,color:#c8cfe0
@@ -85,10 +85,10 @@ The sigmoid gradient σ'(z) = σ(z) × (1 − σ(z)) is derived in 5 steps using
 ```mermaid
 %%{init: {'theme': 'dark', 'themeVariables': {'darkMode': true, 'background': '#0e1117', 'primaryColor': '#1a1d2e', 'primaryTextColor': '#e2e8f0', 'primaryBorderColor': '#2d3148', 'lineColor': '#8892b0', 'secondaryColor': '#252840', 'tertiaryColor': '#1a1d2e', 'fontSize': '14px', 'edgeLabelBackground': '#0e1117'}, 'flowchart': {'nodeSpacing': 30, 'rankSpacing': 40, 'padding': 15, 'htmlLabels': true}}}%%
 graph TD
-    S1["Step 1: Rewrite<br/>σ(z) = (1 plus e⁻ᶻ)⁻¹<br/><i>Easier to differentiate</i>"]
-    S1 --> S2["Step 2: Chain rule<br/>outer: u⁻¹ → derivative: −u⁻²<br/>inner: 1 plus e⁻ᶻ → derivative: −e⁻ᶻ<br/>Multiply: e⁻ᶻ / (1 plus e⁻ᶻ)²"]
-    S2 --> S3["Step 3: Split the fraction<br/>= (1/(1 plus e⁻ᶻ)) × (e⁻ᶻ/(1 plus e⁻ᶻ))<br/>= σ(z) × (something)"]
-    S3 --> S4["Step 4: Show second part = 1 − σ(z)<br/>e⁻ᶻ/(1 plus e⁻ᶻ) = 1 − 1/(1 plus e⁻ᶻ) = 1 − σ(z)"]
+    S1["Step 1: Rewrite<br/>σ(z) = (1 + e⁻ᶻ)⁻¹<br/><i>Easier to differentiate</i>"]
+    S1 --> S2["Step 2: Chain rule<br/>outer: u⁻¹ → derivative: −u⁻²<br/>inner: 1 + e⁻ᶻ → derivative: −e⁻ᶻ<br/>Multiply: e⁻ᶻ / (1 + e⁻ᶻ)²"]
+    S2 --> S3["Step 3: Split the fraction<br/>= (1/(1 + e⁻ᶻ)) × (e⁻ᶻ/(1 + e⁻ᶻ))<br/>= σ(z) × (something)"]
+    S3 --> S4["Step 4: Show second part = 1 − σ(z)<br/>e⁻ᶻ/(1 + e⁻ᶻ) = 1 − 1/(1 + e⁻ᶻ) = 1 − σ(z)"]
     S4 --> S5["Step 5: Final result<br/><b>σ'(z) = σ(z) × (1 − σ(z))</b><br/>Max = 0.25 at z=0"]
 
     style S1 fill:#252840,stroke:#f5b731,color:#c8cfe0
@@ -148,7 +148,7 @@ graph TD
     RULES --> R2["Chain rule<br/>d/dz(f(g(z))) = f'(g) × g'(z)<br/><i>Used in EVERY backprop step</i>"]
     RULES --> R3["Exponential rule<br/>d/dz(eᶻ) = eᶻ<br/><i>e is its own derivative!</i>"]
     RULES --> R4["Quotient rule<br/>d/dz(f/g) = (f'g − fg')/g²<br/><i>Used in tanh derivation</i>"]
-    RULES --> R5["Sum rule<br/>d/dz(f plus g) = f' plus g'<br/><i>Derivatives add</i>"]
+    RULES --> R5["Sum rule<br/>d/dz(f + g) = f' + g'<br/><i>Derivatives add</i>"]
     RULES --> R6["Constant rule<br/>d/dz(c × f) = c × f'<br/><i>Constants pull out</i>"]
 
     style RULES fill:#252840,stroke:#f5b731,color:#c8cfe0
@@ -234,7 +234,7 @@ graph TD
     S1["ReLU activation<br/>Gradient = 1 for positive<br/><i>Fixes vanishing in hidden layers</i>"]
     S2["Proper initialization<br/>Xavier for sigmoid/tanh<br/>He/Kaiming for ReLU<br/><i>Stable variance from the start</i>"]
     S3["Batch Normalization<br/>Normalize to mean=0, var=1<br/><i>Prevents drift between layers</i>"]
-    S4["Residual connections<br/>Skip paths: output = F(x) plus x<br/><i>Gradient flows directly through</i>"]
+    S4["Residual connections<br/>Skip paths: output = F(x) + x<br/><i>Gradient flows directly through</i>"]
     S5["Gradient clipping<br/>Cap gradient magnitude<br/><i>Prevents explosion in RNNs</i>"]
     S6["LSTM/GRU gates<br/>Learned gates control flow<br/><i>For recurrent networks</i>"]
 
@@ -262,7 +262,7 @@ graph TD
     TOOSMALL["Weights too small<br/>Activations collapse to 0<br/>No signal propagates<br/><i>Network is dead</i>"]
     JUSTRIGHT["Proper initialization<br/>Activations stay in healthy range<br/>Gradients flow normally<br/><i>Network can learn</i>"]
 
-    TOOBIG --> FIX["Xavier: var = 2/(n_in plus n_out)<br/>For sigmoid and tanh"]
+    TOOBIG --> FIX["Xavier: var = 2/(n_in + n_out)<br/>For sigmoid and tanh"]
     TOOSMALL --> FIX
     FIX --> FIX2["He/Kaiming: var = 2/n_in<br/>For ReLU (2× larger because<br/>ReLU zeros half the activations)"]
     FIX2 --> JUSTRIGHT
@@ -286,7 +286,7 @@ Each layer's input distribution shifts as previous layers update their weights (
 %%{init: {'theme': 'dark', 'themeVariables': {'darkMode': true, 'background': '#0e1117', 'primaryColor': '#1a1d2e', 'primaryTextColor': '#e2e8f0', 'primaryBorderColor': '#2d3148', 'lineColor': '#8892b0', 'secondaryColor': '#252840', 'tertiaryColor': '#1a1d2e', 'fontSize': '14px', 'edgeLabelBackground': '#0e1117'}, 'flowchart': {'nodeSpacing': 30, 'rankSpacing': 40, 'padding': 15, 'htmlLabels': true}}}%%
 graph TD
     INPUT["Raw activations<br/>mean=1.2, var=0.8<br/><i>Drifting distribution</i>"] --> NORM["Step 1: Normalize<br/>x̂ = (x minus μ) / σ<br/>mean=0, var=1"]
-    NORM --> SCALE["Step 2: Scale and Shift<br/>y = γ × x̂ plus β<br/><i>γ, β are LEARNABLE</i>"]
+    NORM --> SCALE["Step 2: Scale and Shift<br/>y = γ × x̂ + β<br/><i>γ, β are LEARNABLE</i>"]
     SCALE --> OUTPUT["Stable activations<br/><i>Optimal distribution<br/>for this layer</i>"]
 
     SCALE --> WHY["Why learnable γ, β?<br/>If γ=σ and β=μ, batch norm<br/>becomes identity (no effect).<br/>Network can undo it if not helpful."]
@@ -369,8 +369,8 @@ The loss function defines "how wrong is the model?" Different tasks need differe
 %%{init: {'theme': 'dark', 'themeVariables': {'darkMode': true, 'background': '#0e1117', 'primaryColor': '#1a1d2e', 'primaryTextColor': '#e2e8f0', 'primaryBorderColor': '#2d3148', 'lineColor': '#8892b0', 'secondaryColor': '#252840', 'tertiaryColor': '#1a1d2e', 'fontSize': '14px', 'edgeLabelBackground': '#0e1117'}, 'flowchart': {'nodeSpacing': 30, 'rankSpacing': 40, 'padding': 15, 'htmlLabels': true}}}%%
 graph TD
     TASK{"What is your task?"}
-    TASK -->|"Yes or No?"| BCE["Binary Cross Entropy<br/>Loss = neg(y log ŷ plus (1-y) log(1-ŷ))<br/>Output: Sigmoid<br/><i>From Bernoulli distribution</i>"]
-    TASK -->|"Which class? (3 plus)"| CCE["Categorical Cross Entropy<br/>Loss = neg Σ yₖ log ŷₖ<br/>Output: Softmax<br/><i>From Multinomial distribution</i>"]
+    TASK -->|"Yes or No?"| BCE["Binary Cross Entropy<br/>Loss = neg(y log ŷ + (1-y) log(1-ŷ))<br/>Output: Sigmoid<br/><i>From Bernoulli distribution</i>"]
+    TASK -->|"Which class? (3 +)"| CCE["Categorical Cross Entropy<br/>Loss = neg Σ yₖ log ŷₖ<br/>Output: Softmax<br/><i>From Multinomial distribution</i>"]
     TASK -->|"What number?"| MSE["MSE = (1/n) Σ (y minus ŷ)²<br/>Output: Linear<br/><i>From Gaussian distribution</i>"]
     TASK -->|"Number, with outliers?"| MAE["MAE = (1/n) Σ abs(y minus ŷ)<br/>Output: Linear<br/><i>More robust to outliers</i>"]
 

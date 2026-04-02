@@ -216,7 +216,7 @@ graph TD
     Q1 -->|Next Q| Q2{"TF-IDF vs BoW?"}
     Q2 -->|Answer| A2["TF-IDF downweights common words<br/>IDF = log(N / docs with word)<br/>Rare distinctive words get high scores"]
     Q2 -->|Next Q| Q3{"Explain Word2Vec?"}
-    Q3 -->|Answer| A3["Learns vectors from context prediction<br/>Similar contexts = similar vectors<br/>king minus man plus woman = queen"]
+    Q3 -->|Answer| A3["Learns vectors from context prediction<br/>Similar contexts = similar vectors<br/>king minus man + woman = queen"]
     Q3 -->|Next Q| Q4{"Why cosine similarity<br/>for text?"}
     Q4 -->|Answer| A4["Measures angle not magnitude<br/>Long and short docs about same topic<br/>score high despite different lengths"]
 

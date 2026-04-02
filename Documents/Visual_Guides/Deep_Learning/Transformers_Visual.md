@@ -128,9 +128,9 @@ A Transformer block has four components: multi-head attention, add and normalize
 %%{init: {'theme': 'dark', 'themeVariables': {'darkMode': true, 'background': '#0e1117', 'primaryColor': '#1a1d2e', 'primaryTextColor': '#e2e8f0', 'primaryBorderColor': '#2d3148', 'lineColor': '#8892b0', 'secondaryColor': '#252840', 'tertiaryColor': '#1a1d2e', 'fontSize': '14px', 'edgeLabelBackground': '#0e1117'}, 'flowchart': {'nodeSpacing': 30, 'rankSpacing': 40, 'padding': 15, 'htmlLabels': true}}}%%
 graph TD
     IN["Input"] --> ATTN["Multi-Head Self-Attention<br/><i>Each word attends to all words</i>"]
-    ATTN --> AN1["Add and Normalize<br/>output = LayerNorm(x plus Attn(x))<br/><i>Residual connection</i>"]
+    ATTN --> AN1["Add and Normalize<br/>output = LayerNorm(x + Attn(x))<br/><i>Residual connection</i>"]
     AN1 --> FFN["Feed-Forward Network<br/>Two linear layers with ReLU<br/><i>Process each position</i>"]
-    FFN --> AN2["Add and Normalize<br/>output = LayerNorm(x plus FFN(x))<br/><i>Another residual</i>"]
+    FFN --> AN2["Add and Normalize<br/>output = LayerNorm(x + FFN(x))<br/><i>Another residual</i>"]
     AN2 --> OUT["Output<br/><i>To next Transformer block</i>"]
 
     style IN fill:#252840,stroke:#f5b731,color:#c8cfe0
@@ -162,16 +162,16 @@ graph LR
     style ADD fill:#1a2a1f,stroke:#22d3a7,color:#c8d8c0
 ```
 
-Yellow = word embedding (meaning only). Blue = positional encoding (position only). Green = the sum (meaning plus position). The sine/cosine formula gives three properties: (1) each position gets a unique encoding, (2) the model can learn relative positions, (3) it generalizes to any sequence length.
+Yellow = word embedding (meaning only). Blue = positional encoding (position only). Green = the sum (meaning + position). The sine/cosine formula gives three properties: (1) each position gets a unique encoding, (2) the model can learn relative positions, (3) it generalizes to any sequence length.
 
 ### Why Sine and Cosine?
 
 ```mermaid
 %%{init: {'theme': 'dark', 'themeVariables': {'darkMode': true, 'background': '#0e1117', 'primaryColor': '#1a1d2e', 'primaryTextColor': '#e2e8f0', 'primaryBorderColor': '#2d3148', 'lineColor': '#8892b0', 'secondaryColor': '#252840', 'tertiaryColor': '#1a1d2e', 'fontSize': '14px', 'edgeLabelBackground': '#0e1117'}, 'flowchart': {'nodeSpacing': 30, 'rankSpacing': 40, 'padding': 15, 'htmlLabels': true}}}%%
 graph TD
-    FORMULA["PE(pos, 2i) = sin(pos / 10000 to (2i/d))<br/>PE(pos, 2i plus 1) = cos(pos / 10000 to (2i/d))"]
+    FORMULA["PE(pos, 2i) = sin(pos / 10000 to (2i/d))<br/>PE(pos, 2i + 1) = cos(pos / 10000 to (2i/d))"]
     FORMULA --> P1["Unique per position<br/>No two positions share encoding"]
-    FORMULA --> P2["Relative positions learnable<br/>PE(pos plus k) is linear fn of PE(pos)"]
+    FORMULA --> P2["Relative positions learnable<br/>PE(pos + k) is linear fn of PE(pos)"]
     FORMULA --> P3["Generalizes to any length<br/>No maximum sequence limit"]
 
     style FORMULA fill:#252840,stroke:#f5b731,color:#c8cfe0

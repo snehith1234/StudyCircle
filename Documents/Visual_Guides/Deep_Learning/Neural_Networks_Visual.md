@@ -38,7 +38,7 @@ The neuron computes: z = w₁ × Rating + w₂ × Delivery + b, then applies the
 ```mermaid
 %%{init: {'theme': 'dark', 'themeVariables': {'darkMode': true, 'background': '#0e1117', 'primaryColor': '#1a1d2e', 'primaryTextColor': '#e2e8f0', 'primaryBorderColor': '#2d3148', 'lineColor': '#8892b0', 'secondaryColor': '#252840', 'tertiaryColor': '#1a1d2e', 'fontSize': '14px', 'edgeLabelBackground': '#0e1117'}, 'flowchart': {'nodeSpacing': 30, 'rankSpacing': 40, 'padding': 15, 'htmlLabels': true}}}%%
 graph LR
-    X1["x₁ = Rating<br/>4.5"] --> SUM["Σ weighted sum<br/>z = w₁×x₁ plus w₂×x₂ plus b<br/>= 1.0×4.5 plus (−0.05)×20 plus (−2.0)<br/>= 4.5 − 1.0 − 2.0 = <b>1.5</b>"]
+    X1["x₁ = Rating<br/>4.5"] --> SUM["Σ weighted sum<br/>z = w₁×x₁ + w₂×x₂ + b<br/>= 1.0×4.5 + (−0.05)×20 + (−2.0)<br/>= 4.5 − 1.0 − 2.0 = <b>1.5</b>"]
     X2["x₂ = Delivery<br/>20"] --> SUM
     W["Random weights:<br/>w₁=1.0, w₂=−0.05<br/>bias b=−2.0"] -.-> SUM
     SUM --> ACT["Activation<br/>a = σ(1.5)<br/>= <b>0.818</b>"]
@@ -112,7 +112,7 @@ The activation function determines what a neuron outputs. Sigmoid was the origin
 ```mermaid
 %%{init: {'theme': 'dark', 'themeVariables': {'darkMode': true, 'background': '#0e1117', 'primaryColor': '#1a1d2e', 'primaryTextColor': '#e2e8f0', 'primaryBorderColor': '#2d3148', 'lineColor': '#8892b0', 'secondaryColor': '#252840', 'tertiaryColor': '#1a1d2e', 'fontSize': '14px', 'edgeLabelBackground': '#0e1117'}, 'flowchart': {'nodeSpacing': 30, 'rankSpacing': 40, 'padding': 15, 'htmlLabels': true}}}%%
 graph TD
-    SIGMOID["Sigmoid: 1/(1 plus e to neg z)<br/>Range: 0 to 1<br/>Use: output layer (binary)<br/><i>Problem: vanishing gradients</i>"]
+    SIGMOID["Sigmoid: 1/(1 + e to neg z)<br/>Range: 0 to 1<br/>Use: output layer (binary)<br/><i>Problem: vanishing gradients</i>"]
     RELU["ReLU: max(0, z)<br/>Range: 0 to infinity<br/>Use: hidden layers (default)<br/><i>Fast, no vanishing gradient</i>"]
     SOFTMAX["Softmax: e to zᵢ / Σ e to zⱼ<br/>Range: 0 to 1, sums to 1<br/>Use: output layer (multi class)<br/><i>Outputs probabilities per class</i>"]
 
@@ -136,7 +136,7 @@ Basic gradient descent uses the same learning rate for every parameter. Adam ada
 graph TD
     SGD["SGD<br/>w = w minus η × gradient<br/>Same rate for all params<br/><i>Simple but slow</i>"]
     SGD -->|"Add momentum"| SGDM["SGD with Momentum<br/>Remembers past gradients<br/>Pushes through flat regions<br/><i>Better but still one rate</i>"]
-    SGDM -->|"Add per-param scaling"| ADAM["Adam (default choice)<br/>Adapts rate per parameter<br/>momentum plus scaling<br/><i>Just use η=0.001</i>"]
+    SGDM -->|"Add per-param scaling"| ADAM["Adam (default choice)<br/>Adapts rate per parameter<br/>momentum + scaling<br/><i>Just use η=0.001</i>"]
 
     style SGD fill:#252840,stroke:#f5b731,color:#c8cfe0
     style SGDM fill:#1a1d2e,stroke:#5eaeff,color:#e2e8f0

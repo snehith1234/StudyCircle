@@ -64,7 +64,7 @@ graph TD
     end
 
     subgraph M2["Model 2: Linear Regression"]
-        M2D["ŷ = neg56.91 plus 31.13 × Rating<br/>Training MSE = 3.38<br/>Test MSE ≈ 5 to 10"]
+        M2D["ŷ = neg56.91 + 31.13 × Rating<br/>Training MSE = 3.38<br/>Test MSE ≈ 5 to 10"]
         M2V["LOW bias, LOW variance<br/><i>Just right — captures the trend</i>"]
     end
 
@@ -140,7 +140,7 @@ graph TD
     end
 
     subgraph WITH["✅ With Regularization"]
-        R1["Minimize: Prediction Error plus λ × Penalty<br/><i>'Fit well, but keep it simple!'</i>"]
+        R1["Minimize: Prediction Error + λ × Penalty<br/><i>'Fit well, but keep it simple!'</i>"]
         R1 --> R2["Model keeps coefficients small<br/>→ Better generalization"]
     end
 
@@ -174,7 +174,7 @@ graph TD
     end
 
     subgraph ELASTIC["🟡 Elastic Net: L1 and L2"]
-        E["Penalty = λ(α×Σ‖βⱼ‖ plus (1−α)×Σβⱼ²)<br/><i>Mix of both</i>"]
+        E["Penalty = λ(α×Σ‖βⱼ‖ + (1−α)×Σβⱼ²)<br/><i>Mix of both</i>"]
         E --> EB["Feature selection (like Lasso)<br/>handles correlations (like Ridge)<br/>Best of both worlds"]
     end
 
@@ -315,7 +315,7 @@ This is the first thing to check after training any model. The gap between train
 ```mermaid
 %%{init: {'theme': 'dark', 'themeVariables': {'darkMode': true, 'background': '#0e1117', 'primaryColor': '#1a1d2e', 'primaryTextColor': '#e2e8f0', 'primaryBorderColor': '#2d3148', 'lineColor': '#8892b0', 'secondaryColor': '#252840', 'tertiaryColor': '#1a1d2e', 'fontSize': '14px', 'edgeLabelBackground': '#0e1117'}, 'flowchart': {'nodeSpacing': 30, 'rankSpacing': 40, 'padding': 15, 'htmlLabels': true}}}%%
 graph TD
-    Q1{"Explain bias-variance<br/>tradeoff?"} -->|Answer| A1["Error = Bias² plus Variance plus Noise<br/>Simple model: high bias, low variance<br/>Complex model: low bias, high variance<br/>Goal: minimize total error"]
+    Q1{"Explain bias-variance<br/>tradeoff?"} -->|Answer| A1["Error = Bias² + Variance + Noise<br/>Simple model: high bias, low variance<br/>Complex model: low bias, high variance<br/>Goal: minimize total error"]
     Q1 -->|Next Q| Q2{"Ridge vs Lasso?"}
     Q2 -->|Answer| A2["Ridge (L2): shrinks, never zeros<br/>Lasso (L1): can zero out features<br/>Lasso = feature selection<br/>Ridge = when all features matter"]
     Q2 -->|Next Q| Q3{"What does λ control?"}

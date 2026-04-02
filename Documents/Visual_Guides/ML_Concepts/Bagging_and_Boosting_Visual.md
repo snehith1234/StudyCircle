@@ -288,15 +288,15 @@ Here's the mathematical reason bagging works. A single tree has high variance �
 %%{init: {'theme': 'dark', 'themeVariables': {'darkMode': true, 'background': '#0e1117', 'primaryColor': '#1a1d2e', 'primaryTextColor': '#e2e8f0', 'primaryBorderColor': '#2d3148', 'lineColor': '#8892b0', 'secondaryColor': '#252840', 'tertiaryColor': '#1a1d2e', 'fontSize': '14px', 'edgeLabelBackground': '#0e1117'}, 'flowchart': {'nodeSpacing': 30, 'rankSpacing': 40, 'padding': 15, 'htmlLabels': true}}}%%
 graph TD
     subgraph SINGLE["❌ Single Tree"]
-        ST["Error = Bias² plus <b>HIGH Variance</b> plus Noise"]
+        ST["Error = Bias² + <b>HIGH Variance</b> + Noise"]
     end
 
     subgraph BAGGING["✅ Bagging (B trees)"]
-        BT["Error = Bias² plus <b>Variance/B</b> plus Noise"]
+        BT["Error = Bias² + <b>Variance/B</b> + Noise"]
     end
 
     SINGLE -->|"Average B trees"| BAGGING
-    BAGGING --> NOTE["More trees → Lower variance<br/>But limited by tree correlation ρ<br/>Var = ρσ² plus (1−ρ)σ²/B"]
+    BAGGING --> NOTE["More trees → Lower variance<br/>But limited by tree correlation ρ<br/>Var = ρσ² + (1−ρ)σ²/B"]
 
     style SINGLE fill:#2a1a1f,stroke:#f45d6d,color:#e2e8f0
     style BAGGING fill:#1a2a1f,stroke:#22d3a7,color:#e2e8f0
@@ -534,7 +534,7 @@ graph TD
     S1P["🌱 Stump 1<br/>Rating=3.7 ≤ 3.8<br/>→ Predict -1<br/><i>α₁ = 0.973</i>"]
     S2P["🌱 Stump 2<br/>Delivery=22 ≤ 30<br/>→ Predict 1<br/><i>α₂ > 0.973</i>"]
 
-    S1P --> COMBINE["Score = α₁×(neg1) plus α₂×(1)<br/>= neg0.973 plus α₂"]
+    S1P --> COMBINE["Score = α₁×(neg1) + α₂×(1)<br/>= neg0.973 + α₂"]
     S2P --> COMBINE
 
     COMBINE -->|"α₂ > 0.973"| FINAL["Final: sign = <b>1 Successful ✅</b>"]
@@ -561,10 +561,10 @@ Unlike AdaBoost (which reweights samples), Gradient Boosting works by fitting ea
 graph TD
     INIT["F₀ = mean(y) = 0.5<br/>for all stores"] --> RES1["Compute Residuals<br/>rᵢ = yᵢ - F₀"]
     RES1 --> TREE1["🌳 Tree 1<br/>Fit to residuals"]
-    TREE1 --> UPDATE1["F₁ = F₀ plus η × Tree1<br/><i>η = 0.1 (learning rate)</i>"]
+    TREE1 --> UPDATE1["F₁ = F₀ + η × Tree1<br/><i>η = 0.1 (learning rate)</i>"]
     UPDATE1 --> RES2["Compute NEW Residuals<br/>rᵢ = yᵢ - F₁<br/><i>Smaller than before!</i>"]
     RES2 --> TREE2["🌳 Tree 2<br/>Fit to new residuals"]
-    TREE2 --> UPDATE2["F₂ = F₁ plus η × Tree2"]
+    TREE2 --> UPDATE2["F₂ = F₁ + η × Tree2"]
     UPDATE2 --> DOTS["... repeat M times ..."]
     DOTS --> FINAL["F_M ≈ actual values<br/>Residuals ≈ 0"]
 
@@ -631,8 +631,8 @@ graph TD
     TREE --> UPD["Update with η=0.1"]
 
     subgraph UPDATED["Updated Predictions F₁"]
-        US1["S1: 0.5 plus 0.1×0.5 = <b>0.55</b>"]
-        US2["S2: 0.5 plus 0.1×(neg0.5) = <b>0.45</b>"]
+        US1["S1: 0.5 + 0.1×0.5 = <b>0.55</b>"]
+        US2["S2: 0.5 + 0.1×(neg0.5) = <b>0.45</b>"]
     end
 
     UPD --> UPDATED
@@ -804,7 +804,7 @@ flowchart TD
     INIT --> LOOP["For m = 1 to M:"]
     LOOP --> RESID["Compute residuals<br/>rᵢ = yᵢ - Fₘ₋₁(xᵢ)"]
     RESID --> FIT["Fit tree hₘ to residuals"]
-    FIT --> UPDATE["Update model<br/>Fₘ = Fₘ₋₁ plus η × hₘ"]
+    FIT --> UPDATE["Update model<br/>Fₘ = Fₘ₋₁ + η × hₘ"]
     UPDATE --> CHECK{"m < M?"}
     CHECK -->|Yes| LOOP
     CHECK -->|No| FINAL["Final model: Fₘ(x)"]
@@ -852,7 +852,7 @@ graph TD
         GF1["1. F₀ = mean(y)"]
         GF2["2. rᵢ = yᵢ - Fₘ₋₁(xᵢ)"]
         GF3["3. Fit hₘ to residuals"]
-        GF4["4. Fₘ = Fₘ₋₁ plus η × hₘ"]
+        GF4["4. Fₘ = Fₘ₋₁ + η × hₘ"]
         GF5["5. Repeat M times"]
         GF1 --> GF2 --> GF3 --> GF4 --> GF5
     end

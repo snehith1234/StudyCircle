@@ -106,8 +106,8 @@ Before any split, our data is 4 success + 4 failure = 50/50. This is maximum imp
 %%{init: {'theme': 'dark', 'themeVariables': {'darkMode': true, 'background': '#0e1117', 'primaryColor': '#1a1d2e', 'primaryTextColor': '#e2e8f0', 'primaryBorderColor': '#2d3148', 'lineColor': '#8892b0', 'secondaryColor': '#252840', 'tertiaryColor': '#1a1d2e', 'fontSize': '14px', 'edgeLabelBackground': '#0e1117'}, 'flowchart': {'nodeSpacing': 30, 'rankSpacing': 40, 'padding': 15, 'htmlLabels': true}}}%%
 graph LR
     DATA["8 stores<br/>4 success, 4 failure"] --> PROPS["p(1) = 0.5<br/>p(0) = 0.5"]
-    PROPS --> GINI["Gini = 1 minus (0.5² plus 0.5²)<br/>= 1 - 0.5<br/>= <b>0.5</b> (max!)"]
-    PROPS --> ENTROPY["Entropy = −(0.5×log₂0.5 plus 0.5×log₂0.5)<br/>= −(0.5×(−1) plus 0.5×(−1))<br/>= <b>1.0</b> (max!)"]
+    PROPS --> GINI["Gini = 1 minus (0.5² + 0.5²)<br/>= 1 - 0.5<br/>= <b>0.5</b> (max!)"]
+    PROPS --> ENTROPY["Entropy = −(0.5×log₂0.5 + 0.5×log₂0.5)<br/>= −(0.5×(−1) + 0.5×(−1))<br/>= <b>1.0</b> (max!)"]
 
     style DATA fill:#252840,stroke:#f5b731,color:#c8cfe0
     style GINI fill:#1a1d2e,stroke:#5eaeff,color:#e2e8f0
@@ -167,7 +167,7 @@ Information Gain is simply: how much did impurity decrease after the split? The 
 graph TD
     FORMULA["Information Gain = Impurity(parent) - Weighted Impurity(children)"]
     FORMULA --> EXAMPLE["For Rating ≤ 3.8:"]
-    EXAMPLE --> CALC["Gain = 0.5 − (4/8×0.0 plus 4/8×0.0)<br/>= 0.5 − 0.0<br/>= <b>0.5</b>"]
+    EXAMPLE --> CALC["Gain = 0.5 − (4/8×0.0 + 4/8×0.0)<br/>= 0.5 − 0.0<br/>= <b>0.5</b>"]
     CALC --> MEANING["Maximum possible gain!<br/>This split perfectly separates the classes."]
 
     style FORMULA fill:#252840,stroke:#f5b731,color:#c8cfe0

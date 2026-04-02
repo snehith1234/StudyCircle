@@ -55,7 +55,7 @@ graph LR
     style OUT fill:#1a2a1f,stroke:#22d3a7,color:#c8d8c0
 ```
 
-Yellow = input words (one per step). Blue = RNN cells (same weights W at every step). The arrows between cells carry the hidden state h — each one accumulates more context. Green = final prediction using the last hidden state. The formula at each step: hₜ = tanh(W_hh × hₜ₋₁ plus W_xh × xₜ plus b).
+Yellow = input words (one per step). Blue = RNN cells (same weights W at every step). The arrows between cells carry the hidden state h — each one accumulates more context. Green = final prediction using the last hidden state. The formula at each step: hₜ = tanh(W_hh × hₜ₋₁ + W_xh × xₜ + b).
 
 ---
 
@@ -93,7 +93,7 @@ graph TD
     LSTM_WAY["LSTM: Cell state highway<br/>Only small modifications via gates<br/>Old info preserved unless erased<br/><i>Like a notebook you can add to or erase from</i>"]
 
     RNN_WAY --> SHORT["Short memory: 10 to 20 steps"]
-    LSTM_WAY --> LONG["Long memory: 100 plus steps"]
+    LSTM_WAY --> LONG["Long memory: 100 + steps"]
 
     style RNN_WAY fill:#2a1a1f,stroke:#f45d6d,color:#d8a8b8
     style LSTM_WAY fill:#1a2a1f,stroke:#22d3a7,color:#c8d8c0
@@ -118,7 +118,7 @@ graph TD
     IG["🚪 Input Gate<br/>iₜ = σ(W_i × input)<br/>What NEW info to WRITE<br/><i>0 = ignore, 1 = store</i>"]
     OG["🚪 Output Gate<br/>oₜ = σ(W_o × input)<br/>What to READ from memory<br/><i>0 = hide, 1 = output</i>"]
 
-    FG --> CELL["📝 Cell State Update<br/>cₜ = fₜ ⊙ cₜ₋₁ plus iₜ ⊙ candidate<br/><i>Erase old, write new</i>"]
+    FG --> CELL["📝 Cell State Update<br/>cₜ = fₜ ⊙ cₜ₋₁ + iₜ ⊙ candidate<br/><i>Erase old, write new</i>"]
     IG --> CELL
     CELL --> HIDDEN["Hidden State<br/>hₜ = oₜ ⊙ tanh(cₜ)<br/><i>Filtered output</i>"]
     OG --> HIDDEN

@@ -36,13 +36,13 @@ Think of gradient boosting as a reliable sedan and XGBoost as a tuned sports car
 
 ## 2. The XGBoost Objective Function
 
-XGBoost's secret sauce: it optimizes prediction accuracy AND model simplicity simultaneously. The diagram shows the two-part objective — the loss function (how well it fits) plus a regularization term (how complex the trees are). The λ and γ parameters control the tradeoff.
+XGBoost's secret sauce: it optimizes prediction accuracy AND model simplicity simultaneously. The diagram shows the two-part objective — the loss function (how well it fits) + a regularization term (how complex the trees are). The λ and γ parameters control the tradeoff.
 
 ```mermaid
 %%{init: {'theme': 'dark', 'themeVariables': {'darkMode': true, 'background': '#0e1117', 'primaryColor': '#1a1d2e', 'primaryTextColor': '#e2e8f0', 'primaryBorderColor': '#2d3148', 'lineColor': '#8892b0', 'secondaryColor': '#252840', 'tertiaryColor': '#1a1d2e', 'fontSize': '14px', 'edgeLabelBackground': '#0e1117'}, 'flowchart': {'nodeSpacing': 30, 'rankSpacing': 40, 'padding': 15, 'htmlLabels': true}}}%%
 graph LR
     OBJ["Objective ="] --> LOSS["Σ Loss(yᵢ, ŷᵢ)<br/><i>How well it fits</i><br/>📊 Accuracy"]
-    OBJ --> REG["Σ(γT plus ½λΣwⱼ²)<br/><i>How complex the trees are</i><br/>🛡️ Simplicity"]
+    OBJ --> REG["Σ(γT + ½λΣwⱼ²)<br/><i>How complex the trees are</i><br/>🛡️ Simplicity"]
 
     LOSS --> MEANING1["Wants: perfect predictions<br/>Pushes toward: complex trees"]
     REG --> MEANING2["Wants: simple trees<br/>γ penalizes num. of leaves<br/>λ penalizes large leaf weights"]
@@ -109,7 +109,7 @@ This is how XGBoost decides where to split. Unlike basic decision trees (which u
 ```mermaid
 %%{init: {'theme': 'dark', 'themeVariables': {'darkMode': true, 'background': '#0e1117', 'primaryColor': '#1a1d2e', 'primaryTextColor': '#e2e8f0', 'primaryBorderColor': '#2d3148', 'lineColor': '#8892b0', 'secondaryColor': '#252840', 'tertiaryColor': '#1a1d2e', 'fontSize': '14px', 'edgeLabelBackground': '#0e1117'}, 'flowchart': {'nodeSpacing': 30, 'rankSpacing': 40, 'padding': 15, 'htmlLabels': true}}}%%
 graph TD
-    FORMULA["Gain = ½ × (G²_L/(H_L plus λ) plus G²_R/(H_R plus λ) − (G_L plus G_R)²/(H_L plus H_R plus λ)) − γ"]
+    FORMULA["Gain = ½ × (G²_L/(H_L + λ) + G²_R/(H_R + λ) − (G_L + G_R)²/(H_L + H_R + λ)) − γ"]
 
     FORMULA --> EXAMPLE["Split: Rating ≤ 3.8"]
 
@@ -124,7 +124,7 @@ graph TD
     end
 
     EXAMPLE --> LEFT & RIGHT
-    LEFT & RIGHT --> CALC["Gain = ½ × (4/2 plus 4/2 − 0/3)<br/>= ½ × (2 plus 2 − 0)<br/>= <b>2.0</b> with λ=1, γ=0"]
+    LEFT & RIGHT --> CALC["Gain = ½ × (4/2 + 4/2 − 0/3)<br/>= ½ × (2 + 2 − 0)<br/>= <b>2.0</b> with λ=1, γ=0"]
 
     style FORMULA fill:#252840,stroke:#f5b731,color:#c8cfe0
     style LEFT fill:#0e1117,stroke:#f45d6d,color:#e2e8f0
@@ -143,7 +143,7 @@ After finding the best split, XGBoost computes the optimal prediction value for 
 ```mermaid
 %%{init: {'theme': 'dark', 'themeVariables': {'darkMode': true, 'background': '#0e1117', 'primaryColor': '#1a1d2e', 'primaryTextColor': '#e2e8f0', 'primaryBorderColor': '#2d3148', 'lineColor': '#8892b0', 'secondaryColor': '#252840', 'tertiaryColor': '#1a1d2e', 'fontSize': '14px', 'edgeLabelBackground': '#0e1117'}, 'flowchart': {'nodeSpacing': 30, 'rankSpacing': 40, 'padding': 15, 'htmlLabels': true}}}%%
 graph TD
-    FORMULA["Optimal leaf weight: w⁎ = −G / (H plus λ)"]
+    FORMULA["Optimal leaf weight: w⁎ = −G / (H + λ)"]
 
     subgraph LAMBDA_EFFECT["Effect of λ (regularization)"]
         L0["λ = 0 (no reg):<br/>w⁎ = −2.0/1.0 = <b>−2.0</b><br/><i>Aggressive, risk overfitting</i>"]
@@ -173,11 +173,11 @@ graph TD
     PRED0["Current predictions<br/>All stores: ŷ = 0, p = 0.5"] --> GRADS["Compute g and h<br/>Success: g=neg0.5, h=0.25<br/>Failure: g=0.5, h=0.25"]
     GRADS --> SPLIT["Find best split<br/>Rating ≤ 3.8<br/>Gain = 2.0"]
     SPLIT --> LEAVES["Compute leaf weights<br/>Left: w = neg1.0<br/>Right: w = 1.0"]
-    LEAVES --> UPDATE["Update: ŷ_new = ŷ_old plus η × w<br/><i>η = 0.3</i>"]
+    LEAVES --> UPDATE["Update: ŷ_new = ŷ_old + η × w<br/><i>η = 0.3</i>"]
 
     subgraph RESULT["Updated Predictions"]
-        R1["Success stores: ŷ = 0 plus 0.3×(1) = <b>0.3</b><br/>p = σ(0.3) = 0.574 (closer to 1 ✅)"]
-        R2["Failure stores: ŷ = 0 plus 0.3×(neg1) = <b>neg0.3</b><br/>p = σ(-0.3) = 0.426 (closer to 0 ✅)"]
+        R1["Success stores: ŷ = 0 + 0.3×(1) = <b>0.3</b><br/>p = σ(0.3) = 0.574 (closer to 1 ✅)"]
+        R2["Failure stores: ŷ = 0 + 0.3×(neg1) = <b>neg0.3</b><br/>p = σ(-0.3) = 0.426 (closer to 0 ✅)"]
     end
 
     UPDATE --> RESULT
@@ -203,9 +203,9 @@ XGBoost has three regularization knobs that work together. The diagram shows wha
 %%{init: {'theme': 'dark', 'themeVariables': {'darkMode': true, 'background': '#0e1117', 'primaryColor': '#1a1d2e', 'primaryTextColor': '#e2e8f0', 'primaryBorderColor': '#2d3148', 'lineColor': '#8892b0', 'secondaryColor': '#252840', 'tertiaryColor': '#1a1d2e', 'fontSize': '14px', 'edgeLabelBackground': '#0e1117'}, 'flowchart': {'nodeSpacing': 30, 'rankSpacing': 40, 'padding': 15, 'htmlLabels': true}}}%%
 graph TD
     subgraph REGS["🛡️ XGBoost Regularization"]
-        LAMBDA["λ (L2 reg)<br/>Shrinks leaf weights<br/>w⁎ = −G/(H plus <b>λ</b>)<br/><i>Prevents extreme predictions</i>"]
+        LAMBDA["λ (L2 reg)<br/>Shrinks leaf weights<br/>w⁎ = −G/(H + <b>λ</b>)<br/><i>Prevents extreme predictions</i>"]
         GAMMA["γ (min split gain)<br/>Minimum gain to split<br/>If gain < γ → don't split<br/><i>Prunes weak branches</i>"]
-        ETA["η (learning rate)<br/>Scales each tree's contribution<br/>ŷ = ŷ plus <b>η</b> × tree<br/><i>Smaller = more trees needed</i>"]
+        ETA["η (learning rate)<br/>Scales each tree's contribution<br/>ŷ = ŷ + <b>η</b> × tree<br/><i>Smaller = more trees needed</i>"]
     end
 
     LAMBDA --> EFFECT["Together they control:<br/>How complex each tree is (λ, γ)<br/>How much each tree contributes (η)"]
@@ -288,9 +288,9 @@ The arrows show the evolutionary path. XGBoost improved on basic gradient boosti
 graph TD
     Q1{"What makes XGBoost<br/>different?"} -->|Answer| A1["2nd-order Taylor expansion<br/>Built-in L1/L2 regularization<br/>Speed optimizations"]
     Q1 -->|Next Q| Q2{"Explain the<br/>objective function?"}
-    Q2 -->|Answer| A2["Loss plus Regularization<br/>γ×T penalizes num. of leaves<br/>½λΣw² penalizes large weights"]
+    Q2 -->|Answer| A2["Loss + Regularization<br/>γ×T penalizes num. of leaves<br/>½λΣw² penalizes large weights"]
     Q2 -->|Next Q| Q3{"What is the<br/>Gain formula?"}
-    Q3 -->|Answer| A3["Gain = ½(G²_L/(H_L plus λ) plus G²_R/(H_R plus λ)<br/>− (G_L plus G_R)²/(H_L plus H_R plus λ)) − γ<br/>Higher gain = better split"]
+    Q3 -->|Answer| A3["Gain = ½(G²_L/(H_L + λ) + G²_R/(H_R + λ)<br/>− (G_L + G_R)²/(H_L + H_R + λ)) − γ<br/>Higher gain = better split"]
     Q3 -->|Next Q| Q4{"XGBoost vs LightGBM<br/>vs CatBoost?"}
     Q4 -->|Answer| A4["XGB: level-wise, most battle-tested<br/>LGBM: leaf-wise, fastest for large data<br/>CatBoost: best for categorical features"]
 
