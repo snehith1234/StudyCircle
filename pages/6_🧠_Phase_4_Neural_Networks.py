@@ -390,211 +390,175 @@ elif tab == "📉 Loss Functions":
 # TAB: Backpropagation
 # ═══════════════════════════════════════
 elif tab == "🔄 Backpropagation":
-    st.markdown("# 🔄 Backpropagation — Step by Step")
-    st.caption("Watch gradients flow forward then backward through actual numbers")
+    st.markdown("# 🔄 Backpropagation — Multi-Layer")
+    st.caption("Watch gradients flow through a 2-layer network with actual numbers")
 
     st.markdown("""<div class="concept-card">
-    We'll trace <b>Store S1 (Rating=4.5, Delivery=20, Actual=1)</b> through a simple network.
-    First the <b>forward pass</b> computes the prediction. Then the <b>backward pass</b> computes
-    how to fix each weight. Every number is computed — nothing is hidden.
+    We trace <b>S1 (Rating=4.5, Delivery=20, Actual=1)</b> through a <b>2-layer network</b>:
+    2 inputs → 1 hidden neuron → 1 output. During <b>forward pass</b>, weights are FIXED.
+    During <b>backprop</b>, we compute gradients for EVERY weight — both output AND hidden layer.
     </div>""", unsafe_allow_html=True)
 
-    # Network setup
-    x1, x2, y_true = 4.5, 20.0, 1.0
-    w1, w2, b = 1.0, -0.05, -2.0
+    x1_v, x2_v, y_t = 4.5, 20.0, 1.0
     eta = st.slider("Learning rate (η)", 0.01, 1.0, 0.1, 0.01)
 
+    wh1, wh2, bh = 0.5, -0.02, -1.0
+    wo, bo = 0.8, -0.1
+
     bp_step = st.radio("Step:", [
-        "1. Forward: Weighted Sum",
-        "2. Forward: Activation",
+        "1. Forward: Hidden Layer",
+        "2. Forward: Output Layer",
         "3. Forward: Loss",
-        "4. Backward: Output Gradient",
-        "5. Backward: Sigmoid Gradient",
-        "6. Backward: Weight Gradients",
-        "7. Update Weights",
-        "8. Full Picture"
+        "4. Backward: Output Gradients",
+        "5. Backward: Hidden Gradients (Chain Rule)",
+        "6. Update ALL Weights",
+        "7. Full Picture"
     ], horizontal=False)
 
-    # Compute everything
-    z = w1 * x1 + w2 * x2 + b
-    a = 1 / (1 + np.exp(-z))
-    loss = -(y_true * np.log(a) + (1 - y_true) * np.log(1 - a))
+    zh = wh1 * x1_v + wh2 * x2_v + bh
+    ah = 1 / (1 + np.exp(-zh))
+    zo = wo * ah + bo
+    ao = 1 / (1 + np.exp(-zo))
+    loss = -(y_t * np.log(ao) + (1 - y_t) * np.log(1 - ao))
 
-    # Backward
-    dL_da = -y_true / a + (1 - y_true) / (1 - a)  # ∂Loss/∂a
-    da_dz = a * (1 - a)                              # ∂a/∂z (sigmoid derivative)
-    dL_dz = dL_da * da_dz                             # ∂Loss/∂z = (a - y)
-    dz_dw1 = x1                                       # ∂z/∂w1
-    dz_dw2 = x2                                       # ∂z/∂w2
-    dz_db = 1.0                                       # ∂z/∂b
-    dL_dw1 = dL_dz * dz_dw1                           # ∂Loss/∂w1
-    dL_dw2 = dL_dz * dz_dw2                           # ∂Loss/∂w2
-    dL_db = dL_dz * dz_db                             # ∂Loss/∂b
+    dL_dzo = ao - y_t
+    dL_dwo = dL_dzo * ah
+    dL_dbo = dL_dzo
+    dzo_dah = wo
+    dL_dah = dL_dzo * dzo_dah
+    dah_dzh = ah * (1 - ah)
+    dL_dzh = dL_dah * dah_dzh
+    dL_dwh1 = dL_dzh * x1_v
+    dL_dwh2 = dL_dzh * x2_v
+    dL_dbh = dL_dzh
 
-    w1_new = w1 - eta * dL_dw1
-    w2_new = w2 - eta * dL_dw2
-    b_new = b - eta * dL_db
+    wo_n = wo - eta * dL_dwo
+    bo_n = bo - eta * dL_dbo
+    wh1_n = wh1 - eta * dL_dwh1
+    wh2_n = wh2 - eta * dL_dwh2
+    bh_n = bh - eta * dL_dbh
 
-    # New prediction after update
-    z_new = w1_new * x1 + w2_new * x2 + b_new
-    a_new = 1 / (1 + np.exp(-z_new))
-    loss_new = -(y_true * np.log(a_new) + (1 - y_true) * np.log(1 - a_new))
+    zh2 = wh1_n * x1_v + wh2_n * x2_v + bh_n
+    ah2 = 1 / (1 + np.exp(-zh2))
+    zo2 = wo_n * ah2 + bo_n
+    ao2 = 1 / (1 + np.exp(-zo2))
+    loss2 = -(y_t * np.log(ao2) + (1 - y_t) * np.log(1 - ao2))
 
-    if bp_step == "1. Forward: Weighted Sum":
-        st.markdown("### ➡️ Step 1: Compute Weighted Sum (z)")
+    if bp_step == "1. Forward: Hidden Layer":
+        st.markdown("### ➡️ Step 1: Data Enters Hidden Layer")
+        st.markdown("""<div class="concept-card">
+        <b>Weights are FIXED during forward pass.</b> They don't change — data just flows through.
+        </div>""", unsafe_allow_html=True)
         st.markdown(f"""<div class="math-box">
-        <b>z = w₁ × x₁ + w₂ × x₂ + b</b><br><br>
-        z = {w1:.1f} × {x1:.1f} + ({w2:.2f}) × {x2:.0f} + ({b:.1f})<br>
-        z = {w1*x1:.2f} + ({w2*x2:.2f}) + ({b:.1f})<br>
-        <b>z = {z:.4f}</b>
+        <b>z_h = w_h1 × x₁ + w_h2 × x₂ + b_h</b><br>
+        = {wh1} × {x1_v} + ({wh2}) × {x2_v} + ({bh})<br>
+        = {wh1*x1_v:.2f} + ({wh2*x2_v:.2f}) + ({bh})<br>
+        <b>z_h = {zh:.4f}</b><br><br>
+        a_h = σ({zh:.4f}) = <b>{ah:.6f}</b>
         </div>""", unsafe_allow_html=True)
-        st.markdown("""<div class="insight-box">
-        The weighted sum z combines all inputs. Positive z → sigmoid will output > 0.5.
-        Negative z → sigmoid will output < 0.5. z = 0 → exactly 0.5 (coin flip).
+        st.markdown(f"""<div class="insight-box">
+        The hidden neuron outputs {ah:.4f}. This intermediate value feeds into the output layer.
         </div>""", unsafe_allow_html=True)
 
-    elif bp_step == "2. Forward: Activation":
-        st.markdown("### ➡️ Step 2: Apply Sigmoid Activation")
+    elif bp_step == "2. Forward: Output Layer":
+        st.markdown("### ➡️ Step 2: Hidden → Output")
         st.markdown(f"""<div class="math-box">
-        <b>ŷ = σ(z) = 1 / (1 + e⁻ᶻ)</b><br><br>
-        ŷ = 1 / (1 + e^(-{z:.4f}))<br>
-        ŷ = 1 / (1 + {np.exp(-z):.4f})<br>
-        ŷ = 1 / {1 + np.exp(-z):.4f}<br>
-        <b>ŷ = {a:.6f} = {a*100:.2f}%</b>
+        <b>z_o = w_o × a_h + b_o</b><br>
+        = {wo} × {ah:.6f} + ({bo}) = <b>{zo:.6f}</b><br><br>
+        ŷ = σ({zo:.6f}) = <b>{ao:.6f}</b> = {ao*100:.2f}%
         </div>""", unsafe_allow_html=True)
-        if a >= 0.5:
-            st.success(f"Prediction: ✅ Successful ({a*100:.2f}%) — Actual: 1 (Successful)")
+        if ao >= 0.5:
+            st.success(f"Prediction: ✅ {ao*100:.2f}% — Actual: 1")
         else:
-            st.error(f"Prediction: ❌ Not Successful ({a*100:.2f}%) — Actual: 1 (Successful)")
+            st.error(f"Prediction: ❌ {ao*100:.2f}% — Actual: 1")
 
     elif bp_step == "3. Forward: Loss":
-        st.markdown("### ➡️ Step 3: Compute Loss (How Wrong?)")
+        st.markdown("### ➡️ Step 3: Compute Loss")
         st.markdown(f"""<div class="math-box">
-        <b>Loss = −[y × log(ŷ) + (1−y) × log(1−ŷ)]</b><br><br>
-        Since y = 1 (actual is Successful):<br>
-        Loss = −[1 × log({a:.6f}) + 0 × log({1-a:.6f})]<br>
-        Loss = −log({a:.6f})<br>
-        <b>Loss = {loss:.6f}</b>
+        Loss = −log({ao:.6f}) = <b>{loss:.6f}</b>
         </div>""", unsafe_allow_html=True)
         st.markdown(f"""<div class="insight-box">
-        A perfect prediction (ŷ=1.0) would give Loss = 0.<br>
-        Our prediction ŷ={a:.4f} gives Loss = {loss:.4f}.<br>
-        The model needs to push ŷ closer to 1.0 — that's what backprop will do.
+        Now backprop adjusts ALL 5 weights (w_h1, w_h2, b_h, w_o, b_o) to reduce this loss.
         </div>""", unsafe_allow_html=True)
 
-    elif bp_step == "4. Backward: Output Gradient":
-        st.markdown("### ⬅️ Step 4: Gradient of Loss w.r.t. Prediction (∂Loss/∂ŷ)")
+    elif bp_step == "4. Backward: Output Gradients":
+        st.markdown("### ⬅️ Step 4: Output Layer Gradients")
         st.markdown(f"""<div class="math-box">
-        <b>∂Loss/∂ŷ = −y/ŷ + (1−y)/(1−ŷ)</b><br><br>
-        Since y = 1:<br>
-        ∂Loss/∂ŷ = −1/{a:.6f} + 0/(1−{a:.6f})<br>
-        <b>∂Loss/∂ŷ = {dL_da:.6f}</b>
+        <b>∂Loss/∂z_o = ŷ − y = {ao:.6f} − 1 = {dL_dzo:.6f}</b><br><br>
+        <b>∂Loss/∂w_o</b> = (ŷ − y) × a_h = {dL_dzo:.6f} × {ah:.6f} = <b>{dL_dwo:.6f}</b><br>
+        <b>∂Loss/∂b_o</b> = (ŷ − y) = <b>{dL_dbo:.6f}</b>
         </div>""", unsafe_allow_html=True)
-        st.markdown(f"""<div class="insight-box">
-        This is <b>negative</b> ({dL_da:.4f}) because the actual is 1 but prediction is {a:.4f} (too low).
-        A negative gradient means: "increase the prediction to reduce the loss."
+        st.markdown("""<div class="insight-box">
+        Output gradients are straightforward. But the hidden layer doesn't see the loss directly...
         </div>""", unsafe_allow_html=True)
 
-    elif bp_step == "5. Backward: Sigmoid Gradient":
-        st.markdown("### ⬅️ Step 5: Gradient Through Sigmoid (∂ŷ/∂z)")
+    elif bp_step == "5. Backward: Hidden Gradients (Chain Rule)":
+        st.markdown("### ⬅️ Step 5: Hidden Layer Gradients via Chain Rule")
+        st.markdown("""<div class="concept-card">
+        The hidden layer doesn't connect to the loss directly. Its gradient must flow
+        <b>backward through the output layer</b>. This is the "back" in backpropagation.
+        </div>""", unsafe_allow_html=True)
+
         st.markdown(f"""<div class="math-box">
-        <b>∂ŷ/∂z = σ(z) × (1 − σ(z)) = ŷ × (1 − ŷ)</b><br><br>
-        ∂ŷ/∂z = {a:.6f} × (1 − {a:.6f})<br>
-        ∂ŷ/∂z = {a:.6f} × {1-a:.6f}<br>
-        <b>∂ŷ/∂z = {da_dz:.6f}</b><br><br>
-        <b>Combined: ∂Loss/∂z = ∂Loss/∂ŷ × ∂ŷ/∂z</b><br>
-        ∂Loss/∂z = {dL_da:.6f} × {da_dz:.6f}<br>
-        <b>∂Loss/∂z = {dL_dz:.6f}</b><br><br>
-        <i>Shortcut: ∂Loss/∂z = ŷ − y = {a:.6f} − {y_true:.0f} = {a - y_true:.6f} ✓</i>
+        <b>5a. Error signal reaches hidden layer:</b><br>
+        ∂Loss/∂a_h = (ŷ − y) × w_o = {dL_dzo:.6f} × {wo} = <b>{dL_dah:.6f}</b><br>
+        <i>The output weight w_o={wo} scales how much error the hidden neuron "feels"</i><br><br>
+        <b>5b. Pass through hidden sigmoid:</b><br>
+        σ'(z_h) = a_h × (1 − a_h) = {ah:.6f} × {1-ah:.6f} = <b>{dah_dzh:.6f}</b><br>
+        ∂Loss/∂z_h = {dL_dah:.6f} × {dah_dzh:.6f} = <b>{dL_dzh:.6f}</b><br>
+        <i>Sigmoid derivative ({dah_dzh:.4f}) shrinks the gradient — vanishing gradient!</i><br><br>
+        <b>5c. Hidden weight gradients:</b><br>
+        ∂Loss/∂w_h1 = {dL_dzh:.6f} × {x1_v} = <b>{dL_dwh1:.6f}</b><br>
+        ∂Loss/∂w_h2 = {dL_dzh:.6f} × {x2_v} = <b>{dL_dwh2:.6f}</b><br>
+        ∂Loss/∂b_h = <b>{dL_dbh:.6f}</b>
         </div>""", unsafe_allow_html=True)
-        st.markdown(f"""<div class="insight-box">
-        The sigmoid gradient is {da_dz:.4f} — notice it's less than 0.25 (the maximum).
-        This is why sigmoid causes vanishing gradients: each layer multiplies by a number ≤ 0.25.
-        <br><br>The shortcut (ŷ − y) works because log loss and sigmoid are mathematically paired.
-        </div>""", unsafe_allow_html=True)
-
-    elif bp_step == "6. Backward: Weight Gradients":
-        st.markdown("### ⬅️ Step 6: Gradient for Each Weight")
-        st.markdown(f"""<div class="math-box">
-        <b>∂Loss/∂w₁ = ∂Loss/∂z × ∂z/∂w₁ = (ŷ − y) × x₁</b><br>
-        ∂Loss/∂w₁ = {dL_dz:.6f} × {x1:.1f} = <b>{dL_dw1:.6f}</b><br><br>
-        <b>∂Loss/∂w₂ = ∂Loss/∂z × ∂z/∂w₂ = (ŷ − y) × x₂</b><br>
-        ∂Loss/∂w₂ = {dL_dz:.6f} × {x2:.0f} = <b>{dL_dw2:.6f}</b><br><br>
-        <b>∂Loss/∂b = ∂Loss/∂z × ∂z/∂b = (ŷ − y) × 1</b><br>
-        ∂Loss/∂b = {dL_dz:.6f} × 1 = <b>{dL_db:.6f}</b>
-        </div>""", unsafe_allow_html=True)
-        st.markdown(f"""<div class="insight-box">
-        All gradients are <b>negative</b> because the prediction ({a:.4f}) is below the target (1.0).<br>
-        Negative gradient → weights should <b>increase</b> (move opposite to gradient).<br><br>
-        w₂'s gradient ({dL_dw2:.4f}) is larger in magnitude than w₁'s ({dL_dw1:.4f})
-        because x₂ (Delivery={x2:.0f}) is numerically larger than x₁ (Rating={x1:.1f}).
-        </div>""", unsafe_allow_html=True)
-
-    elif bp_step == "7. Update Weights":
-        st.markdown("### 🔧 Step 7: Update Weights")
-        st.markdown(f"""<div class="math-box">
-        <b>Update rule: w_new = w_old − η × gradient</b><br><br>
-        w₁: {w1:.4f} − {eta:.3f} × ({dL_dw1:.6f}) = {w1:.4f} − ({eta * dL_dw1:.6f}) = <b>{w1_new:.6f}</b><br>
-        w₂: {w2:.4f} − {eta:.3f} × ({dL_dw2:.6f}) = {w2:.4f} − ({eta * dL_dw2:.6f}) = <b>{w2_new:.6f}</b><br>
-        b:  {b:.4f} − {eta:.3f} × ({dL_db:.6f}) = {b:.4f} − ({eta * dL_db:.6f}) = <b>{b_new:.6f}</b>
-        </div>""", unsafe_allow_html=True)
-
-        col1, col2, col3 = st.columns(3)
-        col1.metric("w₁ (Rating)", f"{w1_new:.4f}", f"{w1_new - w1:+.4f}")
-        col2.metric("w₂ (Delivery)", f"{w2_new:.4f}", f"{w2_new - w2:+.4f}")
-        col3.metric("b (Bias)", f"{b_new:.4f}", f"{b_new - b:+.4f}")
 
         st.markdown(f"""<div class="insight-box">
-        All weights <b>increased</b> (moved opposite to negative gradient) to push the prediction higher.<br>
-        w₁ increased by {w1_new - w1:+.4f} → higher rating will now contribute more to success.<br>
-        w₂ increased by {w2_new - w2:+.4f} → delivery penalty is now slightly less harsh.
+        Hidden gradient ({abs(dL_dwh1):.6f}) is much smaller than output gradient ({abs(dL_dwo):.6f})
+        because it passed through sigmoid derivative ({dah_dzh:.4f}). With 10 layers, this shrinks to near zero.
         </div>""", unsafe_allow_html=True)
 
-    else:  # Full Picture
-        st.markdown("### 📊 Full Picture: Before vs After One Update")
-
+    elif bp_step == "6. Update ALL Weights":
+        st.markdown("### 🔧 Step 6: Update Every Weight")
         col1, col2 = st.columns(2)
         with col1:
-            st.markdown(f"""<div class="math-box">
-            <b>BEFORE (Forward Pass)</b><br>
-            Weights: w₁={w1:.2f}, w₂={w2:.2f}, b={b:.1f}<br>
-            z = {z:.4f}<br>
-            ŷ = σ(z) = {a:.4f} ({a*100:.1f}%)<br>
-            Loss = {loss:.4f}
-            </div>""", unsafe_allow_html=True)
+            st.markdown("**Output Layer**")
+            st.metric("w_o", f"{wo_n:.4f}", f"{wo_n - wo:+.4f}")
+            st.metric("b_o", f"{bo_n:.4f}", f"{bo_n - bo:+.4f}")
         with col2:
-            st.markdown(f"""<div class="insight-box">
-            <b>AFTER (One Gradient Step)</b><br>
-            Weights: w₁={w1_new:.4f}, w₂={w2_new:.4f}, b={b_new:.4f}<br>
-            z = {z_new:.4f}<br>
-            ŷ = σ(z) = {a_new:.4f} ({a_new*100:.1f}%)<br>
-            Loss = {loss_new:.4f}
-            </div>""", unsafe_allow_html=True)
+            st.markdown("**Hidden Layer**")
+            st.metric("w_h1 (Rating)", f"{wh1_n:.4f}", f"{wh1_n - wh1:+.4f}")
+            st.metric("w_h2 (Delivery)", f"{wh2_n:.4f}", f"{wh2_n - wh2:+.4f}")
+            st.metric("b_h", f"{bh_n:.4f}", f"{bh_n - bh:+.4f}")
 
-        col_a, col_b, col_c = st.columns(3)
-        col_a.metric("Prediction", f"{a_new*100:.1f}%", f"{(a_new - a)*100:+.1f}%")
-        col_b.metric("Loss", f"{loss_new:.4f}", f"{loss_new - loss:+.4f}")
-        col_c.metric("Closer to target?", "Yes ✅" if a_new > a else "No ❌")
-
-        st.markdown("### Gradient Flow Visualization")
-        stages = ['∂Loss/∂ŷ', '× ∂ŷ/∂z', '= ∂Loss/∂z', '× x₁ = ∂L/∂w₁', '× x₂ = ∂L/∂w₂']
-        values = [abs(dL_da), da_dz, abs(dL_dz), abs(dL_dw1), abs(dL_dw2)]
-        colors = ['#f45d6d', '#f5b731', '#5eaeff', '#22d3a7', '#7c6aff']
-
-        fig = go.Figure()
-        fig.add_trace(go.Bar(x=stages, y=values, marker_color=colors,
-                             text=[f"{v:.4f}" for v in values], textposition='outside',
-                             textfont=dict(color='#e2e8f0')))
-        fig.update_layout(**DL, title="Gradient Magnitude at Each Stage", yaxis_title="Gradient magnitude", height=350)
-        st.plotly_chart(fig, use_container_width=True)
-
-        st.markdown(f"""<div class="concept-card">
-        <b>The story in one sentence:</b> The prediction was {a:.4f} but should be 1.0.
-        The error ({a - y_true:.4f}) flows backward through the sigmoid (×{da_dz:.4f}),
-        then splits to each weight (×{x1:.1f} for w₁, ×{x2:.0f} for w₂).
-        Each weight moves opposite to its gradient by η={eta:.3f}, pushing the prediction from {a*100:.1f}% to {a_new*100:.1f}%.
-        Repeat this 1000 times and the network converges.
+        st.markdown(f"""<div class="insight-box">
+        Output weights changed more ({wo_n - wo:+.4f}) than hidden weights ({wh1_n - wh1:+.6f})
+        — the vanishing gradient in action.
         </div>""", unsafe_allow_html=True)
+
+    else:
+        st.markdown("### 📊 Before vs After")
+        col1, col2 = st.columns(2)
+        with col1:
+            st.markdown(f"""<div class="math-box"><b>BEFORE</b><br>
+            Prediction: {ao*100:.2f}% | Loss: {loss:.4f}</div>""", unsafe_allow_html=True)
+        with col2:
+            st.markdown(f"""<div class="insight-box"><b>AFTER</b><br>
+            Prediction: {ao2*100:.2f}% | Loss: {loss2:.4f}</div>""", unsafe_allow_html=True)
+
+        col_a, col_b = st.columns(2)
+        col_a.metric("Prediction", f"{ao2*100:.1f}%", f"{(ao2 - ao)*100:+.1f}%")
+        col_b.metric("Loss", f"{loss2:.4f}", f"{loss_new - loss:+.4f}" if 'loss_new' in dir() else f"{loss2 - loss:+.4f}")
+
+        labels = ['∂L/∂w_o', '∂L/∂b_o', '∂L/∂w_h1', '∂L/∂w_h2', '∂L/∂b_h']
+        grads = [abs(dL_dwo), abs(dL_dbo), abs(dL_dwh1), abs(dL_dwh2), abs(dL_dbh)]
+        colors = ['#22d3a7', '#22d3a7', '#f5b731', '#f5b731', '#f5b731']
+        fig = go.Figure()
+        fig.add_trace(go.Bar(x=labels, y=grads, marker_color=colors,
+                             text=[f"{g:.5f}" for g in grads], textposition='outside',
+                             textfont=dict(color='#e2e8f0')))
+        fig.update_layout(**DL, title="Output (green) vs Hidden (yellow) gradients", height=350)
+        st.plotly_chart(fig, use_container_width=True)
 
 
 # ═══════════════════════════════════════
