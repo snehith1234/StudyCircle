@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Phase 2 — Data Science Core Visual Explainer</title>
+<style>
+  :root{--bg:#0e1117;--surface:#161b22;--surface2:#1a1d2e;--border:#2d3148;--text:#e2e8f0;--dim:#8892b0;--green:#22d3a7;--blue:#5eaeff;--purple:#7c6aff;--yellow:#f5b731;--red:#f45d6d;--orange:#ff9f43}
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.7;padding:2rem;max-width:1100px;margin:0 auto}
+  h1{font-size:2.4rem;color:var(--green);margin-bottom:.3rem}
+  .sub{color:var(--dim);font-size:1.1rem;margin-bottom:2.5rem}
+  h2{font-size:1.6rem;color:var(--blue);margin-top:3rem;margin-bottom:1rem;padding-bottom:.4rem;border-bottom:1px solid var(--border)}
+  h3{font-size:1.15rem;color:var(--purple);margin-top:1.8rem;margin-bottom:.6rem}
+  p,li{margin-bottom:.8rem}ul{padding-left:1.4rem}
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.6rem;margin:1.2rem 0}
+  .cg{border-left:4px solid var(--green)}.cb{border-left:4px solid var(--blue)}.cy{border-left:4px solid var(--yellow)}.cr{border-left:4px solid var(--red)}.cp{border-left:4px solid var(--purple)}
+  code{background:var(--surface2);padding:2px 6px;border-radius:4px;font-family:'Fira Code',monospace;font-size:.9em;color:var(--yellow)}
+  .formula{text-align:center;font-size:1.1rem;color:var(--yellow);padding:.8rem;background:var(--surface2);border-radius:8px;margin:1rem 0;font-family:'Fira Code',monospace}
+  .sc{display:flex;justify-content:center;margin:1.5rem 0;overflow-x:auto}
+  svg text{font-family:'Segoe UI',system-ui,sans-serif}
+  .toc{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.4rem 1.8rem;margin-bottom:2rem}
+  .toc ol{padding-left:1.2rem}.toc li{margin-bottom:.3rem}.toc a{color:var(--blue);text-decoration:none}.toc a:hover{text-decoration:underline}
+  table{width:100%;border-collapse:collapse;font-size:.9rem}th{text-align:left;padding:.5rem;color:var(--blue);border-bottom:1px solid var(--border)}td{padding:.4rem .5rem}
+  @media(max-width:700px){body{padding:1rem}h1{font-size:1.8rem}}
+</style>
+</head>
+<body>
+<h1>📊 Phase 2 — Data Science Core</h1>
+<p class="sub">Data lifecycle, cleaning, feature engineering, and exploratory data analysis — visual reference.</p>
+
+<nav class="toc">
+  <strong style="color:var(--green)">Contents</strong>
+  <ol>
+    <li><a href="#lifecycle">Data Science Lifecycle</a></li>
+    <li><a href="#cleaning">Data Cleaning</a></li>
+    <li><a href="#features">Feature Engineering</a></li>
+    <li><a href="#eda">Exploratory Data Analysis</a></li>
+  </ol>
+</nav>
+
+<!-- ===== SECTION 1: LIFECYCLE ===== -->
+<h2 id="lifecycle">1. Data Science Lifecycle</h2>
+
+<div class="sc">
+<svg width="820" height="200" viewBox="0 0 820 200" xmlns="http://www.w3.org/2000/svg">
+  <rect width="820" height="200" rx="12" fill="#161b22"/>
+  <defs><marker id="la" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#5eaeff"/></marker></defs>
+
+  <rect x="20" y="60" width="110" height="60" rx="8" fill="#1a1d2e" stroke="#7c6aff" stroke-width="2"/>
+  <text x="75" y="85" text-anchor="middle" fill="#7c6aff" font-size="11" font-weight="600">1. Collect</text>
+  <text x="75" y="102" text-anchor="middle" fill="#8892b0" font-size="10">APIs, DBs, CSVs</text>
+  <line x1="130" y1="90" x2="155" y2="90" stroke="#5eaeff" stroke-width="1.5" marker-end="url(#la)"/>
+
+  <rect x="160" y="60" width="110" height="60" rx="8" fill="#1a1d2e" stroke="#5eaeff" stroke-width="2"/>
+  <text x="215" y="85" text-anchor="middle" fill="#5eaeff" font-size="11" font-weight="600">2. Clean</text>
+  <text x="215" y="102" text-anchor="middle" fill="#8892b0" font-size="10">Missing, dupes, types</text>
+  <line x1="270" y1="90" x2="295" y2="90" stroke="#5eaeff" stroke-width="1.5" marker-end="url(#la)"/>
+
+  <rect x="300" y="60" width="110" height="60" rx="8" fill="#1a1d2e" stroke="#f5b731" stroke-width="2"/>
+  <text x="355" y="85" text-anchor="middle" fill="#f5b731" font-size="11" font-weight="600">3. Explore</text>
+  <text x="355" y="102" text-anchor="middle" fill="#8892b0" font-size="10">EDA, visualize</text>
+  <line x1="410" y1="90" x2="435" y2="90" stroke="#5eaeff" stroke-width="1.5" marker-end="url(#la)"/>
+
+  <rect x="440" y="60" width="110" height="60" rx="8" fill="#1a1d2e" stroke="#22d3a7" stroke-width="2"/>
+  <text x="495" y="85" text-anchor="middle" fill="#22d3a7" font-size="11" font-weight="600">4. Engineer</text>
+  <text x="495" y="102" text-anchor="middle" fill="#8892b0" font-size="10">Features, encode</text>
+  <line x1="550" y1="90" x2="575" y2="90" stroke="#5eaeff" stroke-width="1.5" marker-end="url(#la)"/>
+
+  <rect x="580" y="60" width="110" height="60" rx="8" fill="#1a1d2e" stroke="#f45d6d" stroke-width="2"/>
+  <text x="635" y="85" text-anchor="middle" fill="#f45d6d" font-size="11" font-weight="600">5. Model</text>
+  <text x="635" y="102" text-anchor="middle" fill="#8892b0" font-size="10">Train, evaluate</text>
+  <line x1="690" y1="90" x2="715" y2="90" stroke="#5eaeff" stroke-width="1.5" marker-end="url(#la)"/>
+
+  <rect x="720" y="60" width="80" height="60" rx="8" fill="#1a1d2e" stroke="#ff9f43" stroke-width="2"/>
+  <text x="760" y="85" text-anchor="middle" fill="#ff9f43" font-size="11" font-weight="600">6. Deploy</text>
+  <text x="760" y="102" text-anchor="middle" fill="#8892b0" font-size="10">Serve, monitor</text>
+
+  <!-- Loop arrow -->
+  <path d="M760,125 L760,160 L75,160 L75,125" fill="none" stroke="#8892b0" stroke-width="1" stroke-dasharray="5,4" marker-end="url(#la)"/>
+  <text x="410" y="178" text-anchor="middle" fill="#8892b0" font-size="10" font-style="italic">Iterate — real projects loop back constantly</text>
+</svg>
+</div>
+
+<div class="card cy">
+  <strong style="color:var(--yellow)">Reality check</strong>
+  <p>Data scientists spend ~80% of their time on steps 2–4 (cleaning, exploring, engineering). The modeling step is often the smallest part. Good data prep matters more than a fancy algorithm.</p>
+</div>
+
+<!-- ===== SECTION 2: DATA CLEANING ===== -->
+<h2 id="cleaning">2. Data Cleaning</h2>
+
+<div class="sc">
+<svg width="820" height="340" viewBox="0 0 820 340" xmlns="http://www.w3.org/2000/svg">
+  <rect width="820" height="340" rx="12" fill="#161b22"/>
+  <text x="410" y="28" text-anchor="middle" fill="#e2e8f0" font-size="14" font-weight="600">Data Cleaning Checklist</text>
+
+  <!-- Missing Values -->
+  <rect x="30" y="50" width="240" height="260" rx="10" fill="#1a1d2e" stroke="#f45d6d" stroke-width="2"/>
+  <text x="150" y="78" text-anchor="middle" fill="#f45d6d" font-size="13" font-weight="600">Missing Values</text>
+  <text x="50" y="105" fill="#e2e8f0" font-size="11" font-weight="600">Detect:</text>
+  <text x="50" y="125" fill="#8892b0" font-size="11">df.isnull().sum()</text>
+  <text x="50" y="150" fill="#e2e8f0" font-size="11" font-weight="600">Strategies:</text>
+  <text x="50" y="170" fill="#c8d8c0" font-size="11">• Drop rows (if &lt;5% missing)</text>
+  <text x="50" y="190" fill="#c8d8c0" font-size="11">• Fill with mean/median</text>
+  <text x="50" y="210" fill="#c8d8c0" font-size="11">• Fill with mode (categorical)</text>
+  <text x="50" y="230" fill="#c8d8c0" font-size="11">• Forward/backward fill (time)</text>
+  <text x="50" y="255" fill="#f5b731" font-size="11" font-weight="600">Rule of thumb:</text>
+  <text x="50" y="275" fill="#8892b0" font-size="11">Mean → symmetric data</text>
+  <text x="50" y="295" fill="#8892b0" font-size="11">Median → skewed data</text>
+
+  <!-- Duplicates & Types -->
+  <rect x="290" y="50" width="240" height="260" rx="10" fill="#1a1d2e" stroke="#5eaeff" stroke-width="2"/>
+  <text x="410" y="78" text-anchor="middle" fill="#5eaeff" font-size="13" font-weight="600">Duplicates &amp; Types</text>
+  <text x="310" y="105" fill="#e2e8f0" font-size="11" font-weight="600">Duplicates:</text>
+  <text x="310" y="125" fill="#8892b0" font-size="11">df.duplicated().sum()</text>
+  <text x="310" y="145" fill="#8892b0" font-size="11">df.drop_duplicates()</text>
+  <text x="310" y="175" fill="#e2e8f0" font-size="11" font-weight="600">Data Types:</text>
+  <text x="310" y="195" fill="#c8d8c0" font-size="11">• int64, float64 → numeric</text>
+  <text x="310" y="215" fill="#c8d8c0" font-size="11">• object → usually strings</text>
+  <text x="310" y="235" fill="#c8d8c0" font-size="11">• datetime64 → dates</text>
+  <text x="310" y="255" fill="#c8d8c0" font-size="11">• category → low-cardinality</text>
+  <text x="310" y="280" fill="#f5b731" font-size="11">df.dtypes, df.info()</text>
+
+  <!-- Outliers -->
+  <rect x="550" y="50" width="240" height="260" rx="10" fill="#1a1d2e" stroke="#f5b731" stroke-width="2"/>
+  <text x="670" y="78" text-anchor="middle" fill="#f5b731" font-size="13" font-weight="600">Outlier Handling</text>
+  <text x="570" y="105" fill="#e2e8f0" font-size="11" font-weight="600">Detection:</text>
+  <text x="570" y="125" fill="#c8cfe0" font-size="11">• IQR method (1.5×IQR)</text>
+  <text x="570" y="145" fill="#c8cfe0" font-size="11">• Z-score (|z| &gt; 3)</text>
+  <text x="570" y="165" fill="#c8cfe0" font-size="11">• Visual: box plots</text>
+  <text x="570" y="195" fill="#e2e8f0" font-size="11" font-weight="600">Treatment:</text>
+  <text x="570" y="215" fill="#c8d8c0" font-size="11">• Remove (if errors)</text>
+  <text x="570" y="235" fill="#c8d8c0" font-size="11">• Cap/floor (winsorize)</text>
+  <text x="570" y="255" fill="#c8d8c0" font-size="11">• Transform (log, sqrt)</text>
+  <text x="570" y="280" fill="#f45d6d" font-size="11">Don't blindly remove!</text>
+  <text x="570" y="298" fill="#8892b0" font-size="11">Outliers may be real signal</text>
+</svg>
+</div>
+
+<!-- ===== SECTION 3: FEATURE ENGINEERING ===== -->
+<h2 id="features">3. Feature Engineering</h2>
+
+<div class="sc">
+<svg width="820" height="320" viewBox="0 0 820 320" xmlns="http://www.w3.org/2000/svg">
+  <rect width="820" height="320" rx="12" fill="#161b22"/>
+  <text x="410" y="28" text-anchor="middle" fill="#e2e8f0" font-size="14" font-weight="600">Feature Engineering Techniques</text>
+
+  <!-- Encoding -->
+  <rect x="30" y="50" width="245" height="240" rx="10" fill="#1a1d2e" stroke="#7c6aff" stroke-width="2"/>
+  <text x="152" y="78" text-anchor="middle" fill="#7c6aff" font-size="13" font-weight="600">Encoding Categorical Data</text>
+  <text x="50" y="108" fill="#22d3a7" font-size="12" font-weight="600">Label Encoding</text>
+  <text x="50" y="128" fill="#8892b0" font-size="11">Red→0, Blue→1, Green→2</text>
+  <text x="50" y="148" fill="#8892b0" font-size="11">Use for ordinal categories</text>
+  <text x="50" y="178" fill="#5eaeff" font-size="12" font-weight="600">One-Hot Encoding</text>
+  <text x="50" y="198" fill="#8892b0" font-size="11">Red→[1,0,0] Blue→[0,1,0]</text>
+  <text x="50" y="218" fill="#8892b0" font-size="11">Use for nominal categories</text>
+  <text x="50" y="248" fill="#f5b731" font-size="12" font-weight="600">Target Encoding</text>
+  <text x="50" y="268" fill="#8892b0" font-size="11">Replace with mean of target</text>
+  <text x="50" y="288" fill="#f45d6d" font-size="11">Risk of data leakage!</text>
+
+  <!-- Scaling -->
+  <rect x="290" y="50" width="245" height="240" rx="10" fill="#1a1d2e" stroke="#22d3a7" stroke-width="2"/>
+  <text x="412" y="78" text-anchor="middle" fill="#22d3a7" font-size="13" font-weight="600">Scaling / Normalization</text>
+  <text x="310" y="108" fill="#5eaeff" font-size="12" font-weight="600">StandardScaler</text>
+  <text x="310" y="128" fill="#f5b731" font-size="11" font-family="'Fira Code',monospace">z = (x − μ) / σ</text>
+  <text x="310" y="148" fill="#8892b0" font-size="11">Mean=0, Std=1. Default choice.</text>
+  <text x="310" y="178" fill="#5eaeff" font-size="12" font-weight="600">MinMaxScaler</text>
+  <text x="310" y="198" fill="#f5b731" font-size="11" font-family="'Fira Code',monospace">x' = (x−min)/(max−min)</text>
+  <text x="310" y="218" fill="#8892b0" font-size="11">Range [0,1]. For neural nets.</text>
+  <text x="310" y="248" fill="#5eaeff" font-size="12" font-weight="600">RobustScaler</text>
+  <text x="310" y="268" fill="#f5b731" font-size="11" font-family="'Fira Code',monospace">x' = (x−median)/IQR</text>
+  <text x="310" y="288" fill="#8892b0" font-size="11">Robust to outliers.</text>
+
+  <!-- New Features -->
+  <rect x="550" y="50" width="240" height="240" rx="10" fill="#1a1d2e" stroke="#f5b731" stroke-width="2"/>
+  <text x="670" y="78" text-anchor="middle" fill="#f5b731" font-size="13" font-weight="600">Creating New Features</text>
+  <text x="570" y="108" fill="#c8cfe0" font-size="11">• Ratios: revenue / employees</text>
+  <text x="570" y="130" fill="#c8cfe0" font-size="11">• Bins: age → age_group</text>
+  <text x="570" y="152" fill="#c8cfe0" font-size="11">• Date parts: month, day_of_week</text>
+  <text x="570" y="174" fill="#c8cfe0" font-size="11">• Interactions: feature₁ × feature₂</text>
+  <text x="570" y="196" fill="#c8cfe0" font-size="11">• Polynomial: x, x², x³</text>
+  <text x="570" y="218" fill="#c8cfe0" font-size="11">• Log transform: log(1+x)</text>
+  <text x="570" y="248" fill="#22d3a7" font-size="11" font-weight="600">Domain knowledge wins.</text>
+  <text x="570" y="268" fill="#8892b0" font-size="11">The best features come from</text>
+  <text x="570" y="288" fill="#8892b0" font-size="11">understanding the problem.</text>
+</svg>
+</div>
+
+<div class="card cr">
+  <strong style="color:var(--red)">Data Leakage Warning</strong>
+  <p>Always fit scalers/encoders on training data only, then transform both train and test. Fitting on the full dataset leaks test information into training — your metrics will be overly optimistic and the model will fail in production.</p>
+</div>
+
+<!-- ===== SECTION 4: EDA ===== -->
+<h2 id="eda">4. Exploratory Data Analysis</h2>
+
+<div class="sc">
+<svg width="820" height="300" viewBox="0 0 820 300" xmlns="http://www.w3.org/2000/svg">
+  <rect width="820" height="300" rx="12" fill="#161b22"/>
+  <text x="410" y="28" text-anchor="middle" fill="#e2e8f0" font-size="14" font-weight="600">EDA — Choosing the Right Visualization</text>
+
+  <!-- Distribution -->
+  <rect x="30" y="50" width="180" height="110" rx="10" fill="#1a1d2e" stroke="#22d3a7" stroke-width="2"/>
+  <text x="120" y="75" text-anchor="middle" fill="#22d3a7" font-size="12" font-weight="600">Distribution</text>
+  <text x="50" y="98" fill="#c8d8c0" font-size="11">• Histogram</text>
+  <text x="50" y="116" fill="#c8d8c0" font-size="11">• KDE plot</text>
+  <text x="50" y="134" fill="#c8d8c0" font-size="11">• Box plot</text>
+  <text x="50" y="152" fill="#8892b0" font-size="10">"What does this feature look like?"</text>
+
+  <!-- Relationship -->
+  <rect x="225" y="50" width="180" height="110" rx="10" fill="#1a1d2e" stroke="#5eaeff" stroke-width="2"/>
+  <text x="315" y="75" text-anchor="middle" fill="#5eaeff" font-size="12" font-weight="600">Relationship</text>
+  <text x="245" y="98" fill="#e2e8f0" font-size="11">• Scatter plot</text>
+  <text x="245" y="116" fill="#e2e8f0" font-size="11">• Pair plot</text>
+  <text x="245" y="134" fill="#e2e8f0" font-size="11">• Correlation heatmap</text>
+  <text x="245" y="152" fill="#8892b0" font-size="10">"How do features relate?"</text>
+
+  <!-- Comparison -->
+  <rect x="420" y="50" width="180" height="110" rx="10" fill="#1a1d2e" stroke="#f5b731" stroke-width="2"/>
+  <text x="510" y="75" text-anchor="middle" fill="#f5b731" font-size="12" font-weight="600">Comparison</text>
+  <text x="440" y="98" fill="#c8cfe0" font-size="11">• Bar chart</text>
+  <text x="440" y="116" fill="#c8cfe0" font-size="11">• Grouped box plot</text>
+  <text x="440" y="134" fill="#c8cfe0" font-size="11">• Violin plot</text>
+  <text x="440" y="152" fill="#8892b0" font-size="10">"How do groups differ?"</text>
+
+  <!-- Composition -->
+  <rect x="615" y="50" width="180" height="110" rx="10" fill="#1a1d2e" stroke="#7c6aff" stroke-width="2"/>
+  <text x="705" y="75" text-anchor="middle" fill="#7c6aff" font-size="12" font-weight="600">Composition</text>
+  <text x="635" y="98" fill="#e2e8f0" font-size="11">• Pie / donut chart</text>
+  <text x="635" y="116" fill="#e2e8f0" font-size="11">• Stacked bar</text>
+  <text x="635" y="134" fill="#e2e8f0" font-size="11">• Treemap</text>
+  <text x="635" y="152" fill="#8892b0" font-size="10">"What's the breakdown?"</text>
+
+  <!-- Heatmap mini -->
+  <rect x="30" y="185" width="370" height="95" rx="10" fill="#1a1d2e" stroke="#2d3148" stroke-width="1"/>
+  <text x="215" y="210" text-anchor="middle" fill="#f5b731" font-size="12" font-weight="600">Correlation Heatmap — What to Look For</text>
+  <text x="50" y="233" fill="#22d3a7" font-size="11">• Strong positive (r &gt; 0.7) → features move together</text>
+  <text x="50" y="253" fill="#f45d6d" font-size="11">• Strong negative (r &lt; −0.7) → features move opposite</text>
+  <text x="50" y="273" fill="#8892b0" font-size="11">• High correlation between features → multicollinearity risk</text>
+
+  <!-- EDA checklist -->
+  <rect x="420" y="185" width="370" height="95" rx="10" fill="#1a1d2e" stroke="#2d3148" stroke-width="1"/>
+  <text x="605" y="210" text-anchor="middle" fill="#22d3a7" font-size="12" font-weight="600">EDA Checklist</text>
+  <text x="440" y="233" fill="#c8d8c0" font-size="11">✓ Shape, dtypes, head(), describe()</text>
+  <text x="440" y="253" fill="#c8d8c0" font-size="11">✓ Missing values, duplicates, outliers</text>
+  <text x="440" y="273" fill="#c8d8c0" font-size="11">✓ Distributions, correlations, target balance</text>
+</svg>
+</div>
+
+<div class="card cg">
+  <strong style="color:var(--green)">The EDA Mindset</strong>
+  <p>EDA isn't a checklist you rush through — it's where you build intuition about the data. Every plot should answer a question. If a plot doesn't tell you something new, it's not worth making. Focus on: what's the target distribution? Which features correlate with the target? Are there surprising patterns or data quality issues?</p>
+</div>
+
+<p style="color:var(--dim);margin-top:3rem;text-align:center;font-size:.85rem;">Phase 2 Data Science Core — Visual HTML Reference</p>
+</body>
+</html>

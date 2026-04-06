@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Phase 5 — Deep Dive Visual Explainer</title>
+<style>
+  :root{--bg:#0e1117;--surface:#161b22;--surface2:#1a1d2e;--border:#2d3148;--text:#e2e8f0;--dim:#8892b0;--green:#22d3a7;--blue:#5eaeff;--purple:#7c6aff;--yellow:#f5b731;--red:#f45d6d;--orange:#ff9f43}
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.7;padding:2rem;max-width:1100px;margin:0 auto}
+  h1{font-size:2.4rem;color:var(--green);margin-bottom:.3rem}
+  .sub{color:var(--dim);font-size:1.1rem;margin-bottom:2.5rem}
+  h2{font-size:1.6rem;color:var(--blue);margin-top:3rem;margin-bottom:1rem;padding-bottom:.4rem;border-bottom:1px solid var(--border)}
+  h3{font-size:1.15rem;color:var(--purple);margin-top:1.8rem;margin-bottom:.6rem}
+  p,li{margin-bottom:.8rem}ul{padding-left:1.4rem}
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.6rem;margin:1.2rem 0}
+  .cg{border-left:4px solid var(--green)}.cb{border-left:4px solid var(--blue)}.cy{border-left:4px solid var(--yellow)}.cr{border-left:4px solid var(--red)}.cp{border-left:4px solid var(--purple)}
+  code{background:var(--surface2);padding:2px 6px;border-radius:4px;font-family:'Fira Code',monospace;font-size:.9em;color:var(--yellow)}
+  .formula{text-align:center;font-size:1.1rem;color:var(--yellow);padding:.8rem;background:var(--surface2);border-radius:8px;margin:1rem 0;font-family:'Fira Code',monospace}
+  .sc{display:flex;justify-content:center;margin:1.5rem 0;overflow-x:auto}
+  svg text{font-family:'Segoe UI',system-ui,sans-serif}
+  .toc{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.4rem 1.8rem;margin-bottom:2rem}
+  .toc ol{padding-left:1.2rem}.toc li{margin-bottom:.3rem}.toc a{color:var(--blue);text-decoration:none}.toc a:hover{text-decoration:underline}
+  table{width:100%;border-collapse:collapse;font-size:.9rem}th{text-align:left;padding:.5rem;color:var(--blue);border-bottom:1px solid var(--border)}td{padding:.4rem .5rem}
+  @media(max-width:700px){body{padding:1rem}h1{font-size:1.8rem}}
+</style>
+</head>
+<body>
+<h1>🔬 Phase 5 — Deep Dive</h1>
+<p class="sub">Step-by-step math and visual walkthroughs for logistic regression, decision trees, random forest, gradient boosting, and K-means.</p>
+
+<nav class="toc">
+  <strong style="color:var(--green)">Contents</strong>
+  <ol>
+    <li><a href="#logistic-deep">Logistic Regression — Full Pipeline</a></li>
+    <li><a href="#tree-deep">Decision Tree — Splitting Math</a></li>
+    <li><a href="#rf-deep">Random Forest — Under the Hood</a></li>
+    <li><a href="#xgb-deep">Gradient Boosting &amp; XGBoost</a></li>
+    <li><a href="#kmeans-deep">K-Means — Step by Step</a></li>
+  </ol>
+</nav>
+
+<!-- ===== LOGISTIC REGRESSION DEEP DIVE ===== -->
+<h2 id="logistic-deep">1. Logistic Regression — Full Pipeline</h2>
+
+<div class="sc">
+<svg width="820" height="360" viewBox="0 0 820 360" xmlns="http://www.w3.org/2000/svg">
+  <rect width="820" height="360" rx="12" fill="#161b22"/>
+  <text x="410" y="28" text-anchor="middle" fill="#e2e8f0" font-size="14" font-weight="600">Logistic Regression: From Input to Gradient Update</text>
+  <defs><marker id="da" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#5eaeff"/></marker></defs>
+
+  <!-- Step 1: Linear -->
+  <rect x="20" y="55" width="150" height="80" rx="8" fill="#1a1d2e" stroke="#5eaeff" stroke-width="2"/>
+  <text x="95" y="78" text-anchor="middle" fill="#5eaeff" font-size="12" font-weight="600">Step 1: Linear</text>
+  <text x="95" y="100" text-anchor="middle" fill="#f5b731" font-size="12" font-family="'Fira Code',monospace">z = w₁x₁ + w₂x₂ + b</text>
+  <text x="95" y="122" text-anchor="middle" fill="#8892b0" font-size="10">Weighted sum of features</text>
+  <line x1="170" y1="95" x2="200" y2="95" stroke="#5eaeff" stroke-width="1.5" marker-end="url(#da)"/>
+
+  <!-- Step 2: Sigmoid -->
+  <rect x="210" y="55" width="150" height="80" rx="8" fill="#1a1d2e" stroke="#f5b731" stroke-width="2"/>
+  <text x="285" y="78" text-anchor="middle" fill="#f5b731" font-size="12" font-weight="600">Step 2: Sigmoid</text>
+  <text x="285" y="100" text-anchor="middle" fill="#f5b731" font-size="12" font-family="'Fira Code',monospace">ŷ = 1/(1+e⁻ᶻ)</text>
+  <text x="285" y="122" text-anchor="middle" fill="#8892b0" font-size="10">Squash to probability</text>
+  <line x1="360" y1="95" x2="390" y2="95" stroke="#5eaeff" stroke-width="1.5" marker-end="url(#da)"/>
+
+  <!-- Step 3: Loss -->
+  <rect x="400" y="55" width="190" height="80" rx="8" fill="#1a1d2e" stroke="#f45d6d" stroke-width="2"/>
+  <text x="495" y="78" text-anchor="middle" fill="#f45d6d" font-size="12" font-weight="600">Step 3: Loss (BCE)</text>
+  <text x="495" y="100" text-anchor="middle" fill="#f5b731" font-size="11" font-family="'Fira Code',monospace">L = −[y log ŷ + (1−y)log(1−ŷ)]</text>
+  <text x="495" y="122" text-anchor="middle" fill="#8892b0" font-size="10">How wrong is the prediction?</text>
+  <line x1="590" y1="95" x2="620" y2="95" stroke="#5eaeff" stroke-width="1.5" marker-end="url(#da)"/>
+
+  <!-- Step 4: Gradient -->
+  <rect x="630" y="55" width="160" height="80" rx="8" fill="#1a1d2e" stroke="#22d3a7" stroke-width="2"/>
+  <text x="710" y="78" text-anchor="middle" fill="#22d3a7" font-size="12" font-weight="600">Step 4: Gradient</text>
+  <text x="710" y="100" text-anchor="middle" fill="#f5b731" font-size="12" font-family="'Fira Code',monospace">∂L/∂w = (ŷ−y)·x</text>
+  <text x="710" y="122" text-anchor="middle" fill="#8892b0" font-size="10">Direction to adjust</text>
+
+  <!-- Step 5: Update -->
+  <line x1="710" y1="135" x2="710" y2="160" stroke="#22d3a7" stroke-width="1.5" marker-end="url(#da)"/>
+  <rect x="630" y="165" width="160" height="55" rx="8" fill="#1a1d2e" stroke="#7c6aff" stroke-width="2"/>
+  <text x="710" y="188" text-anchor="middle" fill="#7c6aff" font-size="12" font-weight="600">Step 5: Update</text>
+  <text x="710" y="208" text-anchor="middle" fill="#f5b731" font-size="11" font-family="'Fira Code',monospace">w = w − η·∂L/∂w</text>
+
+  <!-- Concrete example -->
+  <rect x="20" y="165" width="590" height="175" rx="10" fill="#1a1d2e" stroke="#2d3148" stroke-width="1"/>
+  <text x="315" y="190" text-anchor="middle" fill="#f5b731" font-size="13" font-weight="600">Concrete Example: Pizza Store Prediction</text>
+
+  <text x="40" y="215" fill="#8892b0" font-size="11">Features: rating=4.2, delivery_time=25min → x₁=4.2, x₂=25</text>
+  <text x="40" y="237" fill="#8892b0" font-size="11">Weights: w₁=0.8, w₂=−0.1, b=0.5 (initial random)</text>
+
+  <text x="40" y="262" fill="#5eaeff" font-size="11">z = 0.8(4.2) + (−0.1)(25) + 0.5 = 3.36 − 2.5 + 0.5 = <tspan fill="#22d3a7" font-weight="600">1.36</tspan></text>
+  <text x="40" y="282" fill="#f5b731" font-size="11">ŷ = σ(1.36) = 1/(1+e⁻¹·³⁶) = <tspan fill="#22d3a7" font-weight="600">0.796</tspan> → 79.6% chance of success</text>
+  <text x="40" y="302" fill="#f45d6d" font-size="11">Actual: y=1 (successful). Loss = −log(0.796) = <tspan fill="#22d3a7" font-weight="600">0.228</tspan></text>
+  <text x="40" y="322" fill="#7c6aff" font-size="11">∂L/∂w₁ = (0.796−1)×4.2 = −0.857 → w₁ increases (good — push toward correct answer)</text>
+</svg>
+</div>
+
+<div class="card cg">
+  <strong style="color:var(--green)">Why the gradient is (ŷ−y)·x</strong>
+  <p>This elegant result comes from the chain rule through sigmoid + BCE loss. When ŷ &gt; y (overconfident), the gradient is positive → weights decrease. When ŷ &lt; y (underconfident), gradient is negative → weights increase. The model self-corrects proportionally to the error.</p>
+</div>
+
+<!-- ===== DECISION TREE DEEP DIVE ===== -->
+<h2 id="tree-deep">2. Decision Tree — Splitting Math</h2>
+
+<div class="sc">
+<svg width="820" height="380" viewBox="0 0 820 380" xmlns="http://www.w3.org/2000/svg">
+  <rect width="820" height="380" rx="12" fill="#161b22"/>
+  <text x="410" y="28" text-anchor="middle" fill="#e2e8f0" font-size="14" font-weight="600">Gini Impurity — Step by Step</text>
+
+  <!-- Parent node -->
+  <rect x="280" y="50" width="260" height="60" rx="8" fill="#252840" stroke="#f5b731" stroke-width="2"/>
+  <text x="410" y="72" text-anchor="middle" fill="#f5b731" font-size="12" font-weight="600">Parent: 10 samples</text>
+  <text x="410" y="92" text-anchor="middle" fill="#8892b0" font-size="11">6 success (●) + 4 fail (●)</text>
+  <circle cx="310" cy="88" r="4" fill="#22d3a7"/><circle cx="490" cy="88" r="4" fill="#f45d6d"/>
+
+  <!-- Gini parent -->
+  <rect x="570" y="50" width="220" height="60" rx="8" fill="#1a1d2e" stroke="#2d3148" stroke-width="1"/>
+  <text x="680" y="72" text-anchor="middle" fill="#f5b731" font-size="11" font-weight="600">Gini(parent)</text>
+  <text x="680" y="92" text-anchor="middle" fill="#f5b731" font-size="11" font-family="'Fira Code',monospace">1−(0.6²+0.4²) = 0.48</text>
+
+  <!-- Split -->
+  <line x1="340" y1="110" x2="180" y2="155" stroke="#2d3148" stroke-width="1.5"/>
+  <line x1="480" y1="110" x2="640" y2="155" stroke="#2d3148" stroke-width="1.5"/>
+  <text x="410" y="140" text-anchor="middle" fill="#5eaeff" font-size="11" font-weight="600">Split: rating &gt; 4.0?</text>
+
+  <!-- Left child -->
+  <rect x="60" y="155" width="240" height="55" rx="8" fill="#1a1d2e" stroke="#22d3a7" stroke-width="2"/>
+  <text x="180" y="177" text-anchor="middle" fill="#22d3a7" font-size="12" font-weight="600">Yes: 6 samples</text>
+  <text x="180" y="197" text-anchor="middle" fill="#8892b0" font-size="11">5 success + 1 fail</text>
+
+  <!-- Right child -->
+  <rect x="520" y="155" width="240" height="55" rx="8" fill="#1a1d2e" stroke="#f45d6d" stroke-width="2"/>
+  <text x="640" y="177" text-anchor="middle" fill="#f45d6d" font-size="12" font-weight="600">No: 4 samples</text>
+  <text x="640" y="197" text-anchor="middle" fill="#8892b0" font-size="11">1 success + 3 fail</text>
+
+  <!-- Gini calculations -->
+  <rect x="30" y="230" width="370" height="130" rx="8" fill="#1a1d2e" stroke="#2d3148" stroke-width="1"/>
+  <text x="215" y="255" text-anchor="middle" fill="#22d3a7" font-size="12" font-weight="600">Left Gini Calculation</text>
+  <text x="50" y="280" fill="#f5b731" font-size="11" font-family="'Fira Code',monospace">p(success) = 5/6 = 0.833</text>
+  <text x="50" y="300" fill="#f5b731" font-size="11" font-family="'Fira Code',monospace">p(fail)    = 1/6 = 0.167</text>
+  <text x="50" y="325" fill="#22d3a7" font-size="12" font-family="'Fira Code',monospace">Gini = 1−(0.833²+0.167²) = 0.278</text>
+  <text x="50" y="348" fill="#8892b0" font-size="10">Fairly pure — mostly success</text>
+
+  <rect x="420" y="230" width="370" height="130" rx="8" fill="#1a1d2e" stroke="#2d3148" stroke-width="1"/>
+  <text x="605" y="255" text-anchor="middle" fill="#f45d6d" font-size="12" font-weight="600">Right Gini Calculation</text>
+  <text x="440" y="280" fill="#f5b731" font-size="11" font-family="'Fira Code',monospace">p(success) = 1/4 = 0.25</text>
+  <text x="440" y="300" fill="#f5b731" font-size="11" font-family="'Fira Code',monospace">p(fail)    = 3/4 = 0.75</text>
+  <text x="440" y="325" fill="#f45d6d" font-size="12" font-family="'Fira Code',monospace">Gini = 1−(0.25²+0.75²) = 0.375</text>
+  <text x="440" y="348" fill="#8892b0" font-size="10">Fairly pure — mostly fail</text>
+</svg>
+</div>
+
+<div class="formula">Weighted Gini = (6/10)×0.278 + (4/10)×0.375 = 0.167 + 0.150 = 0.317</div>
+<div class="formula">Gini Gain = 0.48 − 0.317 = 0.163 ← choose the split with highest gain</div>
+
+<div class="card cp">
+  <strong style="color:var(--purple)">Entropy Alternative</strong>
+  <p>Entropy uses <code>−Σ pᵢ log₂(pᵢ)</code> instead of <code>1 − Σ pᵢ²</code>. Information Gain = Entropy(parent) − weighted Entropy(children). Both metrics pick similar splits in practice. Gini is faster to compute (no logarithm), which is why scikit-learn uses it by default.</p>
+</div>
+
+<!-- ===== RANDOM FOREST DEEP DIVE ===== -->
+<h2 id="rf-deep">3. Random Forest — Under the Hood</h2>
+
+<div class="sc">
+<svg width="820" height="300" viewBox="0 0 820 300" xmlns="http://www.w3.org/2000/svg">
+  <rect width="820" height="300" rx="12" fill="#161b22"/>
+  <text x="410" y="28" text-anchor="middle" fill="#e2e8f0" font-size="14" font-weight="600">Random Forest: Two Sources of Randomness</text>
+
+  <!-- Source 1: Bootstrap -->
+  <rect x="30" y="50" width="370" height="220" rx="10" fill="#1a1d2e" stroke="#22d3a7" stroke-width="2"/>
+  <text x="215" y="78" text-anchor="middle" fill="#22d3a7" font-size="13" font-weight="600">1. Bootstrap Sampling (Row Randomness)</text>
+
+  <text x="50" y="108" fill="#e2e8f0" font-size="11">Original: [A, B, C, D, E, F, G, H, I, J]</text>
+  <text x="50" y="135" fill="#5eaeff" font-size="11">Tree 1 sample: [A, C, C, D, F, G, G, H, I, J]</text>
+  <text x="50" y="155" fill="#7c6aff" font-size="11">Tree 2 sample: [B, B, D, E, F, F, H, I, I, J]</text>
+  <text x="50" y="175" fill="#f5b731" font-size="11">Tree 3 sample: [A, A, B, D, E, G, H, H, I, J]</text>
+
+  <text x="50" y="205" fill="#8892b0" font-size="11">• Sample WITH replacement (same size as original)</text>
+  <text x="50" y="225" fill="#8892b0" font-size="11">• ~63% unique rows per tree (1 − 1/e)</text>
+  <text x="50" y="245" fill="#8892b0" font-size="11">• ~37% left out → free validation (OOB score)</text>
+
+  <!-- Source 2: Feature subset -->
+  <rect x="420" y="50" width="370" height="220" rx="10" fill="#1a1d2e" stroke="#f5b731" stroke-width="2"/>
+  <text x="605" y="78" text-anchor="middle" fill="#f5b731" font-size="13" font-weight="600">2. Feature Subsampling (Column Randomness)</text>
+
+  <text x="440" y="108" fill="#e2e8f0" font-size="11">All features: [age, income, rating, time, area]</text>
+  <text x="440" y="135" fill="#5eaeff" font-size="11">Tree 1 split considers: [age, rating, area]</text>
+  <text x="440" y="155" fill="#7c6aff" font-size="11">Tree 2 split considers: [income, time, area]</text>
+  <text x="440" y="175" fill="#f5b731" font-size="11">Tree 3 split considers: [age, income, time]</text>
+
+  <text x="440" y="205" fill="#8892b0" font-size="11">• At each split, pick √p random features</text>
+  <text x="440" y="225" fill="#8892b0" font-size="11">• Forces trees to use different features</text>
+  <text x="440" y="245" fill="#8892b0" font-size="11">• Decorrelates trees → better ensemble</text>
+</svg>
+</div>
+
+<div class="card cg">
+  <strong style="color:var(--green)">Why two sources of randomness?</strong>
+  <p>Bootstrap alone isn't enough — if one feature dominates (e.g., income), every tree will split on it first, making them correlated. Feature subsampling forces diversity. Correlated trees don't reduce variance when averaged. Decorrelated trees do. That's the whole insight behind Random Forest.</p>
+</div>
+
+<!-- ===== GRADIENT BOOSTING / XGBOOST ===== -->
+<h2 id="xgb-deep">4. Gradient Boosting &amp; XGBoost</h2>
+
+<div class="sc">
+<svg width="820" height="380" viewBox="0 0 820 380" xmlns="http://www.w3.org/2000/svg">
+  <rect width="820" height="380" rx="12" fill="#161b22"/>
+  <text x="410" y="28" text-anchor="middle" fill="#e2e8f0" font-size="14" font-weight="600">Gradient Boosting: Learning from Residuals</text>
+  <defs><marker id="ga" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#f5b731"/></marker></defs>
+
+  <!-- Round 1 -->
+  <rect x="30" y="55" width="230" height="90" rx="8" fill="#1a1d2e" stroke="#5eaeff" stroke-width="2"/>
+  <text x="145" y="78" text-anchor="middle" fill="#5eaeff" font-size="12" font-weight="600">Round 1: Simple Model</text>
+  <text x="50" y="100" fill="#8892b0" font-size="11">Actual:     [3, 7, 5, 9]</text>
+  <text x="50" y="118" fill="#8892b0" font-size="11">Predicted:  [4, 5, 5, 6]</text>
+  <text x="50" y="136" fill="#f45d6d" font-size="11">Residuals: [−1, 2, 0, 3]</text>
+
+  <line x1="260" y1="100" x2="290" y2="100" stroke="#f5b731" stroke-width="1.5" marker-end="url(#ga)"/>
+
+  <!-- Round 2 -->
+  <rect x="300" y="55" width="230" height="90" rx="8" fill="#1a1d2e" stroke="#f5b731" stroke-width="2"/>
+  <text x="415" y="78" text-anchor="middle" fill="#f5b731" font-size="12" font-weight="600">Round 2: Fit Residuals</text>
+  <text x="320" y="100" fill="#8892b0" font-size="11">Target:    [−1, 2, 0, 3]</text>
+  <text x="320" y="118" fill="#8892b0" font-size="11">Predicted: [−0.8, 1.5, 0.1, 2.5]</text>
+  <text x="320" y="136" fill="#f45d6d" font-size="11">New resid: [−0.2, 0.5, −0.1, 0.5]</text>
+
+  <line x1="530" y1="100" x2="560" y2="100" stroke="#f5b731" stroke-width="1.5" marker-end="url(#ga)"/>
+
+  <!-- Round 3 -->
+  <rect x="570" y="55" width="220" height="90" rx="8" fill="#1a1d2e" stroke="#22d3a7" stroke-width="2"/>
+  <text x="680" y="78" text-anchor="middle" fill="#22d3a7" font-size="12" font-weight="600">Round 3: Fit Again</text>
+  <text x="590" y="100" fill="#8892b0" font-size="11">Target: [−0.2, 0.5, −0.1, 0.5]</text>
+  <text x="590" y="118" fill="#8892b0" font-size="11">Each round fixes what's left</text>
+  <text x="590" y="136" fill="#22d3a7" font-size="11">Residuals shrink → converge</text>
+
+  <!-- Final prediction -->
+  <rect x="200" y="170" width="420" height="50" rx="8" fill="#252840" stroke="#7c6aff" stroke-width="2"/>
+  <text x="410" y="195" text-anchor="middle" fill="#7c6aff" font-size="12" font-weight="600">Final = Model₁ + η·Model₂ + η·Model₃ + ...</text>
+  <text x="410" y="212" text-anchor="middle" fill="#8892b0" font-size="10">η = learning rate (shrinkage) — typically 0.01–0.3</text>
+
+  <!-- XGBoost specifics -->
+  <rect x="30" y="245" width="760" height="120" rx="10" fill="#1a1d2e" stroke="#ff9f43" stroke-width="2"/>
+  <text x="410" y="270" text-anchor="middle" fill="#ff9f43" font-size="14" font-weight="600">What Makes XGBoost Special</text>
+
+  <text x="50" y="298" fill="#22d3a7" font-size="12" font-weight="600">Regularized objective:</text>
+  <text x="250" y="298" fill="#f5b731" font-size="12" font-family="'Fira Code',monospace">Obj = Σ L(yᵢ, ŷᵢ) + Σ [γT + ½λ||w||²]</text>
+
+  <text x="50" y="322" fill="#8892b0" font-size="11">L = loss (how wrong)&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;γT = penalize # of leaves&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;λ||w||² = penalize leaf weights</text>
+  <text x="50" y="345" fill="#8892b0" font-size="11">Also uses: 2nd-order Taylor expansion for faster optimization, column subsampling, built-in missing value handling, histogram-based splits</text>
+</svg>
+</div>
+
+<div class="card cy">
+  <strong style="color:var(--yellow)">Key XGBoost Hyperparameters</strong>
+  <ul>
+    <li><code>n_estimators</code> — number of boosting rounds (100–1000). More = better fit, risk of overfitting.</li>
+    <li><code>learning_rate</code> (η) — shrinkage per round (0.01–0.3). Lower = more rounds needed but better generalization.</li>
+    <li><code>max_depth</code> — tree depth (3–10). Deeper = more complex. Start with 6.</li>
+    <li><code>reg_lambda</code> (L2) — weight regularization. Higher = simpler trees.</li>
+    <li><code>subsample</code> — fraction of rows per tree (0.5–1.0). Lower = more randomness.</li>
+    <li><code>colsample_bytree</code> — fraction of features per tree (0.5–1.0). Like Random Forest's feature subsampling.</li>
+  </ul>
+</div>
+
+<!-- ===== K-MEANS DEEP DIVE ===== -->
+<h2 id="kmeans-deep">5. K-Means — Step by Step</h2>
+
+<div class="sc">
+<svg width="820" height="480" viewBox="0 0 820 480" xmlns="http://www.w3.org/2000/svg">
+  <rect width="820" height="480" rx="12" fill="#161b22"/>
+  <text x="410" y="28" text-anchor="middle" fill="#e2e8f0" font-size="14" font-weight="600">K-Means Iteration: K=2 with 6 Points</text>
+
+  <!-- Iteration 1 -->
+  <text x="200" y="58" text-anchor="middle" fill="#5eaeff" font-size="13" font-weight="600">Iteration 1: Random Centroids</text>
+  <rect x="30" y="70" width="340" height="170" rx="8" fill="#1a1d2e" stroke="#5eaeff" stroke-width="1.5"/>
+  <!-- Axes -->
+  <line x1="60" y1="220" x2="340" y2="220" stroke="#2d3148" stroke-width="1"/>
+  <line x1="60" y1="90" x2="60" y2="220" stroke="#2d3148" stroke-width="1"/>
+  <!-- Points -->
+  <circle cx="100" cy="120" r="5" fill="#8892b0"/><circle cx="120" cy="140" r="5" fill="#8892b0"/>
+  <circle cx="130" cy="110" r="5" fill="#8892b0"/><circle cx="250" cy="190" r="5" fill="#8892b0"/>
+  <circle cx="270" cy="170" r="5" fill="#8892b0"/><circle cx="280" cy="200" r="5" fill="#8892b0"/>
+  <!-- Random centroids -->
+  <rect x="85" y="175" width="12" height="12" rx="2" fill="#22d3a7" stroke="#22d3a7" stroke-width="2"/>
+  <rect x="215" y="105" width="12" height="12" rx="2" fill="#f45d6d" stroke="#f45d6d" stroke-width="2"/>
+  <text x="110" y="188" fill="#22d3a7" font-size="9">C₁</text>
+  <text x="235" y="118" fill="#f45d6d" font-size="9">C₂</text>
+
+  <!-- Iteration 2 -->
+  <text x="610" y="58" text-anchor="middle" fill="#f5b731" font-size="13" font-weight="600">Iteration 2: Assign &amp; Update</text>
+  <rect x="450" y="70" width="340" height="170" rx="8" fill="#1a1d2e" stroke="#f5b731" stroke-width="1.5"/>
+  <line x1="480" y1="220" x2="760" y2="220" stroke="#2d3148" stroke-width="1"/>
+  <line x1="480" y1="90" x2="480" y2="220" stroke="#2d3148" stroke-width="1"/>
+  <!-- Assigned points -->
+  <circle cx="520" cy="120" r="5" fill="#22d3a7"/><circle cx="540" cy="140" r="5" fill="#22d3a7"/>
+  <circle cx="550" cy="110" r="5" fill="#22d3a7"/>
+  <circle cx="670" cy="190" r="5" fill="#f45d6d"/><circle cx="690" cy="170" r="5" fill="#f45d6d"/>
+  <circle cx="700" cy="200" r="5" fill="#f45d6d"/>
+  <!-- Updated centroids (at cluster means) -->
+  <rect x="530" y="117" width="12" height="12" rx="2" fill="#22d3a7" stroke="white" stroke-width="1"/>
+  <rect x="680" y="180" width="12" height="12" rx="2" fill="#f45d6d" stroke="white" stroke-width="1"/>
+  <text x="555" y="130" fill="#22d3a7" font-size="9">C₁ (updated)</text>
+  <text x="705" y="193" fill="#f45d6d" font-size="9">C₂ (updated)</text>
+
+  <!-- Converged -->
+  <text x="410" y="270" text-anchor="middle" fill="#22d3a7" font-size="13" font-weight="600">Converged: Centroids Stable</text>
+  <rect x="170" y="280" width="480" height="80" rx="8" fill="#1a1d2e" stroke="#22d3a7" stroke-width="2"/>
+  <text x="410" y="305" text-anchor="middle" fill="#f5b731" font-size="12" font-family="'Fira Code',monospace">Inertia = Σ ||xᵢ − centroid(xᵢ)||²</text>
+  <text x="410" y="325" text-anchor="middle" fill="#8892b0" font-size="11">Sum of squared distances from each point to its centroid</text>
+  <text x="410" y="345" text-anchor="middle" fill="#8892b0" font-size="11">Lower inertia = tighter clusters = better</text>
+
+  <!-- Elbow method -->
+  <text x="410" y="385" text-anchor="middle" fill="#f5b731" font-size="13" font-weight="600">Elbow Method: Choosing K</text>
+  <rect x="170" y="395" width="480" height="70" rx="8" fill="#1a1d2e" stroke="#2d3148" stroke-width="1"/>
+  <!-- Mini elbow chart -->
+  <line x1="200" y1="450" x2="620" y2="450" stroke="#2d3148" stroke-width="1"/>
+  <line x1="200" y1="410" x2="200" y2="450" stroke="#2d3148" stroke-width="1"/>
+  <polyline fill="none" stroke="#5eaeff" stroke-width="2" points="220,412 290,420 360,438 430,443 500,445 570,447 610,448"/>
+  <circle cx="360" cy="438" r="5" fill="none" stroke="#f5b731" stroke-width="2"/>
+  <text x="360" y="432" text-anchor="middle" fill="#f5b731" font-size="10">← elbow (K=3)</text>
+  <text x="200" y="465" fill="#8892b0" font-size="10">K=1</text>
+  <text x="610" y="465" fill="#8892b0" font-size="10">K=7</text>
+</svg>
+</div>
+
+<div class="card cr">
+  <strong style="color:var(--red)">K-Means Limitations</strong>
+  <ul>
+    <li>Assumes spherical, equally-sized clusters — fails on elongated or irregular shapes</li>
+    <li>Sensitive to initialization — use K-means++ (default in scikit-learn) for smarter starting centroids</li>
+    <li>Must specify K in advance — use elbow method or silhouette score to guide the choice</li>
+    <li>Sensitive to outliers — a single outlier can pull a centroid far from the real cluster center</li>
+  </ul>
+</div>
+
+<p style="color:var(--dim);margin-top:3rem;text-align:center;font-size:.85rem;">Phase 5 Deep Dive — Visual HTML Reference</p>
+</body>
+</html>

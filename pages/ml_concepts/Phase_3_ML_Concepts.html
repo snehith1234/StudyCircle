@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Phase 3 — ML Concepts Visual Explainer</title>
+<style>
+  :root{--bg:#0e1117;--surface:#161b22;--surface2:#1a1d2e;--border:#2d3148;--text:#e2e8f0;--dim:#8892b0;--green:#22d3a7;--blue:#5eaeff;--purple:#7c6aff;--yellow:#f5b731;--red:#f45d6d;--orange:#ff9f43}
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.7;padding:2rem;max-width:1100px;margin:0 auto}
+  h1{font-size:2.4rem;color:var(--green);margin-bottom:.3rem}
+  .sub{color:var(--dim);font-size:1.1rem;margin-bottom:2.5rem}
+  h2{font-size:1.6rem;color:var(--blue);margin-top:3rem;margin-bottom:1rem;padding-bottom:.4rem;border-bottom:1px solid var(--border)}
+  h3{font-size:1.15rem;color:var(--purple);margin-top:1.8rem;margin-bottom:.6rem}
+  p,li{margin-bottom:.8rem}ul{padding-left:1.4rem}
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.6rem;margin:1.2rem 0}
+  .cg{border-left:4px solid var(--green)}.cb{border-left:4px solid var(--blue)}.cy{border-left:4px solid var(--yellow)}.cr{border-left:4px solid var(--red)}.cp{border-left:4px solid var(--purple)}
+  code{background:var(--surface2);padding:2px 6px;border-radius:4px;font-family:'Fira Code',monospace;font-size:.9em;color:var(--yellow)}
+  .formula{text-align:center;font-size:1.1rem;color:var(--yellow);padding:.8rem;background:var(--surface2);border-radius:8px;margin:1rem 0;font-family:'Fira Code',monospace}
+  .sc{display:flex;justify-content:center;margin:1.5rem 0;overflow-x:auto}
+  svg text{font-family:'Segoe UI',system-ui,sans-serif}
+  .toc{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.4rem 1.8rem;margin-bottom:2rem}
+  .toc ol{padding-left:1.2rem}.toc li{margin-bottom:.3rem}.toc a{color:var(--blue);text-decoration:none}.toc a:hover{text-decoration:underline}
+  table{width:100%;border-collapse:collapse;font-size:.9rem}th{text-align:left;padding:.5rem;color:var(--blue);border-bottom:1px solid var(--border)}td{padding:.4rem .5rem}
+  @media(max-width:700px){body{padding:1rem}h1{font-size:1.8rem}}
+</style>
+</head>
+<body>
+<h1>🤖 Phase 3 — Machine Learning Concepts</h1>
+<p class="sub">Supervised &amp; unsupervised learning, decision trees, ensembles, bias-variance, and regularization — visual reference.</p>
+
+<nav class="toc">
+  <strong style="color:var(--green)">Contents</strong>
+  <ol>
+    <li><a href="#supervised">Supervised Learning Overview</a></li>
+    <li><a href="#logistic">Logistic Regression</a></li>
+    <li><a href="#trees">Decision Trees</a></li>
+    <li><a href="#ensembles">Ensemble Methods</a></li>
+    <li><a href="#unsupervised">Unsupervised: K-Means</a></li>
+    <li><a href="#bias-variance">Bias-Variance &amp; Regularization</a></li>
+  </ol>
+</nav>
+
+<!-- ===== SECTION 1: SUPERVISED LEARNING ===== -->
+<h2 id="supervised">1. Supervised Learning Overview</h2>
+
+<div class="sc">
+<svg width="820" height="280" viewBox="0 0 820 280" xmlns="http://www.w3.org/2000/svg">
+  <rect width="820" height="280" rx="12" fill="#161b22"/>
+  <text x="410" y="28" text-anchor="middle" fill="#e2e8f0" font-size="14" font-weight="600">Classification vs Regression</text>
+  <defs><marker id="ma" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#5eaeff"/></marker></defs>
+
+  <!-- Classification side -->
+  <rect x="30" y="50" width="370" height="200" rx="10" fill="#1a1d2e" stroke="#7c6aff" stroke-width="2"/>
+  <text x="215" y="78" text-anchor="middle" fill="#7c6aff" font-size="14" font-weight="600">Classification</text>
+  <text x="215" y="100" text-anchor="middle" fill="#8892b0" font-size="11">Predict a category / label</text>
+
+  <!-- Scatter with decision boundary -->
+  <circle cx="80" cy="140" r="5" fill="#22d3a7"/><circle cx="100" cy="155" r="5" fill="#22d3a7"/>
+  <circle cx="90" cy="170" r="5" fill="#22d3a7"/><circle cx="110" cy="130" r="5" fill="#22d3a7"/>
+  <circle cx="120" cy="165" r="5" fill="#22d3a7"/><circle cx="75" cy="185" r="5" fill="#22d3a7"/>
+  <circle cx="200" cy="130" r="5" fill="#f45d6d"/><circle cx="220" cy="145" r="5" fill="#f45d6d"/>
+  <circle cx="210" cy="160" r="5" fill="#f45d6d"/><circle cx="230" cy="135" r="5" fill="#f45d6d"/>
+  <circle cx="240" cy="155" r="5" fill="#f45d6d"/><circle cx="195" cy="175" r="5" fill="#f45d6d"/>
+  <!-- Decision boundary -->
+  <line x1="155" y1="115" x2="155" y2="200" stroke="#f5b731" stroke-width="2" stroke-dasharray="6,4"/>
+  <text x="155" y="220" text-anchor="middle" fill="#f5b731" font-size="10">decision boundary</text>
+
+  <text x="80" y="240" fill="#22d3a7" font-size="11">● Class A</text>
+  <text x="200" y="240" fill="#f45d6d" font-size="11">● Class B</text>
+
+  <!-- Regression side -->
+  <rect x="420" y="50" width="370" height="200" rx="10" fill="#1a1d2e" stroke="#22d3a7" stroke-width="2"/>
+  <text x="605" y="78" text-anchor="middle" fill="#22d3a7" font-size="14" font-weight="600">Regression</text>
+  <text x="605" y="100" text-anchor="middle" fill="#8892b0" font-size="11">Predict a continuous number</text>
+
+  <!-- Scatter with regression line -->
+  <circle cx="460" cy="195" r="4" fill="#5eaeff"/><circle cx="480" cy="185" r="4" fill="#5eaeff"/>
+  <circle cx="500" cy="178" r="4" fill="#5eaeff"/><circle cx="520" cy="165" r="4" fill="#5eaeff"/>
+  <circle cx="545" cy="160" r="4" fill="#5eaeff"/><circle cx="570" cy="148" r="4" fill="#5eaeff"/>
+  <circle cx="595" cy="145" r="4" fill="#5eaeff"/><circle cx="620" cy="135" r="4" fill="#5eaeff"/>
+  <circle cx="650" cy="128" r="4" fill="#5eaeff"/><circle cx="680" cy="122" r="4" fill="#5eaeff"/>
+  <circle cx="710" cy="118" r="4" fill="#5eaeff"/><circle cx="740" cy="115" r="4" fill="#5eaeff"/>
+  <!-- Best fit line -->
+  <line x1="450" y1="200" x2="750" y2="112" stroke="#f5b731" stroke-width="2"/>
+  <text x="605" y="220" text-anchor="middle" fill="#f5b731" font-size="10">ŷ = mx + b</text>
+  <text x="605" y="240" fill="#8892b0" font-size="11">Minimize distance from line to points</text>
+</svg>
+</div>
+
+<div class="card cb">
+<table>
+  <thead><tr><th>Aspect</th><th style="color:var(--purple)">Classification</th><th style="color:var(--green)">Regression</th></tr></thead>
+  <tbody>
+    <tr><td>Output</td><td>Category (spam/not, cat/dog)</td><td>Number (price, temperature)</td></tr>
+    <tr><td>Loss</td><td>Cross-entropy, log loss</td><td>MSE, MAE</td></tr>
+    <tr><td>Metrics</td><td>Accuracy, precision, recall, F1</td><td>R², RMSE, MAE</td></tr>
+    <tr><td>Algorithms</td><td>Logistic reg, trees, SVM, NN</td><td>Linear reg, trees, NN</td></tr>
+  </tbody>
+</table>
+</div>
+
+<!-- ===== SECTION 2: LOGISTIC REGRESSION ===== -->
+<h2 id="logistic">2. Logistic Regression</h2>
+<p>Despite the name, logistic regression is a classification algorithm. It applies the sigmoid function to a linear combination to output a probability between 0 and 1.</p>
+
+<div class="formula">P(y=1|x) = σ(Wx + b) = 1 / (1 + e⁻⁽ᵂˣ⁺ᵇ⁾)</div>
+
+<div class="sc">
+<svg width="820" height="220" viewBox="0 0 820 220" xmlns="http://www.w3.org/2000/svg">
+  <rect width="820" height="220" rx="12" fill="#161b22"/>
+  <defs><marker id="lg" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#5eaeff"/></marker></defs>
+
+  <!-- Pipeline -->
+  <rect x="30" y="60" width="140" height="60" rx="8" fill="#1a1d2e" stroke="#5eaeff" stroke-width="2"/>
+  <text x="100" y="85" text-anchor="middle" fill="#5eaeff" font-size="12" font-weight="600">Linear: z=Wx+b</text>
+  <text x="100" y="105" text-anchor="middle" fill="#8892b0" font-size="10">Any real number</text>
+  <line x1="170" y1="90" x2="210" y2="90" stroke="#5eaeff" stroke-width="1.5" marker-end="url(#lg)"/>
+
+  <rect x="220" y="60" width="140" height="60" rx="8" fill="#1a1d2e" stroke="#f5b731" stroke-width="2"/>
+  <text x="290" y="85" text-anchor="middle" fill="#f5b731" font-size="12" font-weight="600">Sigmoid: σ(z)</text>
+  <text x="290" y="105" text-anchor="middle" fill="#8892b0" font-size="10">Squash to (0, 1)</text>
+  <line x1="360" y1="90" x2="400" y2="90" stroke="#5eaeff" stroke-width="1.5" marker-end="url(#lg)"/>
+
+  <rect x="410" y="60" width="140" height="60" rx="8" fill="#1a1d2e" stroke="#22d3a7" stroke-width="2"/>
+  <text x="480" y="85" text-anchor="middle" fill="#22d3a7" font-size="12" font-weight="600">Threshold: 0.5</text>
+  <text x="480" y="105" text-anchor="middle" fill="#8892b0" font-size="10">p ≥ 0.5 → class 1</text>
+  <line x1="550" y1="90" x2="590" y2="90" stroke="#5eaeff" stroke-width="1.5" marker-end="url(#lg)"/>
+
+  <rect x="600" y="60" width="140" height="60" rx="8" fill="#1a1d2e" stroke="#7c6aff" stroke-width="2"/>
+  <text x="670" y="85" text-anchor="middle" fill="#7c6aff" font-size="12" font-weight="600">Prediction</text>
+  <text x="670" y="105" text-anchor="middle" fill="#8892b0" font-size="10">0 or 1</text>
+
+  <!-- Loss -->
+  <text x="410" y="160" text-anchor="middle" fill="#f5b731" font-size="12" font-weight="600">Loss: Binary Cross-Entropy</text>
+  <text x="410" y="185" text-anchor="middle" fill="#f5b731" font-size="12" font-family="'Fira Code',monospace">L = −[y log(ŷ) + (1−y) log(1−ŷ)]</text>
+  <text x="410" y="208" text-anchor="middle" fill="#8892b0" font-size="11">Heavily penalizes confident wrong predictions</text>
+</svg>
+</div>
+
+<!-- ===== SECTION 3: DECISION TREES ===== -->
+<h2 id="trees">3. Decision Trees</h2>
+<p>A decision tree splits data by asking yes/no questions about features, choosing the split that best separates the classes (or reduces variance for regression).</p>
+
+<div class="sc">
+<svg width="820" height="340" viewBox="0 0 820 340" xmlns="http://www.w3.org/2000/svg">
+  <rect width="820" height="340" rx="12" fill="#161b22"/>
+  <text x="410" y="28" text-anchor="middle" fill="#e2e8f0" font-size="14" font-weight="600">Decision Tree Structure</text>
+
+  <!-- Root -->
+  <rect x="310" y="45" width="200" height="45" rx="8" fill="#1a1d2e" stroke="#f5b731" stroke-width="2"/>
+  <text x="410" y="73" text-anchor="middle" fill="#f5b731" font-size="12">Income &gt; $50K?</text>
+
+  <!-- Level 1 -->
+  <line x1="360" y1="90" x2="210" y2="130" stroke="#2d3148" stroke-width="1.5"/>
+  <line x1="460" y1="90" x2="610" y2="130" stroke="#2d3148" stroke-width="1.5"/>
+  <text x="270" y="115" fill="#22d3a7" font-size="10">Yes</text>
+  <text x="540" y="115" fill="#f45d6d" font-size="10">No</text>
+
+  <rect x="110" y="130" width="200" height="45" rx="8" fill="#1a1d2e" stroke="#5eaeff" stroke-width="2"/>
+  <text x="210" y="158" text-anchor="middle" fill="#5eaeff" font-size="12">Age &gt; 30?</text>
+
+  <rect x="510" y="130" width="200" height="45" rx="8" fill="#1a1d2e" stroke="#5eaeff" stroke-width="2"/>
+  <text x="610" y="158" text-anchor="middle" fill="#5eaeff" font-size="12">Has Degree?</text>
+
+  <!-- Level 2 leaves -->
+  <line x1="160" y1="175" x2="90" y2="215" stroke="#2d3148" stroke-width="1.5"/>
+  <line x1="260" y1="175" x2="330" y2="215" stroke="#2d3148" stroke-width="1.5"/>
+  <line x1="560" y1="175" x2="490" y2="215" stroke="#2d3148" stroke-width="1.5"/>
+  <line x1="660" y1="175" x2="730" y2="215" stroke="#2d3148" stroke-width="1.5"/>
+
+  <rect x="30" y="215" width="120" height="40" rx="8" fill="#1a2a1f" stroke="#22d3a7" stroke-width="1.5"/>
+  <text x="90" y="240" text-anchor="middle" fill="#22d3a7" font-size="11">✓ Approve</text>
+
+  <rect x="270" y="215" width="120" height="40" rx="8" fill="#1a2a1f" stroke="#22d3a7" stroke-width="1.5"/>
+  <text x="330" y="240" text-anchor="middle" fill="#22d3a7" font-size="11">✓ Approve</text>
+
+  <rect x="430" y="215" width="120" height="40" rx="8" fill="#2a1a1f" stroke="#f45d6d" stroke-width="1.5"/>
+  <text x="490" y="240" text-anchor="middle" fill="#f45d6d" font-size="11">✗ Deny</text>
+
+  <rect x="670" y="215" width="120" height="40" rx="8" fill="#2a1a1f" stroke="#f45d6d" stroke-width="1.5"/>
+  <text x="730" y="240" text-anchor="middle" fill="#f45d6d" font-size="11">✗ Deny</text>
+
+  <!-- Splitting criteria -->
+  <rect x="30" y="275" width="370" height="50" rx="8" fill="#1a1d2e" stroke="#2d3148" stroke-width="1"/>
+  <text x="215" y="298" text-anchor="middle" fill="#f5b731" font-size="11" font-weight="600">Gini Impurity = 1 − Σ pᵢ²</text>
+  <text x="215" y="316" text-anchor="middle" fill="#8892b0" font-size="10">0 = pure node, 0.5 = max impurity (binary)</text>
+
+  <rect x="420" y="275" width="370" height="50" rx="8" fill="#1a1d2e" stroke="#2d3148" stroke-width="1"/>
+  <text x="605" y="298" text-anchor="middle" fill="#7c6aff" font-size="11" font-weight="600">Entropy = −Σ pᵢ log₂(pᵢ)</text>
+  <text x="605" y="316" text-anchor="middle" fill="#8892b0" font-size="10">Info Gain = Entropy(parent) − weighted Entropy(children)</text>
+</svg>
+</div>
+
+<div class="card cy">
+  <strong style="color:var(--yellow)">Trees: Pros &amp; Cons</strong>
+  <ul>
+    <li><strong style="color:var(--green)">Pros:</strong> Interpretable, handles mixed data types, no scaling needed, captures non-linear patterns</li>
+    <li><strong style="color:var(--red)">Cons:</strong> Overfits easily (high variance), unstable (small data changes → different tree), greedy splits aren't globally optimal</li>
+    <li><strong style="color:var(--blue)">Fix:</strong> Pruning (max_depth, min_samples_leaf) or use ensembles (Random Forest, XGBoost)</li>
+  </ul>
+</div>
+
+<!-- ===== SECTION 4: ENSEMBLES ===== -->
+<h2 id="ensembles">4. Ensemble Methods</h2>
+<p>Combine multiple weak models to create a strong one. The two main strategies: bagging (parallel, reduce variance) and boosting (sequential, reduce bias).</p>
+
+<div class="sc">
+<svg width="820" height="440" viewBox="0 0 820 440" xmlns="http://www.w3.org/2000/svg">
+  <rect width="820" height="440" rx="12" fill="#161b22"/>
+
+  <!-- BAGGING -->
+  <text x="210" y="28" text-anchor="middle" fill="#22d3a7" font-size="15" font-weight="600">Bagging (Random Forest)</text>
+  <text x="210" y="48" text-anchor="middle" fill="#8892b0" font-size="11">Parallel — reduce variance</text>
+
+  <!-- Data -->
+  <rect x="150" y="65" width="120" height="35" rx="6" fill="#252840" stroke="#f5b731" stroke-width="1.5"/>
+  <text x="210" y="87" text-anchor="middle" fill="#f5b731" font-size="11">Full Dataset</text>
+
+  <!-- Bootstrap arrows -->
+  <line x1="170" y1="100" x2="80" y2="130" stroke="#2d3148" stroke-width="1"/>
+  <line x1="210" y1="100" x2="210" y2="130" stroke="#2d3148" stroke-width="1"/>
+  <line x1="250" y1="100" x2="340" y2="130" stroke="#2d3148" stroke-width="1"/>
+
+  <!-- Bootstrap samples -->
+  <rect x="30" y="130" width="100" height="30" rx="6" fill="#1a1d2e" stroke="#5eaeff" stroke-width="1"/>
+  <text x="80" y="150" text-anchor="middle" fill="#5eaeff" font-size="10">Sample 1</text>
+  <rect x="160" y="130" width="100" height="30" rx="6" fill="#1a1d2e" stroke="#5eaeff" stroke-width="1"/>
+  <text x="210" y="150" text-anchor="middle" fill="#5eaeff" font-size="10">Sample 2</text>
+  <rect x="290" y="130" width="100" height="30" rx="6" fill="#1a1d2e" stroke="#5eaeff" stroke-width="1"/>
+  <text x="340" y="150" text-anchor="middle" fill="#5eaeff" font-size="10">Sample n</text>
+
+  <!-- Trees -->
+  <line x1="80" y1="160" x2="80" y2="185" stroke="#2d3148" stroke-width="1"/>
+  <line x1="210" y1="160" x2="210" y2="185" stroke="#2d3148" stroke-width="1"/>
+  <line x1="340" y1="160" x2="340" y2="185" stroke="#2d3148" stroke-width="1"/>
+
+  <rect x="40" y="185" width="80" height="35" rx="6" fill="#1a1d2e" stroke="#22d3a7" stroke-width="1.5"/>
+  <text x="80" y="207" text-anchor="middle" fill="#22d3a7" font-size="10">Tree 1</text>
+  <rect x="170" y="185" width="80" height="35" rx="6" fill="#1a1d2e" stroke="#22d3a7" stroke-width="1.5"/>
+  <text x="210" y="207" text-anchor="middle" fill="#22d3a7" font-size="10">Tree 2</text>
+  <rect x="300" y="185" width="80" height="35" rx="6" fill="#1a1d2e" stroke="#22d3a7" stroke-width="1.5"/>
+  <text x="340" y="207" text-anchor="middle" fill="#22d3a7" font-size="10">Tree n</text>
+
+  <!-- Vote -->
+  <line x1="80" y1="220" x2="210" y2="250" stroke="#2d3148" stroke-width="1"/>
+  <line x1="210" y1="220" x2="210" y2="250" stroke="#2d3148" stroke-width="1"/>
+  <line x1="340" y1="220" x2="210" y2="250" stroke="#2d3148" stroke-width="1"/>
+  <rect x="150" y="250" width="120" height="35" rx="6" fill="#1a2a1f" stroke="#22d3a7" stroke-width="2"/>
+  <text x="210" y="272" text-anchor="middle" fill="#22d3a7" font-size="11" font-weight="600">Majority Vote</text>
+
+  <!-- BOOSTING -->
+  <text x="620" y="28" text-anchor="middle" fill="#f5b731" font-size="15" font-weight="600">Boosting (XGBoost)</text>
+  <text x="620" y="48" text-anchor="middle" fill="#8892b0" font-size="11">Sequential — reduce bias</text>
+
+  <defs><marker id="ba" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#f5b731"/></marker></defs>
+
+  <rect x="480" y="70" width="120" height="40" rx="6" fill="#1a1d2e" stroke="#f5b731" stroke-width="1.5"/>
+  <text x="540" y="95" text-anchor="middle" fill="#f5b731" font-size="11">Weak Model 1</text>
+  <line x1="540" y1="110" x2="540" y2="125" stroke="#f5b731" stroke-width="1.5" marker-end="url(#ba)"/>
+  <text x="570" y="122" fill="#f45d6d" font-size="9">errors</text>
+
+  <rect x="480" y="130" width="120" height="40" rx="6" fill="#1a1d2e" stroke="#f5b731" stroke-width="1.5"/>
+  <text x="540" y="155" text-anchor="middle" fill="#f5b731" font-size="11">Weak Model 2</text>
+  <text x="460" y="155" fill="#8892b0" font-size="9">focus on↑</text>
+  <line x1="540" y1="170" x2="540" y2="185" stroke="#f5b731" stroke-width="1.5" marker-end="url(#ba)"/>
+  <text x="570" y="182" fill="#f45d6d" font-size="9">errors</text>
+
+  <rect x="480" y="190" width="120" height="40" rx="6" fill="#1a1d2e" stroke="#f5b731" stroke-width="1.5"/>
+  <text x="540" y="215" text-anchor="middle" fill="#f5b731" font-size="11">Weak Model n</text>
+  <text x="460" y="215" fill="#8892b0" font-size="9">focus on↑</text>
+
+  <line x1="540" y1="230" x2="540" y2="250" stroke="#f5b731" stroke-width="1.5" marker-end="url(#ba)"/>
+  <rect x="480" y="255" width="120" height="35" rx="6" fill="#252840" stroke="#f5b731" stroke-width="2"/>
+  <text x="540" y="277" text-anchor="middle" fill="#f5b731" font-size="11" font-weight="600">Weighted Sum</text>
+
+  <!-- XGBoost extras -->
+  <rect x="630" y="70" width="170" height="220" rx="10" fill="#1a1d2e" stroke="#2d3148" stroke-width="1"/>
+  <text x="715" y="95" text-anchor="middle" fill="#ff9f43" font-size="12" font-weight="600">XGBoost Extras</text>
+  <text x="645" y="118" fill="#c8cfe0" font-size="11">• L1 + L2 regularization</text>
+  <text x="645" y="140" fill="#c8cfe0" font-size="11">• Tree pruning</text>
+  <text x="645" y="162" fill="#c8cfe0" font-size="11">• Column subsampling</text>
+  <text x="645" y="184" fill="#c8cfe0" font-size="11">• Handles missing values</text>
+  <text x="645" y="206" fill="#c8cfe0" font-size="11">• Parallel tree building</text>
+  <text x="645" y="228" fill="#c8cfe0" font-size="11">• Learning rate (shrinkage)</text>
+  <text x="645" y="255" fill="#22d3a7" font-size="11" font-weight="600">Often wins Kaggle</text>
+  <text x="645" y="275" fill="#8892b0" font-size="10">for tabular data</text>
+
+  <!-- Comparison table -->
+  <rect x="30" y="310" width="760" height="115" rx="10" fill="#1a1d2e" stroke="#2d3148" stroke-width="1"/>
+  <text x="410" y="335" text-anchor="middle" fill="#e2e8f0" font-size="12" font-weight="600">Ensemble Comparison</text>
+  <text x="50" y="360" fill="#22d3a7" font-size="11" font-weight="600">Random Forest</text>
+  <text x="200" y="360" fill="#8892b0" font-size="11">Parallel trees, bootstrap samples, feature subsets. Low variance.</text>
+  <text x="50" y="382" fill="#f5b731" font-size="11" font-weight="600">AdaBoost</text>
+  <text x="200" y="382" fill="#8892b0" font-size="11">Sequential, reweights misclassified samples. Sensitive to noise.</text>
+  <text x="50" y="404" fill="#ff9f43" font-size="11" font-weight="600">XGBoost</text>
+  <text x="200" y="404" fill="#8892b0" font-size="11">Gradient boosted trees + regularization. Best for tabular data.</text>
+</svg>
+</div>
+
+<!-- ===== SECTION 5: K-MEANS ===== -->
+<h2 id="unsupervised">5. Unsupervised Learning: K-Means Clustering</h2>
+<p>No labels — the algorithm discovers structure on its own. K-Means partitions data into K clusters by iteratively assigning points to the nearest centroid and updating centroids.</p>
+
+<div class="sc">
+<svg width="820" height="240" viewBox="0 0 820 240" xmlns="http://www.w3.org/2000/svg">
+  <rect width="820" height="240" rx="12" fill="#161b22"/>
+  <text x="410" y="28" text-anchor="middle" fill="#e2e8f0" font-size="14" font-weight="600">K-Means Algorithm Steps</text>
+  <defs><marker id="ka" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#5eaeff"/></marker></defs>
+
+  <rect x="20" y="55" width="150" height="70" rx="8" fill="#1a1d2e" stroke="#7c6aff" stroke-width="2"/>
+  <text x="95" y="80" text-anchor="middle" fill="#7c6aff" font-size="11" font-weight="600">1. Pick K</text>
+  <text x="95" y="100" text-anchor="middle" fill="#8892b0" font-size="10">Random centroids</text>
+  <text x="95" y="115" text-anchor="middle" fill="#8892b0" font-size="10">(or K-means++)</text>
+  <line x1="170" y1="90" x2="200" y2="90" stroke="#5eaeff" stroke-width="1.5" marker-end="url(#ka)"/>
+
+  <rect x="210" y="55" width="150" height="70" rx="8" fill="#1a1d2e" stroke="#5eaeff" stroke-width="2"/>
+  <text x="285" y="80" text-anchor="middle" fill="#5eaeff" font-size="11" font-weight="600">2. Assign</text>
+  <text x="285" y="100" text-anchor="middle" fill="#8892b0" font-size="10">Each point → nearest</text>
+  <text x="285" y="115" text-anchor="middle" fill="#8892b0" font-size="10">centroid</text>
+  <line x1="360" y1="90" x2="390" y2="90" stroke="#5eaeff" stroke-width="1.5" marker-end="url(#ka)"/>
+
+  <rect x="400" y="55" width="150" height="70" rx="8" fill="#1a1d2e" stroke="#f5b731" stroke-width="2"/>
+  <text x="475" y="80" text-anchor="middle" fill="#f5b731" font-size="11" font-weight="600">3. Update</text>
+  <text x="475" y="100" text-anchor="middle" fill="#8892b0" font-size="10">Centroid = mean of</text>
+  <text x="475" y="115" text-anchor="middle" fill="#8892b0" font-size="10">assigned points</text>
+  <line x1="550" y1="90" x2="580" y2="90" stroke="#5eaeff" stroke-width="1.5" marker-end="url(#ka)"/>
+
+  <rect x="590" y="55" width="150" height="70" rx="8" fill="#1a1d2e" stroke="#22d3a7" stroke-width="2"/>
+  <text x="665" y="80" text-anchor="middle" fill="#22d3a7" font-size="11" font-weight="600">4. Converge?</text>
+  <text x="665" y="100" text-anchor="middle" fill="#8892b0" font-size="10">Centroids stable →</text>
+  <text x="665" y="115" text-anchor="middle" fill="#8892b0" font-size="10">done. Else → step 2</text>
+
+  <!-- Loop arrow -->
+  <path d="M665,125 L665,155 L285,155 L285,125" fill="none" stroke="#f45d6d" stroke-width="1" stroke-dasharray="5,4"/>
+  <text x="475" y="172" text-anchor="middle" fill="#f45d6d" font-size="10" font-style="italic">Repeat until convergence</text>
+
+  <!-- Elbow method -->
+  <rect x="30" y="190" width="760" height="35" rx="8" fill="#1a1d2e" stroke="#2d3148" stroke-width="1"/>
+  <text x="410" y="213" text-anchor="middle" fill="#f5b731" font-size="11"><tspan font-weight="600">Elbow Method:</tspan> Plot inertia (within-cluster sum of squares) vs K. Pick K at the "elbow" where adding more clusters gives diminishing returns.</text>
+</svg>
+</div>
+
+<!-- ===== SECTION 6: BIAS-VARIANCE ===== -->
+<h2 id="bias-variance">6. Bias-Variance Tradeoff &amp; Regularization</h2>
+
+<div class="sc">
+<svg width="820" height="320" viewBox="0 0 820 320" xmlns="http://www.w3.org/2000/svg">
+  <rect width="820" height="320" rx="12" fill="#161b22"/>
+  <text x="410" y="28" text-anchor="middle" fill="#e2e8f0" font-size="14" font-weight="600">Bias-Variance Tradeoff</text>
+
+  <!-- Underfitting -->
+  <rect x="30" y="50" width="240" height="150" rx="10" fill="#1a1d2e" stroke="#f45d6d" stroke-width="2"/>
+  <text x="150" y="78" text-anchor="middle" fill="#f45d6d" font-size="13" font-weight="600">Underfitting</text>
+  <text x="150" y="98" text-anchor="middle" fill="#8892b0" font-size="11">High Bias, Low Variance</text>
+  <!-- Simple line through curved data -->
+  <circle cx="60" cy="170" r="3" fill="#5eaeff"/><circle cx="80" cy="140" r="3" fill="#5eaeff"/>
+  <circle cx="110" cy="120" r="3" fill="#5eaeff"/><circle cx="140" cy="130" r="3" fill="#5eaeff"/>
+  <circle cx="170" cy="150" r="3" fill="#5eaeff"/><circle cx="200" cy="160" r="3" fill="#5eaeff"/>
+  <circle cx="230" cy="175" r="3" fill="#5eaeff"/>
+  <line x1="50" y1="165" x2="240" y2="135" stroke="#f45d6d" stroke-width="2"/>
+  <text x="150" y="195" text-anchor="middle" fill="#8892b0" font-size="10">Too simple — misses the pattern</text>
+
+  <!-- Just right -->
+  <rect x="290" y="50" width="240" height="150" rx="10" fill="#1a1d2e" stroke="#22d3a7" stroke-width="2"/>
+  <text x="410" y="78" text-anchor="middle" fill="#22d3a7" font-size="13" font-weight="600">Good Fit</text>
+  <text x="410" y="98" text-anchor="middle" fill="#8892b0" font-size="11">Balanced Bias &amp; Variance</text>
+  <circle cx="320" cy="170" r="3" fill="#5eaeff"/><circle cx="340" cy="140" r="3" fill="#5eaeff"/>
+  <circle cx="370" cy="120" r="3" fill="#5eaeff"/><circle cx="400" cy="130" r="3" fill="#5eaeff"/>
+  <circle cx="430" cy="150" r="3" fill="#5eaeff"/><circle cx="460" cy="160" r="3" fill="#5eaeff"/>
+  <circle cx="490" cy="175" r="3" fill="#5eaeff"/>
+  <path d="M310,172 C330,145 355,118 380,120 C405,122 430,148 460,162 C480,170 495,176 500,178" fill="none" stroke="#22d3a7" stroke-width="2"/>
+  <text x="410" y="195" text-anchor="middle" fill="#8892b0" font-size="10">Captures the real pattern</text>
+
+  <!-- Overfitting -->
+  <rect x="550" y="50" width="240" height="150" rx="10" fill="#1a1d2e" stroke="#f5b731" stroke-width="2"/>
+  <text x="670" y="78" text-anchor="middle" fill="#f5b731" font-size="13" font-weight="600">Overfitting</text>
+  <text x="670" y="98" text-anchor="middle" fill="#8892b0" font-size="11">Low Bias, High Variance</text>
+  <circle cx="580" cy="170" r="3" fill="#5eaeff"/><circle cx="600" cy="140" r="3" fill="#5eaeff"/>
+  <circle cx="630" cy="120" r="3" fill="#5eaeff"/><circle cx="660" cy="130" r="3" fill="#5eaeff"/>
+  <circle cx="690" cy="150" r="3" fill="#5eaeff"/><circle cx="720" cy="160" r="3" fill="#5eaeff"/>
+  <circle cx="750" cy="175" r="3" fill="#5eaeff"/>
+  <path d="M575,172 C582,168 590,142 600,140 C610,138 618,125 630,120 C642,115 650,128 660,130 C670,132 680,148 690,150 C700,152 712,158 720,160 C728,162 742,172 750,175" fill="none" stroke="#f5b731" stroke-width="2"/>
+  <text x="670" y="195" text-anchor="middle" fill="#8892b0" font-size="10">Memorizes noise — fails on new data</text>
+
+  <!-- Regularization -->
+  <rect x="30" y="225" width="760" height="80" rx="10" fill="#1a1d2e" stroke="#7c6aff" stroke-width="2"/>
+  <text x="410" y="250" text-anchor="middle" fill="#7c6aff" font-size="13" font-weight="600">Regularization — Fighting Overfitting</text>
+  <text x="100" y="278" fill="#22d3a7" font-size="12" font-weight="600">L1 (Lasso)</text>
+  <text x="200" y="278" fill="#8892b0" font-size="11">Adds |W| to loss. Drives weights to zero → feature selection.</text>
+  <text x="100" y="298" fill="#5eaeff" font-size="12" font-weight="600">L2 (Ridge)</text>
+  <text x="200" y="298" fill="#8892b0" font-size="11">Adds W² to loss. Shrinks weights → smoother model. Default choice.</text>
+</svg>
+</div>
+
+<div class="formula">Total Error = Bias² + Variance + Irreducible Noise</div>
+
+<div class="card cg">
+  <strong style="color:var(--green)">The Practical Rule</strong>
+  <p>If training accuracy is high but test accuracy is low → overfitting → add regularization, dropout, or get more data. If both are low → underfitting → use a more complex model or better features. Cross-validation is your best tool for detecting this.</p>
+</div>
+
+<p style="color:var(--dim);margin-top:3rem;text-align:center;font-size:.85rem;">Phase 3 ML Concepts — Visual HTML Reference</p>
+</body>
+</html>

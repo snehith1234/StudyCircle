@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Phase 1 — Statistics Visual Explainer</title>
+<style>
+  :root {
+    --bg:#0e1117;--surface:#161b22;--surface2:#1a1d2e;--border:#2d3148;
+    --text:#e2e8f0;--dim:#8892b0;--green:#22d3a7;--blue:#5eaeff;
+    --purple:#7c6aff;--yellow:#f5b731;--red:#f45d6d;--orange:#ff9f43;
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.7;padding:2rem;max-width:1100px;margin:0 auto}
+  h1{font-size:2.4rem;color:var(--green);margin-bottom:.3rem}
+  .sub{color:var(--dim);font-size:1.1rem;margin-bottom:2.5rem}
+  h2{font-size:1.6rem;color:var(--blue);margin-top:3rem;margin-bottom:1rem;padding-bottom:.4rem;border-bottom:1px solid var(--border)}
+  h3{font-size:1.15rem;color:var(--purple);margin-top:1.8rem;margin-bottom:.6rem}
+  p,li{margin-bottom:.8rem}
+  ul{padding-left:1.4rem}
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.6rem;margin:1.2rem 0}
+  .cg{border-left:4px solid var(--green)}.cb{border-left:4px solid var(--blue)}
+  .cy{border-left:4px solid var(--yellow)}.cr{border-left:4px solid var(--red)}
+  .cp{border-left:4px solid var(--purple)}
+  code{background:var(--surface2);padding:2px 6px;border-radius:4px;font-family:'Fira Code',monospace;font-size:.9em;color:var(--yellow)}
+  .formula{text-align:center;font-size:1.1rem;color:var(--yellow);padding:.8rem;background:var(--surface2);border-radius:8px;margin:1rem 0;font-family:'Fira Code',monospace}
+  .sc{display:flex;justify-content:center;margin:1.5rem 0;overflow-x:auto}
+  svg text{font-family:'Segoe UI',system-ui,sans-serif}
+  .toc{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.4rem 1.8rem;margin-bottom:2rem}
+  .toc ol{padding-left:1.2rem}.toc li{margin-bottom:.3rem}.toc a{color:var(--blue);text-decoration:none}.toc a:hover{text-decoration:underline}
+  table{width:100%;border-collapse:collapse;font-size:.9rem}
+  th{text-align:left;padding:.5rem;color:var(--blue);border-bottom:1px solid var(--border)}
+  td{padding:.4rem .5rem}
+  @media(max-width:700px){body{padding:1rem}h1{font-size:1.8rem}}
+</style>
+</head>
+<body>
+<h1>📊 Phase 1 — Statistics</h1>
+<p class="sub">Descriptive stats, probability, distributions, hypothesis testing, correlation &amp; regression — visual reference.</p>
+
+<nav class="toc">
+  <strong style="color:var(--green)">Contents</strong>
+  <ol>
+    <li><a href="#descriptive">Descriptive Statistics</a></li>
+    <li><a href="#probability">Probability &amp; Bayes</a></li>
+    <li><a href="#distributions">Distributions</a></li>
+    <li><a href="#hypothesis">Hypothesis Testing</a></li>
+    <li><a href="#correlation">Correlation &amp; Regression</a></li>
+  </ol>
+</nav>
+
+<!-- ===== SECTION 1: DESCRIPTIVE STATS ===== -->
+<h2 id="descriptive">1. Descriptive Statistics</h2>
+<p>Descriptive stats summarize a dataset with a few numbers: where the center is, how spread out the data is, and whether outliers exist.</p>
+
+<div class="sc">
+<svg width="820" height="300" viewBox="0 0 820 300" xmlns="http://www.w3.org/2000/svg">
+  <rect width="820" height="300" rx="12" fill="#161b22"/>
+  <text x="410" y="28" text-anchor="middle" fill="#e2e8f0" font-size="14" font-weight="600">Measures of Center &amp; Spread</text>
+
+  <!-- Center box -->
+  <rect x="30" y="50" width="240" height="220" rx="10" fill="#1a1d2e" stroke="#22d3a7" stroke-width="2"/>
+  <text x="150" y="78" text-anchor="middle" fill="#22d3a7" font-size="13" font-weight="600">Center</text>
+  <text x="50" y="108" fill="#c8d8c0" font-size="12">Mean = Σxᵢ / n</text>
+  <text x="50" y="130" fill="#8892b0" font-size="11">Sensitive to outliers</text>
+  <text x="50" y="160" fill="#c8d8c0" font-size="12">Median = middle value</text>
+  <text x="50" y="182" fill="#8892b0" font-size="11">Robust to outliers</text>
+  <text x="50" y="212" fill="#c8d8c0" font-size="12">Mode = most frequent</text>
+  <text x="50" y="234" fill="#8892b0" font-size="11">Works for categorical data</text>
+
+  <!-- Spread box -->
+  <rect x="290" y="50" width="240" height="220" rx="10" fill="#1a1d2e" stroke="#5eaeff" stroke-width="2"/>
+  <text x="410" y="78" text-anchor="middle" fill="#5eaeff" font-size="13" font-weight="600">Spread</text>
+  <text x="310" y="108" fill="#e2e8f0" font-size="12">Range = max − min</text>
+  <text x="310" y="130" fill="#8892b0" font-size="11">Simplest, affected by outliers</text>
+  <text x="310" y="160" fill="#e2e8f0" font-size="12">Variance = Σ(xᵢ−μ)² / n</text>
+  <text x="310" y="182" fill="#8892b0" font-size="11">Average squared deviation</text>
+  <text x="310" y="212" fill="#e2e8f0" font-size="12">Std Dev = √Variance</text>
+  <text x="310" y="234" fill="#8892b0" font-size="11">Same units as data</text>
+
+  <!-- Outliers box -->
+  <rect x="550" y="50" width="240" height="220" rx="10" fill="#1a1d2e" stroke="#f5b731" stroke-width="2"/>
+  <text x="670" y="78" text-anchor="middle" fill="#f5b731" font-size="13" font-weight="600">Outlier Detection</text>
+  <text x="570" y="108" fill="#c8cfe0" font-size="12">IQR = Q3 − Q1</text>
+  <text x="570" y="130" fill="#8892b0" font-size="11">Interquartile range</text>
+  <text x="570" y="160" fill="#c8cfe0" font-size="12">Lower = Q1 − 1.5×IQR</text>
+  <text x="570" y="182" fill="#c8cfe0" font-size="12">Upper = Q3 + 1.5×IQR</text>
+  <text x="570" y="212" fill="#f45d6d" font-size="12">Outside → outlier</text>
+  <text x="570" y="234" fill="#8892b0" font-size="11">Box plot whiskers show this</text>
+</svg>
+</div>
+
+<div class="card cg">
+  <strong style="color:var(--green)">When to use which?</strong>
+  <p>Use <code>mean</code> + <code>std dev</code> for symmetric data. Use <code>median</code> + <code>IQR</code> when outliers are present. The median is always a safer default for skewed distributions like income or house prices.</p>
+</div>
+
+<!-- ===== SECTION 2: PROBABILITY ===== -->
+<h2 id="probability">2. Probability &amp; Bayes' Theorem</h2>
+
+<div class="sc">
+<svg width="820" height="320" viewBox="0 0 820 320" xmlns="http://www.w3.org/2000/svg">
+  <rect width="820" height="320" rx="12" fill="#161b22"/>
+  <text x="410" y="28" text-anchor="middle" fill="#e2e8f0" font-size="14" font-weight="600">Probability Fundamentals</text>
+
+  <!-- Basic prob -->
+  <rect x="30" y="50" width="240" height="110" rx="10" fill="#1a1d2e" stroke="#7c6aff" stroke-width="2"/>
+  <text x="150" y="78" text-anchor="middle" fill="#7c6aff" font-size="13" font-weight="600">Basic Probability</text>
+  <text x="50" y="105" fill="#e2e8f0" font-size="12">P(A) = favorable / total</text>
+  <text x="50" y="128" fill="#8892b0" font-size="11">Always between 0 and 1</text>
+  <text x="50" y="148" fill="#8892b0" font-size="11">P(A') = 1 − P(A)</text>
+
+  <!-- Conditional -->
+  <rect x="290" y="50" width="240" height="110" rx="10" fill="#1a1d2e" stroke="#5eaeff" stroke-width="2"/>
+  <text x="410" y="78" text-anchor="middle" fill="#5eaeff" font-size="13" font-weight="600">Conditional Probability</text>
+  <text x="310" y="105" fill="#e2e8f0" font-size="12">P(A|B) = P(A∩B) / P(B)</text>
+  <text x="310" y="128" fill="#8892b0" font-size="11">"Probability of A given B"</text>
+  <text x="310" y="148" fill="#8892b0" font-size="11">Restricts sample space to B</text>
+
+  <!-- Independence -->
+  <rect x="550" y="50" width="240" height="110" rx="10" fill="#1a1d2e" stroke="#22d3a7" stroke-width="2"/>
+  <text x="670" y="78" text-anchor="middle" fill="#22d3a7" font-size="13" font-weight="600">Independence</text>
+  <text x="570" y="105" fill="#c8d8c0" font-size="12">P(A∩B) = P(A) × P(B)</text>
+  <text x="570" y="128" fill="#8892b0" font-size="11">Only if A and B are independent</text>
+  <text x="570" y="148" fill="#8892b0" font-size="11">Knowing B doesn't change P(A)</text>
+
+  <!-- Bayes -->
+  <rect x="140" y="185" width="540" height="115" rx="10" fill="#1a1d2e" stroke="#f5b731" stroke-width="2"/>
+  <text x="410" y="213" text-anchor="middle" fill="#f5b731" font-size="14" font-weight="600">Bayes' Theorem</text>
+  <text x="410" y="245" text-anchor="middle" fill="#f5b731" font-size="16" font-family="'Fira Code',monospace">P(A|B) = P(B|A) × P(A) / P(B)</text>
+  <text x="200" y="278" fill="#8892b0" font-size="11">posterior</text>
+  <text x="340" y="278" fill="#8892b0" font-size="11">likelihood</text>
+  <text x="470" y="278" fill="#8892b0" font-size="11">prior</text>
+  <text x="570" y="278" fill="#8892b0" font-size="11">evidence</text>
+</svg>
+</div>
+
+<div class="card cy">
+  <strong style="color:var(--yellow)">Bayes in Plain English</strong>
+  <p>Start with a belief (prior). See new evidence (likelihood). Update your belief (posterior). The denominator P(B) just normalizes so probabilities sum to 1. This is the foundation of spam filters, medical diagnosis, and Bayesian ML.</p>
+</div>
+
+<!-- ===== SECTION 3: DISTRIBUTIONS ===== -->
+<h2 id="distributions">3. Key Distributions</h2>
+
+<div class="sc">
+<svg width="820" height="400" viewBox="0 0 820 400" xmlns="http://www.w3.org/2000/svg">
+  <rect width="820" height="400" rx="12" fill="#161b22"/>
+
+  <!-- Normal -->
+  <text x="200" y="28" text-anchor="middle" fill="#22d3a7" font-size="14" font-weight="600">Normal (Gaussian)</text>
+  <line x1="50" y1="180" x2="350" y2="180" stroke="#2d3148" stroke-width="1"/>
+  <line x1="200" y1="50" x2="200" y2="180" stroke="#2d3148" stroke-width="1" stroke-dasharray="4,4"/>
+  <path d="M50,178 C80,176 110,170 130,155 C150,135 170,100 185,70 C192,55 196,48 200,45 C204,48 208,55 215,70 C230,100 250,135 270,155 C290,170 320,176 350,178" fill="none" stroke="#22d3a7" stroke-width="2.5"/>
+  <text x="200" y="200" text-anchor="middle" fill="#8892b0" font-size="10">μ</text>
+  <text x="130" y="200" text-anchor="middle" fill="#8892b0" font-size="10">μ−σ</text>
+  <text x="270" y="200" text-anchor="middle" fill="#8892b0" font-size="10">μ+σ</text>
+  <text x="200" y="225" text-anchor="middle" fill="#c8d8c0" font-size="11">68% within ±1σ</text>
+  <text x="200" y="243" text-anchor="middle" fill="#c8d8c0" font-size="11">95% within ±2σ</text>
+  <text x="200" y="261" text-anchor="middle" fill="#c8d8c0" font-size="11">99.7% within ±3σ</text>
+
+  <!-- Binomial -->
+  <text x="610" y="28" text-anchor="middle" fill="#5eaeff" font-size="14" font-weight="600">Binomial</text>
+  <line x1="460" y1="180" x2="760" y2="180" stroke="#2d3148" stroke-width="1"/>
+  <!-- bars -->
+  <rect x="480" y="172" width="20" height="8" rx="2" fill="#5eaeff" opacity="0.3"/>
+  <rect x="510" y="158" width="20" height="22" rx="2" fill="#5eaeff" opacity="0.4"/>
+  <rect x="540" y="135" width="20" height="45" rx="2" fill="#5eaeff" opacity="0.5"/>
+  <rect x="570" y="105" width="20" height="75" rx="2" fill="#5eaeff" opacity="0.7"/>
+  <rect x="600" y="70" width="20" height="110" rx="2" fill="#5eaeff" opacity="0.9"/>
+  <rect x="630" y="85" width="20" height="95" rx="2" fill="#5eaeff" opacity="0.8"/>
+  <rect x="660" y="120" width="20" height="60" rx="2" fill="#5eaeff" opacity="0.6"/>
+  <rect x="690" y="150" width="20" height="30" rx="2" fill="#5eaeff" opacity="0.4"/>
+  <rect x="720" y="168" width="20" height="12" rx="2" fill="#5eaeff" opacity="0.3"/>
+  <text x="610" y="200" text-anchor="middle" fill="#8892b0" font-size="10">k successes</text>
+  <text x="610" y="225" text-anchor="middle" fill="#e2e8f0" font-size="11">n trials, probability p</text>
+  <text x="610" y="243" text-anchor="middle" fill="#e2e8f0" font-size="11">P(X=k) = C(n,k) pᵏ (1−p)ⁿ⁻ᵏ</text>
+
+  <!-- Poisson -->
+  <text x="200" y="290" text-anchor="middle" fill="#f5b731" font-size="14" font-weight="600">Poisson</text>
+  <line x1="50" y1="380" x2="350" y2="380" stroke="#2d3148" stroke-width="1"/>
+  <rect x="65" y="320" width="18" height="60" rx="2" fill="#f5b731" opacity="0.9"/>
+  <rect x="95" y="335" width="18" height="45" rx="2" fill="#f5b731" opacity="0.8"/>
+  <rect x="125" y="348" width="18" height="32" rx="2" fill="#f5b731" opacity="0.6"/>
+  <rect x="155" y="358" width="18" height="22" rx="2" fill="#f5b731" opacity="0.5"/>
+  <rect x="185" y="365" width="18" height="15" rx="2" fill="#f5b731" opacity="0.4"/>
+  <rect x="215" y="370" width="18" height="10" rx="2" fill="#f5b731" opacity="0.3"/>
+  <rect x="245" y="374" width="18" height="6" rx="2" fill="#f5b731" opacity="0.2"/>
+  <text x="200" y="398" text-anchor="middle" fill="#c8cfe0" font-size="11">P(X=k) = e⁻λ λᵏ / k!</text>
+
+  <!-- Z-score -->
+  <rect x="430" y="280" width="360" height="100" rx="10" fill="#1a1d2e" stroke="#7c6aff" stroke-width="2"/>
+  <text x="610" y="308" text-anchor="middle" fill="#7c6aff" font-size="14" font-weight="600">Z-Score</text>
+  <text x="610" y="338" text-anchor="middle" fill="#f5b731" font-size="15" font-family="'Fira Code',monospace">z = (x − μ) / σ</text>
+  <text x="610" y="365" text-anchor="middle" fill="#8892b0" font-size="11">How many std devs from the mean</text>
+</svg>
+</div>
+
+<div class="card cb">
+  <strong style="color:var(--blue)">Which distribution when?</strong>
+  <ul>
+    <li><strong style="color:var(--green)">Normal</strong> — continuous data, symmetric (heights, test scores, measurement errors)</li>
+    <li><strong style="color:var(--blue)">Binomial</strong> — count of successes in n independent yes/no trials (coin flips, pass/fail)</li>
+    <li><strong style="color:var(--yellow)">Poisson</strong> — count of events in a fixed interval (calls per hour, defects per batch)</li>
+  </ul>
+</div>
+
+<!-- ===== SECTION 4: HYPOTHESIS TESTING ===== -->
+<h2 id="hypothesis">4. Hypothesis Testing</h2>
+
+<div class="sc">
+<svg width="820" height="380" viewBox="0 0 820 380" xmlns="http://www.w3.org/2000/svg">
+  <rect width="820" height="380" rx="12" fill="#161b22"/>
+  <text x="410" y="28" text-anchor="middle" fill="#e2e8f0" font-size="14" font-weight="600">Hypothesis Testing Pipeline</text>
+  <defs>
+    <marker id="ha" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#5eaeff"/></marker>
+  </defs>
+
+  <!-- Step 1 -->
+  <rect x="30" y="55" width="170" height="75" rx="10" fill="#1a1d2e" stroke="#7c6aff" stroke-width="2"/>
+  <text x="115" y="82" text-anchor="middle" fill="#7c6aff" font-size="12" font-weight="600">1. State Hypotheses</text>
+  <text x="115" y="102" text-anchor="middle" fill="#c8cfe0" font-size="11">H₀: no effect (null)</text>
+  <text x="115" y="118" text-anchor="middle" fill="#c8cfe0" font-size="11">H₁: there IS an effect</text>
+  <line x1="200" y1="92" x2="240" y2="92" stroke="#5eaeff" stroke-width="1.5" marker-end="url(#ha)"/>
+
+  <!-- Step 2 -->
+  <rect x="250" y="55" width="170" height="75" rx="10" fill="#1a1d2e" stroke="#5eaeff" stroke-width="2"/>
+  <text x="335" y="82" text-anchor="middle" fill="#5eaeff" font-size="12" font-weight="600">2. Choose α</text>
+  <text x="335" y="102" text-anchor="middle" fill="#c8cfe0" font-size="11">Significance level</text>
+  <text x="335" y="118" text-anchor="middle" fill="#c8cfe0" font-size="11">Usually α = 0.05</text>
+  <line x1="420" y1="92" x2="460" y2="92" stroke="#5eaeff" stroke-width="1.5" marker-end="url(#ha)"/>
+
+  <!-- Step 3 -->
+  <rect x="470" y="55" width="170" height="75" rx="10" fill="#1a1d2e" stroke="#f5b731" stroke-width="2"/>
+  <text x="555" y="82" text-anchor="middle" fill="#f5b731" font-size="12" font-weight="600">3. Compute Statistic</text>
+  <text x="555" y="102" text-anchor="middle" fill="#c8cfe0" font-size="11">t-test, z-test, χ²...</text>
+  <text x="555" y="118" text-anchor="middle" fill="#c8cfe0" font-size="11">→ get p-value</text>
+  <line x1="640" y1="92" x2="680" y2="92" stroke="#5eaeff" stroke-width="1.5" marker-end="url(#ha)"/>
+
+  <!-- Step 4 -->
+  <rect x="690" y="55" width="100" height="75" rx="10" fill="#1a1d2e" stroke="#22d3a7" stroke-width="2"/>
+  <text x="740" y="82" text-anchor="middle" fill="#22d3a7" font-size="12" font-weight="600">4. Decide</text>
+  <text x="740" y="102" text-anchor="middle" fill="#c8d8c0" font-size="11">p &lt; α →</text>
+  <text x="740" y="118" text-anchor="middle" fill="#c8d8c0" font-size="11">reject H₀</text>
+
+  <!-- P-value visual -->
+  <text x="410" y="165" text-anchor="middle" fill="#f5b731" font-size="13" font-weight="600">What is a p-value?</text>
+  <!-- Normal curve for p-value -->
+  <line x1="160" y1="310" x2="660" y2="310" stroke="#2d3148" stroke-width="1"/>
+  <path d="M160,308 C200,305 250,295 300,270 C340,245 370,210 395,185 C405,175 408,172 410,170 C412,172 415,175 425,185 C450,210 480,245 520,270 C570,295 620,305 660,308" fill="none" stroke="#5eaeff" stroke-width="2"/>
+  <!-- Shaded rejection region -->
+  <path d="M580,295 C600,300 630,305 660,308 L660,310 L580,310 Z" fill="#f45d6d" opacity="0.4"/>
+  <text x="630" y="290" fill="#f45d6d" font-size="11" font-weight="600">α region</text>
+  <!-- Test statistic line -->
+  <line x1="550" y1="300" x2="550" y2="310" stroke="#f5b731" stroke-width="2"/>
+  <circle cx="550" cy="300" r="4" fill="#f5b731"/>
+  <text x="550" y="330" text-anchor="middle" fill="#f5b731" font-size="10">test statistic</text>
+
+  <text x="410" y="360" text-anchor="middle" fill="#8892b0" font-size="11">p-value = probability of seeing this result (or more extreme) if H₀ is true</text>
+  <text x="410" y="378" text-anchor="middle" fill="#8892b0" font-size="11">Small p-value → data is unlikely under H₀ → reject H₀</text>
+</svg>
+</div>
+
+<h3>Confidence Intervals &amp; CLT</h3>
+<div class="card cp">
+  <strong style="color:var(--purple)">Central Limit Theorem</strong>
+  <p>No matter the population distribution, the sampling distribution of the mean approaches a normal distribution as sample size n increases (n ≥ 30 is the rule of thumb). This is why so many statistical tests assume normality.</p>
+</div>
+<div class="formula">95% CI = x̄ ± 1.96 × (σ / √n)</div>
+<p>A 95% confidence interval means: if we repeated this experiment 100 times, about 95 of those intervals would contain the true population parameter. It does NOT mean there's a 95% chance the true value is in this specific interval.</p>
+
+<h3>Type I &amp; Type II Errors</h3>
+<div class="card cy">
+<table>
+  <thead><tr><th></th><th style="color:var(--green)">H₀ True</th><th style="color:var(--red)">H₀ False</th></tr></thead>
+  <tbody>
+    <tr><td style="color:var(--blue)">Reject H₀</td><td style="color:var(--red)">Type I (α) — false alarm</td><td style="color:var(--green)">Correct — power (1−β)</td></tr>
+    <tr><td style="color:var(--blue)">Fail to reject</td><td style="color:var(--green)">Correct</td><td style="color:var(--red)">Type II (β) — missed finding</td></tr>
+  </tbody>
+</table>
+</div>
+
+<!-- ===== SECTION 5: CORRELATION & REGRESSION ===== -->
+<h2 id="correlation">5. Correlation &amp; Regression</h2>
+
+<div class="sc">
+<svg width="820" height="300" viewBox="0 0 820 300" xmlns="http://www.w3.org/2000/svg">
+  <rect width="820" height="300" rx="12" fill="#161b22"/>
+  <text x="410" y="28" text-anchor="middle" fill="#e2e8f0" font-size="14" font-weight="600">Correlation Spectrum</text>
+
+  <!-- r = -1 -->
+  <rect x="30" y="50" width="150" height="140" rx="8" fill="#1a1d2e" stroke="#f45d6d" stroke-width="1.5"/>
+  <text x="105" y="75" text-anchor="middle" fill="#f45d6d" font-size="12" font-weight="600">r = −1</text>
+  <circle cx="55" cy="100" r="3" fill="#f45d6d"/><circle cx="65" cy="110" r="3" fill="#f45d6d"/>
+  <circle cx="75" cy="120" r="3" fill="#f45d6d"/><circle cx="85" cy="130" r="3" fill="#f45d6d"/>
+  <circle cx="95" cy="140" r="3" fill="#f45d6d"/><circle cx="105" cy="150" r="3" fill="#f45d6d"/>
+  <circle cx="115" cy="160" r="3" fill="#f45d6d"/><circle cx="125" cy="170" r="3" fill="#f45d6d"/>
+  <line x1="50" y1="95" x2="135" y2="175" stroke="#f45d6d" stroke-width="1" stroke-dasharray="4,3"/>
+  <text x="105" y="198" text-anchor="middle" fill="#8892b0" font-size="10">Perfect negative</text>
+
+  <!-- r = 0 -->
+  <rect x="200" y="50" width="150" height="140" rx="8" fill="#1a1d2e" stroke="#8892b0" stroke-width="1.5"/>
+  <text x="275" y="75" text-anchor="middle" fill="#8892b0" font-size="12" font-weight="600">r ≈ 0</text>
+  <circle cx="225" cy="110" r="3" fill="#8892b0"/><circle cx="260" cy="150" r="3" fill="#8892b0"/>
+  <circle cx="240" cy="170" r="3" fill="#8892b0"/><circle cx="290" cy="100" r="3" fill="#8892b0"/>
+  <circle cx="310" cy="160" r="3" fill="#8892b0"/><circle cx="250" cy="120" r="3" fill="#8892b0"/>
+  <circle cx="280" cy="130" r="3" fill="#8892b0"/><circle cx="220" cy="145" r="3" fill="#8892b0"/>
+  <text x="275" y="198" text-anchor="middle" fill="#8892b0" font-size="10">No linear relationship</text>
+
+  <!-- r = +1 -->
+  <rect x="370" y="50" width="150" height="140" rx="8" fill="#1a1d2e" stroke="#22d3a7" stroke-width="1.5"/>
+  <text x="445" y="75" text-anchor="middle" fill="#22d3a7" font-size="12" font-weight="600">r = +1</text>
+  <circle cx="395" cy="170" r="3" fill="#22d3a7"/><circle cx="405" cy="160" r="3" fill="#22d3a7"/>
+  <circle cx="415" cy="150" r="3" fill="#22d3a7"/><circle cx="425" cy="140" r="3" fill="#22d3a7"/>
+  <circle cx="435" cy="130" r="3" fill="#22d3a7"/><circle cx="445" cy="120" r="3" fill="#22d3a7"/>
+  <circle cx="455" cy="110" r="3" fill="#22d3a7"/><circle cx="465" cy="100" r="3" fill="#22d3a7"/>
+  <line x1="390" y1="175" x2="475" y2="95" stroke="#22d3a7" stroke-width="1" stroke-dasharray="4,3"/>
+  <text x="445" y="198" text-anchor="middle" fill="#8892b0" font-size="10">Perfect positive</text>
+
+  <!-- Regression box -->
+  <rect x="550" y="50" width="240" height="220" rx="10" fill="#1a1d2e" stroke="#f5b731" stroke-width="2"/>
+  <text x="670" y="78" text-anchor="middle" fill="#f5b731" font-size="13" font-weight="600">Linear Regression</text>
+  <text x="570" y="108" fill="#f5b731" font-size="13" font-family="'Fira Code',monospace">ŷ = mx + b</text>
+  <text x="570" y="135" fill="#8892b0" font-size="11">m = slope (change in y per x)</text>
+  <text x="570" y="155" fill="#8892b0" font-size="11">b = intercept (y when x=0)</text>
+  <text x="570" y="185" fill="#e2e8f0" font-size="12">R² = explained variance</text>
+  <text x="570" y="208" fill="#8892b0" font-size="11">R²=1 → perfect fit</text>
+  <text x="570" y="228" fill="#8892b0" font-size="11">R²=0 → no better than mean</text>
+  <text x="570" y="255" fill="#f45d6d" font-size="11">Correlation ≠ causation</text>
+</svg>
+</div>
+
+<div class="card cg">
+  <strong style="color:var(--green)">Key Formulas</strong>
+  <ul>
+    <li><code>r = Σ(xᵢ−x̄)(yᵢ−ȳ) / √[Σ(xᵢ−x̄)² × Σ(yᵢ−ȳ)²]</code> — Pearson correlation coefficient</li>
+    <li><code>R² = 1 − (SS_res / SS_tot)</code> — proportion of variance explained by the model</li>
+    <li><code>MSE = (1/n) Σ(yᵢ − ŷᵢ)²</code> — average squared prediction error</li>
+  </ul>
+</div>
+
+<p style="color:var(--dim);margin-top:3rem;text-align:center;font-size:.85rem;">Phase 1 Statistics — Visual HTML Reference</p>
+</body>
+</html>
