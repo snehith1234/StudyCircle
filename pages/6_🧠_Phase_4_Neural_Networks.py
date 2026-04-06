@@ -390,63 +390,211 @@ elif tab == "📉 Loss Functions":
 # TAB: Backpropagation
 # ═══════════════════════════════════════
 elif tab == "🔄 Backpropagation":
-    st.markdown("# 🔄 Backpropagation")
-    st.caption("How the network learns from its mistakes")
+    st.markdown("# 🔄 Backpropagation — Step by Step")
+    st.caption("Watch gradients flow forward then backward through actual numbers")
 
     st.markdown("""<div class="concept-card">
-    Backpropagation is the <b>chain rule</b> applied through the network layers in reverse.
-    The loss gradient flows backward from the output to the input, computing how much each weight
-    contributed to the error. Each weight is then adjusted to reduce the error.
+    We'll trace <b>Store S1 (Rating=4.5, Delivery=20, Actual=1)</b> through a simple network.
+    First the <b>forward pass</b> computes the prediction. Then the <b>backward pass</b> computes
+    how to fix each weight. Every number is computed — nothing is hidden.
     </div>""", unsafe_allow_html=True)
 
-    st.markdown("### The Chain Rule — 3 Steps")
+    # Network setup
+    x1, x2, y_true = 4.5, 20.0, 1.0
+    w1, w2, b = 1.0, -0.05, -2.0
+    eta = st.slider("Learning rate (η)", 0.01, 1.0, 0.1, 0.01)
 
-    col1, col2, col3 = st.columns(3)
-    with col1:
-        st.markdown("""<div class="math-box">
-        <b>Part 1: ∂Loss/∂p</b><br>
-        How does loss change with prediction?<br>
-        = −y/p + (1−y)/(1−p)<br><br>
-        <i>If prediction is wrong, this is large.</i>
+    bp_step = st.radio("Step:", [
+        "1. Forward: Weighted Sum",
+        "2. Forward: Activation",
+        "3. Forward: Loss",
+        "4. Backward: Output Gradient",
+        "5. Backward: Sigmoid Gradient",
+        "6. Backward: Weight Gradients",
+        "7. Update Weights",
+        "8. Full Picture"
+    ], horizontal=False)
+
+    # Compute everything
+    z = w1 * x1 + w2 * x2 + b
+    a = 1 / (1 + np.exp(-z))
+    loss = -(y_true * np.log(a) + (1 - y_true) * np.log(1 - a))
+
+    # Backward
+    dL_da = -y_true / a + (1 - y_true) / (1 - a)  # ∂Loss/∂a
+    da_dz = a * (1 - a)                              # ∂a/∂z (sigmoid derivative)
+    dL_dz = dL_da * da_dz                             # ∂Loss/∂z = (a - y)
+    dz_dw1 = x1                                       # ∂z/∂w1
+    dz_dw2 = x2                                       # ∂z/∂w2
+    dz_db = 1.0                                       # ∂z/∂b
+    dL_dw1 = dL_dz * dz_dw1                           # ∂Loss/∂w1
+    dL_dw2 = dL_dz * dz_dw2                           # ∂Loss/∂w2
+    dL_db = dL_dz * dz_db                             # ∂Loss/∂b
+
+    w1_new = w1 - eta * dL_dw1
+    w2_new = w2 - eta * dL_dw2
+    b_new = b - eta * dL_db
+
+    # New prediction after update
+    z_new = w1_new * x1 + w2_new * x2 + b_new
+    a_new = 1 / (1 + np.exp(-z_new))
+    loss_new = -(y_true * np.log(a_new) + (1 - y_true) * np.log(1 - a_new))
+
+    if bp_step == "1. Forward: Weighted Sum":
+        st.markdown("### ➡️ Step 1: Compute Weighted Sum (z)")
+        st.markdown(f"""<div class="math-box">
+        <b>z = w₁ × x₁ + w₂ × x₂ + b</b><br><br>
+        z = {w1:.1f} × {x1:.1f} + ({w2:.2f}) × {x2:.0f} + ({b:.1f})<br>
+        z = {w1*x1:.2f} + ({w2*x2:.2f}) + ({b:.1f})<br>
+        <b>z = {z:.4f}</b>
         </div>""", unsafe_allow_html=True)
-    with col2:
-        st.markdown("""<div class="math-box">
-        <b>Part 2: ∂p/∂z</b><br>
-        How does sigmoid change with z?<br>
-        = σ(z) × (1 − σ(z))<br><br>
-        <i>Max = 0.25 → vanishing gradient!</i>
-        </div>""", unsafe_allow_html=True)
-    with col3:
-        st.markdown("""<div class="math-box">
-        <b>Part 3: ∂z/∂w</b><br>
-        How does z change with weight?<br>
-        = xⱼ (just the feature value)<br><br>
-        <i>Larger features → larger updates.</i>
+        st.markdown("""<div class="insight-box">
+        The weighted sum z combines all inputs. Positive z → sigmoid will output > 0.5.
+        Negative z → sigmoid will output < 0.5. z = 0 → exactly 0.5 (coin flip).
         </div>""", unsafe_allow_html=True)
 
-    st.markdown("""<div class="insight-box">
-    <b>Multiply all three:</b> ∂Loss/∂w = (∂Loss/∂p) × (∂p/∂z) × (∂z/∂w) = <b>(p − y) × x</b><br><br>
-    Three complex derivatives simplify to: <b>prediction error × feature value</b>. This isn't a coincidence —
-    log loss and sigmoid were designed to work together.
-    </div>""", unsafe_allow_html=True)
+    elif bp_step == "2. Forward: Activation":
+        st.markdown("### ➡️ Step 2: Apply Sigmoid Activation")
+        st.markdown(f"""<div class="math-box">
+        <b>ŷ = σ(z) = 1 / (1 + e⁻ᶻ)</b><br><br>
+        ŷ = 1 / (1 + e^(-{z:.4f}))<br>
+        ŷ = 1 / (1 + {np.exp(-z):.4f})<br>
+        ŷ = 1 / {1 + np.exp(-z):.4f}<br>
+        <b>ŷ = {a:.6f} = {a*100:.2f}%</b>
+        </div>""", unsafe_allow_html=True)
+        if a >= 0.5:
+            st.success(f"Prediction: ✅ Successful ({a*100:.2f}%) — Actual: 1 (Successful)")
+        else:
+            st.error(f"Prediction: ❌ Not Successful ({a*100:.2f}%) — Actual: 1 (Successful)")
 
-    st.markdown("### Vanishing Gradient Through Layers")
-    n_layers = st.slider("Number of sigmoid layers", 1, 20, 10)
-    grad_per_layer = [0.25 ** i for i in range(n_layers)]
+    elif bp_step == "3. Forward: Loss":
+        st.markdown("### ➡️ Step 3: Compute Loss (How Wrong?)")
+        st.markdown(f"""<div class="math-box">
+        <b>Loss = −[y × log(ŷ) + (1−y) × log(1−ŷ)]</b><br><br>
+        Since y = 1 (actual is Successful):<br>
+        Loss = −[1 × log({a:.6f}) + 0 × log({1-a:.6f})]<br>
+        Loss = −log({a:.6f})<br>
+        <b>Loss = {loss:.6f}</b>
+        </div>""", unsafe_allow_html=True)
+        st.markdown(f"""<div class="insight-box">
+        A perfect prediction (ŷ=1.0) would give Loss = 0.<br>
+        Our prediction ŷ={a:.4f} gives Loss = {loss:.4f}.<br>
+        The model needs to push ŷ closer to 1.0 — that's what backprop will do.
+        </div>""", unsafe_allow_html=True)
 
-    fig = go.Figure()
-    fig.add_trace(go.Bar(
-        x=[f"Layer {n_layers - i}" for i in range(n_layers)],
-        y=grad_per_layer,
-        marker_color=['#22d3a7' if g > 0.01 else '#f5b731' if g > 0.001 else '#f45d6d' for g in grad_per_layer]
-    ))
-    fig.update_layout(**DL, title=f"Gradient magnitude through {n_layers} sigmoid layers", yaxis_title="Gradient", height=350, yaxis_type="log")
-    st.plotly_chart(fig, use_container_width=True)
+    elif bp_step == "4. Backward: Output Gradient":
+        st.markdown("### ⬅️ Step 4: Gradient of Loss w.r.t. Prediction (∂Loss/∂ŷ)")
+        st.markdown(f"""<div class="math-box">
+        <b>∂Loss/∂ŷ = −y/ŷ + (1−y)/(1−ŷ)</b><br><br>
+        Since y = 1:<br>
+        ∂Loss/∂ŷ = −1/{a:.6f} + 0/(1−{a:.6f})<br>
+        <b>∂Loss/∂ŷ = {dL_da:.6f}</b>
+        </div>""", unsafe_allow_html=True)
+        st.markdown(f"""<div class="insight-box">
+        This is <b>negative</b> ({dL_da:.4f}) because the actual is 1 but prediction is {a:.4f} (too low).
+        A negative gradient means: "increase the prediction to reduce the loss."
+        </div>""", unsafe_allow_html=True)
 
-    st.markdown(f"""<div class="math-box">
-    Layer {n_layers} gradient: <b>1.0</b> | Layer 1 gradient: <b>{0.25**n_layers:.2e}</b>
-    <br>Ratio: Layer 1 gets {1/(0.25**n_layers):.0f}× less gradient than Layer {n_layers}
-    </div>""", unsafe_allow_html=True)
+    elif bp_step == "5. Backward: Sigmoid Gradient":
+        st.markdown("### ⬅️ Step 5: Gradient Through Sigmoid (∂ŷ/∂z)")
+        st.markdown(f"""<div class="math-box">
+        <b>∂ŷ/∂z = σ(z) × (1 − σ(z)) = ŷ × (1 − ŷ)</b><br><br>
+        ∂ŷ/∂z = {a:.6f} × (1 − {a:.6f})<br>
+        ∂ŷ/∂z = {a:.6f} × {1-a:.6f}<br>
+        <b>∂ŷ/∂z = {da_dz:.6f}</b><br><br>
+        <b>Combined: ∂Loss/∂z = ∂Loss/∂ŷ × ∂ŷ/∂z</b><br>
+        ∂Loss/∂z = {dL_da:.6f} × {da_dz:.6f}<br>
+        <b>∂Loss/∂z = {dL_dz:.6f}</b><br><br>
+        <i>Shortcut: ∂Loss/∂z = ŷ − y = {a:.6f} − {y_true:.0f} = {a - y_true:.6f} ✓</i>
+        </div>""", unsafe_allow_html=True)
+        st.markdown(f"""<div class="insight-box">
+        The sigmoid gradient is {da_dz:.4f} — notice it's less than 0.25 (the maximum).
+        This is why sigmoid causes vanishing gradients: each layer multiplies by a number ≤ 0.25.
+        <br><br>The shortcut (ŷ − y) works because log loss and sigmoid are mathematically paired.
+        </div>""", unsafe_allow_html=True)
+
+    elif bp_step == "6. Backward: Weight Gradients":
+        st.markdown("### ⬅️ Step 6: Gradient for Each Weight")
+        st.markdown(f"""<div class="math-box">
+        <b>∂Loss/∂w₁ = ∂Loss/∂z × ∂z/∂w₁ = (ŷ − y) × x₁</b><br>
+        ∂Loss/∂w₁ = {dL_dz:.6f} × {x1:.1f} = <b>{dL_dw1:.6f}</b><br><br>
+        <b>∂Loss/∂w₂ = ∂Loss/∂z × ∂z/∂w₂ = (ŷ − y) × x₂</b><br>
+        ∂Loss/∂w₂ = {dL_dz:.6f} × {x2:.0f} = <b>{dL_dw2:.6f}</b><br><br>
+        <b>∂Loss/∂b = ∂Loss/∂z × ∂z/∂b = (ŷ − y) × 1</b><br>
+        ∂Loss/∂b = {dL_dz:.6f} × 1 = <b>{dL_db:.6f}</b>
+        </div>""", unsafe_allow_html=True)
+        st.markdown(f"""<div class="insight-box">
+        All gradients are <b>negative</b> because the prediction ({a:.4f}) is below the target (1.0).<br>
+        Negative gradient → weights should <b>increase</b> (move opposite to gradient).<br><br>
+        w₂'s gradient ({dL_dw2:.4f}) is larger in magnitude than w₁'s ({dL_dw1:.4f})
+        because x₂ (Delivery={x2:.0f}) is numerically larger than x₁ (Rating={x1:.1f}).
+        </div>""", unsafe_allow_html=True)
+
+    elif bp_step == "7. Update Weights":
+        st.markdown("### 🔧 Step 7: Update Weights")
+        st.markdown(f"""<div class="math-box">
+        <b>Update rule: w_new = w_old − η × gradient</b><br><br>
+        w₁: {w1:.4f} − {eta:.3f} × ({dL_dw1:.6f}) = {w1:.4f} − ({eta * dL_dw1:.6f}) = <b>{w1_new:.6f}</b><br>
+        w₂: {w2:.4f} − {eta:.3f} × ({dL_dw2:.6f}) = {w2:.4f} − ({eta * dL_dw2:.6f}) = <b>{w2_new:.6f}</b><br>
+        b:  {b:.4f} − {eta:.3f} × ({dL_db:.6f}) = {b:.4f} − ({eta * dL_db:.6f}) = <b>{b_new:.6f}</b>
+        </div>""", unsafe_allow_html=True)
+
+        col1, col2, col3 = st.columns(3)
+        col1.metric("w₁ (Rating)", f"{w1_new:.4f}", f"{w1_new - w1:+.4f}")
+        col2.metric("w₂ (Delivery)", f"{w2_new:.4f}", f"{w2_new - w2:+.4f}")
+        col3.metric("b (Bias)", f"{b_new:.4f}", f"{b_new - b:+.4f}")
+
+        st.markdown(f"""<div class="insight-box">
+        All weights <b>increased</b> (moved opposite to negative gradient) to push the prediction higher.<br>
+        w₁ increased by {w1_new - w1:+.4f} → higher rating will now contribute more to success.<br>
+        w₂ increased by {w2_new - w2:+.4f} → delivery penalty is now slightly less harsh.
+        </div>""", unsafe_allow_html=True)
+
+    else:  # Full Picture
+        st.markdown("### 📊 Full Picture: Before vs After One Update")
+
+        col1, col2 = st.columns(2)
+        with col1:
+            st.markdown(f"""<div class="math-box">
+            <b>BEFORE (Forward Pass)</b><br>
+            Weights: w₁={w1:.2f}, w₂={w2:.2f}, b={b:.1f}<br>
+            z = {z:.4f}<br>
+            ŷ = σ(z) = {a:.4f} ({a*100:.1f}%)<br>
+            Loss = {loss:.4f}
+            </div>""", unsafe_allow_html=True)
+        with col2:
+            st.markdown(f"""<div class="insight-box">
+            <b>AFTER (One Gradient Step)</b><br>
+            Weights: w₁={w1_new:.4f}, w₂={w2_new:.4f}, b={b_new:.4f}<br>
+            z = {z_new:.4f}<br>
+            ŷ = σ(z) = {a_new:.4f} ({a_new*100:.1f}%)<br>
+            Loss = {loss_new:.4f}
+            </div>""", unsafe_allow_html=True)
+
+        col_a, col_b, col_c = st.columns(3)
+        col_a.metric("Prediction", f"{a_new*100:.1f}%", f"{(a_new - a)*100:+.1f}%")
+        col_b.metric("Loss", f"{loss_new:.4f}", f"{loss_new - loss:+.4f}")
+        col_c.metric("Closer to target?", "Yes ✅" if a_new > a else "No ❌")
+
+        st.markdown("### Gradient Flow Visualization")
+        stages = ['∂Loss/∂ŷ', '× ∂ŷ/∂z', '= ∂Loss/∂z', '× x₁ = ∂L/∂w₁', '× x₂ = ∂L/∂w₂']
+        values = [abs(dL_da), da_dz, abs(dL_dz), abs(dL_dw1), abs(dL_dw2)]
+        colors = ['#f45d6d', '#f5b731', '#5eaeff', '#22d3a7', '#7c6aff']
+
+        fig = go.Figure()
+        fig.add_trace(go.Bar(x=stages, y=values, marker_color=colors,
+                             text=[f"{v:.4f}" for v in values], textposition='outside',
+                             textfont=dict(color='#e2e8f0')))
+        fig.update_layout(**DL, title="Gradient Magnitude at Each Stage", yaxis_title="Gradient magnitude", height=350)
+        st.plotly_chart(fig, use_container_width=True)
+
+        st.markdown(f"""<div class="concept-card">
+        <b>The story in one sentence:</b> The prediction was {a:.4f} but should be 1.0.
+        The error ({a - y_true:.4f}) flows backward through the sigmoid (×{da_dz:.4f}),
+        then splits to each weight (×{x1:.1f} for w₁, ×{x2:.0f} for w₂).
+        Each weight moves opposite to its gradient by η={eta:.3f}, pushing the prediction from {a*100:.1f}% to {a_new*100:.1f}%.
+        Repeat this 1000 times and the network converges.
+        </div>""", unsafe_allow_html=True)
 
 
 # ═══════════════════════════════════════
