@@ -64,7 +64,7 @@ graph TD
     end
 
     subgraph M2["Model 2: Linear Regression"]
-        M2D["ŷ = neg56.91 + 31.13 × Rating<br/>Training MSE = 3.38<br/>Test MSE ≈ 5 to 10"]
+        M2D["ŷ = −56.91 + 31.13 × Rating<br/>Training MSE = 3.38<br/>Test MSE ≈ 5 to 10"]
         M2V["LOW bias, LOW variance<br/><i>Just right — captures the trend</i>"]
     end
 

@@ -534,7 +534,7 @@ graph TD
     S1P["🌱 Stump 1<br/>Rating=3.7 ≤ 3.8<br/>→ Predict -1<br/><i>α₁ = 0.973</i>"]
     S2P["🌱 Stump 2<br/>Delivery=22 ≤ 30<br/>→ Predict 1<br/><i>α₂ > 0.973</i>"]
 
-    S1P --> COMBINE["Score = α₁×(neg1) + α₂×(1)<br/>= neg0.973 + α₂"]
+    S1P --> COMBINE["Score = α₁×(−1) + α₂×(1)<br/>= −0.973 + α₂"]
     S2P --> COMBINE
 
     COMBINE -->|"α₂ > 0.973"| FINAL["Final: sign = <b>1 Successful ✅</b>"]
@@ -615,7 +615,7 @@ This zooms into one complete iteration. On the left, we see the residuals for al
 ```mermaid
 %%{init: {'theme': 'dark', 'themeVariables': {'darkMode': true, 'background': '#0e1117', 'primaryColor': '#1a1d2e', 'primaryTextColor': '#e2e8f0', 'primaryBorderColor': '#2d3148', 'lineColor': '#8892b0', 'secondaryColor': '#252840', 'tertiaryColor': '#1a1d2e', 'fontSize': '14px', 'edgeLabelBackground': '#0e1117'}, 'flowchart': {'nodeSpacing': 30, 'rankSpacing': 40, 'padding': 15, 'htmlLabels': true}}}%%
 graph TD
-    subgraph RESIDUALS["Residuals: yᵢ minus 0.5"]
+    subgraph RESIDUALS["Residuals: yᵢ − 0.5"]
         RS1["S1: 0.5"]
         RS2["S2: -0.5"]
         RS3["S3: 0.5"]
@@ -626,13 +626,13 @@ graph TD
         RS8["S8: -0.5"]
     end
 
-    RESIDUALS --> TREE["🌳 Tree 1 learns:<br/>Rating ≤ 3.8 → predict neg0.5<br/>Rating > 3.8 → predict 0.5"]
+    RESIDUALS --> TREE["🌳 Tree 1 learns:<br/>Rating ≤ 3.8 → predict −0.5<br/>Rating > 3.8 → predict 0.5"]
 
     TREE --> UPD["Update with η=0.1"]
 
     subgraph UPDATED["Updated Predictions F₁"]
         US1["S1: 0.5 + 0.1×0.5 = <b>0.55</b>"]
-        US2["S2: 0.5 + 0.1×(neg0.5) = <b>0.45</b>"]
+        US2["S2: 0.5 + 0.1×(−0.5) = <b>0.45</b>"]
     end
 
     UPD --> UPDATED

@@ -288,7 +288,7 @@ Each layer's input distribution shifts as previous layers update their weights (
 ```mermaid
 %%{init: {'theme': 'dark', 'themeVariables': {'darkMode': true, 'background': '#0e1117', 'primaryColor': '#1a1d2e', 'primaryTextColor': '#e2e8f0', 'primaryBorderColor': '#2d3148', 'lineColor': '#8892b0', 'secondaryColor': '#252840', 'tertiaryColor': '#1a1d2e', 'fontSize': '14px', 'edgeLabelBackground': '#0e1117'}, 'flowchart': {'nodeSpacing': 30, 'rankSpacing': 40, 'padding': 15, 'htmlLabels': true}}}%%
 graph TD
-    INPUT["Raw activations<br/>mean=1.2, var=0.8<br/><i>Drifting distribution</i>"] --> NORM["Step 1: Normalize<br/>x̂ = (x minus μ) / σ<br/>mean=0, var=1"]
+    INPUT["Raw activations<br/>mean=1.2, var=0.8<br/><i>Drifting distribution</i>"] --> NORM["Step 1: Normalize<br/>x̂ = (x − μ) / σ<br/>mean=0, var=1"]
     NORM --> SCALE["Step 2: Scale and Shift<br/>y = γ × x̂ + β<br/><i>γ, β are LEARNABLE</i>"]
     SCALE --> OUTPUT["Stable activations<br/><i>Optimal distribution<br/>for this layer</i>"]
 
@@ -374,8 +374,8 @@ graph TD
     TASK{"What is your task?"}
     TASK -->|"Yes or No?"| BCE["Binary Cross Entropy<br/>Loss = neg(y log ŷ + (1-y) log(1-ŷ))<br/>Output: Sigmoid<br/><i>From Bernoulli distribution</i>"]
     TASK -->|"Which class? (3 +)"| CCE["Categorical Cross Entropy<br/>Loss = neg Σ yₖ log ŷₖ<br/>Output: Softmax<br/><i>From Multinomial distribution</i>"]
-    TASK -->|"What number?"| MSE["MSE = (1/n) Σ (y minus ŷ)²<br/>Output: Linear<br/><i>From Gaussian distribution</i>"]
-    TASK -->|"Number, with outliers?"| MAE["MAE = (1/n) Σ abs(y minus ŷ)<br/>Output: Linear<br/><i>More robust to outliers</i>"]
+    TASK -->|"What number?"| MSE["MSE = (1/n) Σ (y − ŷ)²<br/>Output: Linear<br/><i>From Gaussian distribution</i>"]
+    TASK -->|"Number, with outliers?"| MAE["MAE = (1/n) Σ abs(y − ŷ)<br/>Output: Linear<br/><i>More robust to outliers</i>"]
 
     style TASK fill:#252840,stroke:#f5b731,color:#c8cfe0
     style BCE fill:#1a1d2e,stroke:#5eaeff,color:#e2e8f0

@@ -61,13 +61,13 @@ After training on our 8 pizza stores using gradient descent (section 4), the mod
 %%{init: {'theme': 'dark', 'themeVariables': {'darkMode': true, 'background': '#0e1117', 'primaryColor': '#1a1d2e', 'primaryTextColor': '#e2e8f0', 'primaryBorderColor': '#2d3148', 'lineColor': '#8892b0', 'secondaryColor': '#252840', 'tertiaryColor': '#1a1d2e', 'fontSize': '14px', 'edgeLabelBackground': '#0e1117'}, 'flowchart': {'nodeSpacing': 30, 'rankSpacing': 40, 'padding': 15, 'htmlLabels': true}}}%%
 graph TD
     subgraph STORE1["S1: Rating=4.5, Delivery=20"]
-        Z1["z = neg4.0 + 1.2(4.5) + (neg0.04)(20)<br/>= neg4.0 + 5.4 minus 0.8 = <b>0.6</b>"]
+        Z1["z = −4.0 + 1.2(4.5) + (−0.04)(20)<br/>= −4.0 + 5.4 − 0.8 = <b>0.6</b>"]
         Z1 --> P1["P = σ(0.6) = <b>0.646</b> = 64.6%"]
         P1 --> C1["0.646 ≥ 0.5 → Predict 1 ✅"]
     end
 
     subgraph STORE2["S2: Rating=3.2, Delivery=45"]
-        Z2["z = neg4.0 + 1.2(3.2) + (neg0.04)(45)<br/>= neg4.0 + 3.84 minus 1.8 = <b>neg1.96</b>"]
+        Z2["z = −4.0 + 1.2(3.2) + (−0.04)(45)<br/>= −4.0 + 3.84 − 1.8 = <b>−1.96</b>"]
         Z2 --> P2["P = σ(-1.96) = <b>0.123</b> = 12.3%"]
         P2 --> C2["0.123 < 0.5 → Predict 0 ❌"]
     end
@@ -147,7 +147,7 @@ The model starts with random weights and iteratively adjusts them to minimize lo
 %%{init: {'theme': 'dark', 'themeVariables': {'darkMode': true, 'background': '#0e1117', 'primaryColor': '#1a1d2e', 'primaryTextColor': '#e2e8f0', 'primaryBorderColor': '#2d3148', 'lineColor': '#8892b0', 'secondaryColor': '#252840', 'tertiaryColor': '#1a1d2e', 'fontSize': '14px', 'edgeLabelBackground': '#0e1117'}, 'flowchart': {'nodeSpacing': 30, 'rankSpacing': 40, 'padding': 15, 'htmlLabels': true}}}%%
 graph TD
     INIT["Initialize weights<br/>β₀=0, β₁=0, β₂=0"] --> PREDICT["Compute predictions<br/>z = β₀ + β₁x₁ + β₂x₂<br/>p = σ(z)"]
-    PREDICT --> LOSS["Compute loss<br/>L = negΣ y log(p) + (1−y) log(1−p)"]
+    PREDICT --> LOSS["Compute loss<br/>L = −Σ y log(p) + (1−y) log(1−p)"]
     LOSS --> GRAD["Compute gradients<br/>∂L/∂βⱼ = (1/n) Σ(pᵢ - yᵢ) × xᵢⱼ"]
     GRAD --> UPDATE["Update weights<br/>βⱼ = βⱼ - η × ∂L/∂βⱼ"]
     UPDATE --> CHECK{"Converged?<br/><i>Loss stopped<br/>decreasing</i>"}
@@ -171,7 +171,7 @@ The gradient passes through three stages via the chain rule. Each stage is simpl
 ```mermaid
 %%{init: {'theme': 'dark', 'themeVariables': {'darkMode': true, 'background': '#0e1117', 'primaryColor': '#1a1d2e', 'primaryTextColor': '#e2e8f0', 'primaryBorderColor': '#2d3148', 'lineColor': '#8892b0', 'secondaryColor': '#252840', 'tertiaryColor': '#1a1d2e', 'fontSize': '14px', 'edgeLabelBackground': '#0e1117'}, 'flowchart': {'nodeSpacing': 30, 'rankSpacing': 40, 'padding': 15, 'htmlLabels': true}}}%%
 graph LR
-    C1["Part 1: ∂Loss/∂p<br/>= negy/p + (1−y)/(1−p)"] --> C2["Part 2: ∂p/∂z<br/>= p(1-p)<br/><i>sigmoid derivative</i>"]
+    C1["Part 1: ∂Loss/∂p<br/>= −y/p + (1−y)/(1−p)"] --> C2["Part 2: ∂p/∂z<br/>= p(1-p)<br/><i>sigmoid derivative</i>"]
     C2 --> C3["Part 3: ∂z/∂β<br/>= xⱼ<br/><i>just the feature</i>"]
     C3 --> RESULT["Multiply all three:<br/>simplifies to<br/><b>(pᵢ - yᵢ) × xⱼ</b>"]
 

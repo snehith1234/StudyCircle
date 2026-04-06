@@ -87,7 +87,7 @@ graph TD
     subgraph COMPUTE["Initial: p₀ = 0.5 for all stores"]
         direction LR
         SUCCESS["Successful stores (y=1):<br/>g = 0.5 - 1 = <b>-0.5</b><br/>h = 0.5 × 0.5 = <b>0.25</b>"]
-        FAILURE["Failed stores (y=0):<br/>g = 0.5 minus 0 = <b>0.5</b><br/>h = 0.5 × 0.5 = <b>0.25</b>"]
+        FAILURE["Failed stores (y=0):<br/>g = 0.5 − 0 = <b>0.5</b><br/>h = 0.5 × 0.5 = <b>0.25</b>"]
     end
 
     SUCCESS --> MEANING1["Negative g → model underpredicts<br/>Need to push prediction UP"]
@@ -170,14 +170,14 @@ This diagram traces one full iteration: compute gradients → find best split �
 ```mermaid
 %%{init: {'theme': 'dark', 'themeVariables': {'darkMode': true, 'background': '#0e1117', 'primaryColor': '#1a1d2e', 'primaryTextColor': '#e2e8f0', 'primaryBorderColor': '#2d3148', 'lineColor': '#8892b0', 'secondaryColor': '#252840', 'tertiaryColor': '#1a1d2e', 'fontSize': '14px', 'edgeLabelBackground': '#0e1117'}, 'flowchart': {'nodeSpacing': 30, 'rankSpacing': 40, 'padding': 15, 'htmlLabels': true}}}%%
 graph TD
-    PRED0["Current predictions<br/>All stores: ŷ = 0, p = 0.5"] --> GRADS["Compute g and h<br/>Success: g=neg0.5, h=0.25<br/>Failure: g=0.5, h=0.25"]
+    PRED0["Current predictions<br/>All stores: ŷ = 0, p = 0.5"] --> GRADS["Compute g and h<br/>Success: g=−0.5, h=0.25<br/>Failure: g=0.5, h=0.25"]
     GRADS --> SPLIT["Find best split<br/>Rating ≤ 3.8<br/>Gain = 2.0"]
-    SPLIT --> LEAVES["Compute leaf weights<br/>Left: w = neg1.0<br/>Right: w = 1.0"]
+    SPLIT --> LEAVES["Compute leaf weights<br/>Left: w = −1.0<br/>Right: w = 1.0"]
     LEAVES --> UPDATE["Update: ŷ_new = ŷ_old + η × w<br/><i>η = 0.3</i>"]
 
     subgraph RESULT["Updated Predictions"]
         R1["Success stores: ŷ = 0 + 0.3×(1) = <b>0.3</b><br/>p = σ(0.3) = 0.574 (closer to 1 ✅)"]
-        R2["Failure stores: ŷ = 0 + 0.3×(neg1) = <b>neg0.3</b><br/>p = σ(-0.3) = 0.426 (closer to 0 ✅)"]
+        R2["Failure stores: ŷ = 0 + 0.3×(−1) = <b>−0.3</b><br/>p = σ(-0.3) = 0.426 (closer to 0 ✅)"]
     end
 
     UPDATE --> RESULT

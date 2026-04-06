@@ -142,7 +142,7 @@ graph TD
     W1 --> SIMILAR["Similar contexts → Similar vectors!<br/>'great' = 0.8, 0.2, 0.9<br/>'amazing' = 0.7, 0.3, 0.8<br/>distance = 0.17 (very close)"]
     W2 --> SIMILAR
 
-    SIMILAR --> VS["vs 'terrible' = opposite context<br/>'terrible' = neg0.7, 0.2, neg0.8<br/>distance from 'great' = 2.40 (far!)"]
+    SIMILAR --> VS["vs 'terrible' = opposite context<br/>'terrible' = −0.7, 0.2, −0.8<br/>distance from 'great' = 2.40 (far!)"]
 
     style CONTEXT fill:#252840,stroke:#f5b731,color:#c8cfe0
     style W1 fill:#1a1d2e,stroke:#5eaeff,color:#e2e8f0
@@ -192,7 +192,7 @@ graph TD
 
     FORMULA --> SCORE1["Score near 1.0<br/>Same direction = same topic<br/><i>'great pizza' vs 'amazing pizza'</i>"]
     FORMULA --> SCORE0["Score near 0.0<br/>Perpendicular = unrelated<br/><i>'great pizza' vs 'stock market'</i>"]
-    FORMULA --> SCOREN["Score near neg1.0<br/>Opposite direction = opposite meaning<br/><i>'great pizza' vs 'terrible pizza'</i>"]
+    FORMULA --> SCOREN["Score near −1.0<br/>Opposite direction = opposite meaning<br/><i>'great pizza' vs 'terrible pizza'</i>"]
 
     SCORE1 --> RAG["Used in RAG: find most similar<br/>documents to a query<br/>= semantic search"]
 
@@ -216,7 +216,7 @@ graph TD
     Q1 -->|Next Q| Q2{"TF-IDF vs BoW?"}
     Q2 -->|Answer| A2["TF-IDF downweights common words<br/>IDF = log(N / docs with word)<br/>Rare distinctive words get high scores"]
     Q2 -->|Next Q| Q3{"Explain Word2Vec?"}
-    Q3 -->|Answer| A3["Learns vectors from context prediction<br/>Similar contexts = similar vectors<br/>king minus man + woman = queen"]
+    Q3 -->|Answer| A3["Learns vectors from context prediction<br/>Similar contexts = similar vectors<br/>king − man + woman = queen"]
     Q3 -->|Next Q| Q4{"Why cosine similarity<br/>for text?"}
     Q4 -->|Answer| A4["Measures angle not magnitude<br/>Long and short docs about same topic<br/>score high despite different lengths"]
 

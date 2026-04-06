@@ -91,7 +91,7 @@ graph TD
     FWD["⬇️ FORWARD PASS<br/>Input → Hidden → Output → Loss<br/><i>Compute prediction and error</i>"]
     FWD --> LOSS["Loss = 0.613<br/><i>How wrong is the prediction?</i>"]
     LOSS --> BWD["⬆️ BACKWARD PASS (Backprop)<br/>Loss → Output → Hidden → Input<br/><i>Compute gradients for each weight</i>"]
-    BWD --> UPD["Update all weights<br/>w = w minus η × gradient<br/><i>Nudge weights to reduce error</i>"]
+    BWD --> UPD["Update all weights<br/>w = w − η × gradient<br/><i>Nudge weights to reduce error</i>"]
     UPD --> REPEAT["Repeat 1000s of times<br/>until loss is small"]
 
     style FWD fill:#1a2a1f,stroke:#22d3a7,color:#c8d8c0
@@ -134,7 +134,7 @@ Basic gradient descent uses the same learning rate for every parameter. Adam ada
 ```mermaid
 %%{init: {'theme': 'dark', 'themeVariables': {'darkMode': true, 'background': '#0e1117', 'primaryColor': '#1a1d2e', 'primaryTextColor': '#e2e8f0', 'primaryBorderColor': '#2d3148', 'lineColor': '#8892b0', 'secondaryColor': '#252840', 'tertiaryColor': '#1a1d2e', 'fontSize': '14px', 'edgeLabelBackground': '#0e1117'}, 'flowchart': {'nodeSpacing': 30, 'rankSpacing': 40, 'padding': 15, 'htmlLabels': true}}}%%
 graph TD
-    SGD["SGD<br/>w = w minus η × gradient<br/>Same rate for all params<br/><i>Simple but slow</i>"]
+    SGD["SGD<br/>w = w − η × gradient<br/>Same rate for all params<br/><i>Simple but slow</i>"]
     SGD -->|"Add momentum"| SGDM["SGD with Momentum<br/>Remembers past gradients<br/>Pushes through flat regions<br/><i>Better but still one rate</i>"]
     SGDM -->|"Add per-param scaling"| ADAM["Adam (default choice)<br/>Adapts rate per parameter<br/>momentum + scaling<br/><i>Just use η=0.001</i>"]
 

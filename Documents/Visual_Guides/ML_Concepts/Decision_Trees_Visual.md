@@ -106,7 +106,7 @@ Before any split, our data is 4 success + 4 failure = 50/50. This is maximum imp
 %%{init: {'theme': 'dark', 'themeVariables': {'darkMode': true, 'background': '#0e1117', 'primaryColor': '#1a1d2e', 'primaryTextColor': '#e2e8f0', 'primaryBorderColor': '#2d3148', 'lineColor': '#8892b0', 'secondaryColor': '#252840', 'tertiaryColor': '#1a1d2e', 'fontSize': '14px', 'edgeLabelBackground': '#0e1117'}, 'flowchart': {'nodeSpacing': 30, 'rankSpacing': 40, 'padding': 15, 'htmlLabels': true}}}%%
 graph LR
     DATA["8 stores<br/>4 success, 4 failure"] --> PROPS["p(1) = 0.5<br/>p(0) = 0.5"]
-    PROPS --> GINI["Gini = 1 minus (0.5² + 0.5²)<br/>= 1 - 0.5<br/>= <b>0.5</b> (max!)"]
+    PROPS --> GINI["Gini = 1 − (0.5² + 0.5²)<br/>= 1 - 0.5<br/>= <b>0.5</b> (max!)"]
     PROPS --> ENTROPY["Entropy = −(0.5×log₂0.5 + 0.5×log₂0.5)<br/>= −(0.5×(−1) + 0.5×(−1))<br/>= <b>1.0</b> (max!)"]
 
     style DATA fill:#252840,stroke:#f5b731,color:#c8cfe0
