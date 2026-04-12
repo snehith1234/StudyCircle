@@ -65,6 +65,11 @@ PHASE_NOTEBOOKS = {
         "desc": "Supervised learning, decision trees, random forests, XGBoost, and clustering.",
         "topics": ["Supervised Learning", "Decision Trees", "Random Forest", "XGBoost", "K-Means"],
     },
+    "Phase3_Linear_Regression_Pizza": {
+        "title": "📈 Linear Regression Deep Dive",
+        "desc": "Complete linear regression — by hand, normal equation, gradient descent, regularization.",
+        "topics": ["Simple Regression", "Multiple Regression", "Normal Equation", "Gradient Descent", "Ridge", "Lasso", "R²"],
+    },
 }
 
 # Module notebooks
