@@ -77,7 +77,23 @@ e⁻ᶻ / (1 + e⁻ᶻ) = (1 + e⁻ᶻ − 1) / (1 + e⁻ᶻ)    ← add and sub
 
 **What does this result actually tell us?**
 
-Look at the formula: the gradient is the sigmoid output multiplied by (1 minus the sigmoid output). Both σ(z) and (1 − σ(z)) are always between 0 and 1. When you multiply two numbers that are each between 0 and 1, the result is always SMALLER than either of them. The product is maximized when both factors are equal — that happens when σ(z) = 0.5, giving 0.5 × 0.5 = 0.25.
+Look at the formula: the gradient is σ(z) × (1 − σ(z)). These two factors are **not independent** — they must always add up to 1. If σ(z) = 0.6, then (1 − σ(z)) must be 0.4. You can't have 0.5 × 0.6 because that would require σ(z) = 0.5 AND (1 − σ(z)) = 0.6, but 0.5 + 0.6 = 1.1 ≠ 1.
+
+Since both factors are between 0 and 1 AND they must sum to 1, the product is maximized when they're equal — both 0.5:
+
+```
+σ(z)    1 − σ(z)    Sum    Product σ'(z)
+0.1     0.9         1.0    0.09
+0.2     0.8         1.0    0.16
+0.3     0.7         1.0    0.21
+0.4     0.6         1.0    0.24
+0.5     0.5         1.0    0.25  ← maximum!
+0.6     0.4         1.0    0.24
+0.7     0.3         1.0    0.21
+0.9     0.1         1.0    0.09
+
+(Math fact: for any a + b = 1, the product a × b is maximized when a = b = 0.5)
+```
 
 This means the gradient can NEVER be larger than 0.25. And it gets much worse: when the sigmoid output is near 0 or near 1 (which happens for large |z|), one of the factors approaches 0, making the entire gradient approach 0.
 
@@ -321,7 +337,7 @@ This is why ReLU enabled training of 50, 100, even 152-layer networks.
 ```
 If weights are large (e.g., Wᵢ = 2 for all layers):
 
-Gradient factor per layer: σ'(z) × W ≈ 0.25 × 2 = 0.5 (still vanishes)
+Gradient factor per layer: σ'(z) × W ≈ 0.25 × 2 = 0.5 (still vanishes with sigmoid)
 
 But with ReLU and large weights:
   ReLU'(z) × W = 1 × 2 = 2 per layer
@@ -329,6 +345,82 @@ But with ReLU and large weights:
 
 The gradient EXPLODES — weights get enormous updates, training diverges.
 Loss becomes NaN. This is the EXPLODING GRADIENT problem.
+```
+
+**Wait — if sigmoid max derivative is 0.25, how can gradients explode with sigmoid?**
+
+They usually can't! With sigmoid, the factor per layer is at most 0.25 × w. For this to exceed 1, you'd need w > 4, which is unusual. Exploding gradients with sigmoid are rare.
+
+**Where exploding gradients actually happen in practice:**
+
+**Case 1: RNNs (Recurrent Neural Networks)** — the same weight matrix W is multiplied at every time step. Even a small factor > 1 compounds over hundreds of steps:
+
+```
+RNN processing a sentence of 100 words:
+  Same weight W applied 100 times.
+  If the effective factor per step = 1.1:
+    1.1^100 = 13,781
+
+  If factor = 1.5:
+    1.5^100 = 406,561,177,535  ← gradient is 400 billion!
+
+  Even factor = 1.01:
+    1.01^100 = 2.7  ← still grows, just slower
+```
+
+**Case 2: Deep networks with ReLU + bad initialization** — ReLU derivative is 1 (not 0.25), so the factor per layer is just the weight value:
+
+```
+10-layer network, weights initialized too large (avg = 1.5):
+
+  Layer 10 (output): gradient = 1.0
+  Layer 9:  1.0 × 1 × 1.5 = 1.5
+  Layer 8:  1.5 × 1 × 1.5 = 2.25
+  Layer 7:  2.25 × 1 × 1.5 = 3.375
+  Layer 6:  3.375 × 1 × 1.5 = 5.06
+  Layer 5:  5.06 × 1 × 1.5 = 7.59
+  ...
+  Layer 1:  1.5^9 = 38.4
+
+With 50 layers: 1.5^49 = 637,621,500
+  The first layer's gradient is 600 MILLION times larger than the output's.
+```
+
+**What actually happens when gradients explode — a concrete disaster:**
+
+```
+Normal training (gradient = 0.003):
+  w_old = 0.50
+  w_new = 0.50 - 0.01 × 0.003 = 0.49997
+  → Tiny nudge. Weight barely changed. Good.
+
+Exploding gradient (gradient = 637,621,500):
+  w_old = 0.50
+  w_new = 0.50 - 0.01 × 637,621,500 = -6,376,214.5
+  → Weight jumped from 0.5 to NEGATIVE 6 MILLION in one step!
+
+Next forward pass with w = -6,376,214.5:
+  z = -6,376,214.5 × input = astronomically large negative number
+  sigmoid(z) = 0.0000...0 (completely saturated)
+  loss = infinity or NaN
+  Training has crashed. Game over.
+```
+
+**The fix — gradient clipping:**
+
+```
+Before updating weights, check the gradient magnitude:
+
+  if |gradient| > threshold:
+      gradient = threshold × sign(gradient)
+
+Example with threshold = 5.0:
+  Original gradient: 637,621,500
+  After clipping:    5.0
+  w_new = 0.50 - 0.01 × 5.0 = 0.45  ← reasonable update!
+
+PyTorch: torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=5.0)
+TensorFlow: tf.clip_by_global_norm(gradients, clip_norm=5.0)
 ```
 
 ### Solutions to Vanishing/Exploding Gradients
